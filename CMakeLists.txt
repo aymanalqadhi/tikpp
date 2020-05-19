@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(tikpp LANG CXX)
+project(tikpp CXX)
 
 # Project options
 set(CMAKE_CXX_STANDARD 17)
@@ -14,5 +14,9 @@ endif()
 
 set(LIBRARY_OUTPUT_PATH lib)
 
+# Project files
+set(SOURCE_FILES src/api.cpp)
+
 # Targets
-add_library(${PROJECT_NAME})
+add_library(${PROJECT_NAME} INTERFACE)
+target_include_directories(${PROJECT_NAME} INTERFACE include/)
