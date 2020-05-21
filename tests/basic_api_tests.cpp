@@ -1,5 +1,5 @@
 #include "mocks/socket.hpp"
-#include "tikpp/api.hpp"
+#include "tikpp/basic_api.hpp"
 
 #include "gtest/gtest.h"
 #include <boost/asio/error.hpp>
@@ -13,7 +13,7 @@
 
 namespace {
 
-constexpr auto invalid_ip_address = "Invalid address#@!#";
+constexpr auto invalid_ip_address = "Invalid address";
 constexpr auto valid_ip_address   = "127.0.0.1";
 constexpr auto api_port           = 8728;
 
