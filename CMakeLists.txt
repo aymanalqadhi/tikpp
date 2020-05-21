@@ -19,7 +19,7 @@ add_subdirectory(lib/fmt)
 add_subdirectory(lib/googletest)
 
 # Project files
-set(SOURCE_FILES src/request.cpp)
+set(SOURCE_FILES src/request.cpp src/response.cpp)
 include_directories(include/)
 
 # Targets
