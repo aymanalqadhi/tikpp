@@ -36,10 +36,6 @@ class basic_api : public std::enable_shared_from_this<basic_api<TSocket>> {
         std::function<void(const boost::system::error_code &)>;
 
   public:
-    explicit basic_api(boost::asio::io_context &io, api_version version)
-        : io_ {io}, sock_ {io}, version_ {version}, state_ {api_state::closed} {
-    }
-
     void async_open(const std::string &host,
                     std::uint16_t      port,
                     connect_handler && cb) {
@@ -100,7 +96,17 @@ class basic_api : public std::enable_shared_from_this<basic_api<TSocket>> {
         return state() != api_state::closed && sock_.is_open();
     }
 
+    static inline auto create(boost::asio::io_context &io, api_version ver)
+        -> std::shared_ptr<basic_api<TSocket>> {
+        return std::shared_ptr<basic_api<TSocket>>(
+            new basic_api<TSocket> {io, ver});
+    }
+
   protected:
+    explicit basic_api(boost::asio::io_context &io, api_version version)
+        : io_ {io}, sock_ {io}, version_ {version}, state_ {api_state::closed} {
+    }
+
     void start() {
         assert(state() == api_state::connected);
     }
