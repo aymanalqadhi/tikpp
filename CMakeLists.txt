@@ -20,3 +20,8 @@ set(SOURCE_FILES src/api.cpp)
 # Targets
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE include/)
+
+# Testing
+enable_testing()
+add_subdirectory(lib/googletest)
+add_subdirectory(tests)
