@@ -30,7 +30,7 @@ enum class api_state {
 template <typename TSocket,
           typename =
               std::enable_if_t<tikpp::detail::is_valid_socket<TSocket>::value>>
-class basic_api : std::enable_shared_from_this<basic_api<TSocket>> {
+class basic_api : public std::enable_shared_from_this<basic_api<TSocket>> {
 
     using connect_handler =
         std::function<void(const boost::system::error_code &)>;
@@ -72,6 +72,8 @@ class basic_api : std::enable_shared_from_this<basic_api<TSocket>> {
                                 if (!err) {
                                     self->state(api_state::connected);
                                     self->start();
+                                } else {
+                                    self->state(api_state::closed);
                                 }
 
                                 cb(err);
@@ -92,6 +94,10 @@ class basic_api : std::enable_shared_from_this<basic_api<TSocket>> {
 
     [[nodiscard]] inline auto socket() noexcept -> TSocket & {
         return sock_;
+    }
+
+    [[nodiscard]] inline auto is_open() const noexcept -> bool {
+        return state() != api_state::closed && sock_.is_open();
     }
 
   protected:
