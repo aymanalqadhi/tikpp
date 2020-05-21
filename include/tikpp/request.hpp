@@ -8,6 +8,7 @@
 #include <string>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace tikpp {
 
@@ -78,6 +79,8 @@ struct request {
 
         return words_.at(key);
     }
+
+    void encode(std::vector<std::uint8_t> &buf) const;
 
   protected:
     std::string   command_;
