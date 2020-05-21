@@ -76,6 +76,12 @@ class basic_api : public std::enable_shared_from_this<basic_api<TSocket>> {
                             });
     }
 
+    inline void close() {
+        assert(is_open());
+        sock_.close();
+        state(api_state::closed);
+    }
+
     [[nodiscard]] inline auto state() const noexcept -> api_state {
         return state_.load();
     }

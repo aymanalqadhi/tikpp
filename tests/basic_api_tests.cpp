@@ -44,6 +44,7 @@ TEST_F(ApiTest, AsyncConnectTest) {
     fut.wait();
     EXPECT_FALSE(api->socket().is_open());
     EXPECT_FALSE(api->is_open());
+    EXPECT_EQ(api->state(), tikpp::api_state::closed);
 
     prom = std::promise<void> {};
     fut  = prom.get_future();
@@ -57,6 +58,7 @@ TEST_F(ApiTest, AsyncConnectTest) {
     fut.wait();
     EXPECT_FALSE(api->socket().is_open());
     EXPECT_FALSE(api->is_open());
+    EXPECT_EQ(api->state(), tikpp::api_state::closed);
 
     prom = std::promise<void> {};
     fut  = prom.get_future();
@@ -70,6 +72,12 @@ TEST_F(ApiTest, AsyncConnectTest) {
     fut.wait();
     EXPECT_TRUE(api->socket().is_open());
     EXPECT_TRUE(api->is_open());
+    EXPECT_NE(api->state(), tikpp::api_state::closed);
     EXPECT_EQ(::valid_ip_address,
               api->socket().remote_endpoint().address().to_string());
+
+    api->close();
+    EXPECT_FALSE(api->socket().is_open());
+    EXPECT_FALSE(api->is_open());
+    EXPECT_EQ(api->state(), tikpp::api_state::closed);
 }
