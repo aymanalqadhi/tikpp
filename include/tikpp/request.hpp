@@ -3,6 +3,8 @@
 
 #include "fmt/format.h"
 
+#include <boost/lexical_cast.hpp>
+
 #include <cassert>
 #include <cstdint>
 #include <string>
@@ -78,6 +80,12 @@ struct request {
         assert(contains(key));
 
         return words_.at(key);
+    }
+
+    template <typename T>
+    [[nodiscard]] inline auto get(const std::string &key) const noexcept -> T {
+        assert(contains(key));
+        return boost::lexical_cast<T>(words_.at(key));
     }
 
     void encode(std::vector<std::uint8_t> &buf) const;

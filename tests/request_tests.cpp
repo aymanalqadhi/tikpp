@@ -46,14 +46,16 @@ TEST_F(RequestTest, AddParamTest) {
     request.add_param("key1", 123);
     request.add_param("key2", "string"s);
     request.add_param("key3", 123.123);
-    request.add_param("key4", true);
 
-    EXPECT_EQ(4, request.size());
+    EXPECT_EQ(3, request.size());
 
     EXPECT_EQ(request["=key1"], "123");
     EXPECT_EQ(request["=key2"], "string");
     EXPECT_EQ(request["=key3"], "123.123");
-    EXPECT_EQ(request["=key4"], "true");
+
+    EXPECT_EQ(request.get<int>("=key1"), 123);
+    EXPECT_EQ(request.get<std::string>("=key2"), "string");
+    EXPECT_EQ(request.get<double>("=key3"), 123.123);
 }
 
 TEST_F(RequestTest, AddAttributeTest) {
@@ -62,14 +64,16 @@ TEST_F(RequestTest, AddAttributeTest) {
     request.add_attribute("key1", 123);
     request.add_attribute("key2", "string"s);
     request.add_attribute("key3", 123.123);
-    request.add_attribute("key4", true);
 
-    EXPECT_EQ(4, request.size());
+    EXPECT_EQ(3, request.size());
 
     EXPECT_EQ(request[".key1"], "123");
     EXPECT_EQ(request[".key2"], "string");
     EXPECT_EQ(request[".key3"], "123.123");
-    EXPECT_EQ(request[".key4"], "true");
+
+    EXPECT_EQ(request.get<int>(".key1"), 123);
+    EXPECT_EQ(request.get<std::string>(".key2"), "string");
+    EXPECT_EQ(request.get<double>(".key3"), 123.123);
 }
 
 TEST_F(RequestTest, EncodeTest) {
