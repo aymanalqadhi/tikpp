@@ -2,7 +2,9 @@
 
 #include "gtest/gtest.h"
 
+#include <cstdint>
 #include <string>
+#include <vector>
 
 using namespace std::string_literals;
 
@@ -68,4 +70,32 @@ TEST_F(RequestTest, AddAttributeTest) {
     EXPECT_EQ(request[".key2"], "string");
     EXPECT_EQ(request[".key3"], "123.123");
     EXPECT_EQ(request[".key4"], "true");
+}
+
+TEST_F(RequestTest, EncodeTest) {
+    EXPECT_EQ(0, request.size());
+
+    request.add_param("param", "value1");
+    request.add_attribute("attr", "value2");
+
+    EXPECT_EQ(2, request.size());
+
+    EXPECT_EQ(request["=param"], "value1");
+    EXPECT_EQ(request[".attr"], "value2");
+
+    std::vector<std::uint8_t> buf {};
+    std::vector<std::uint8_t> expected_buf {
+        0x12, 0x2f, 0x74, 0x65, 0x73, 0x74, 0x2f, 0x63, 0x6f, 0x6d, 0x6d, 0x61,
+        0x6e, 0x64, 0x2f, 0x70, 0x61, 0x74, 0x68, 0x09, 0x2e, 0x74, 0x61, 0x67,
+        0x3d, 0x31, 0x32, 0x33, 0x34, 0x0c, 0x2e, 0x61, 0x74, 0x74, 0x72, 0x3d,
+        0x76, 0x61, 0x6c, 0x75, 0x65, 0x32, 0x0d, 0x3d, 0x70, 0x61, 0x72, 0x61,
+        0x6d, 0x3d, 0x76, 0x61, 0x6c, 0x75, 0x65, 0x31, 0x00};
+
+    request.encode(buf);
+
+    ASSERT_EQ(buf.size(), expected_buf.size());
+
+    for (std::size_t i {0}; i < buf.size(); ++i) {
+        EXPECT_EQ(buf[i], expected_buf[i]);
+    }
 }
