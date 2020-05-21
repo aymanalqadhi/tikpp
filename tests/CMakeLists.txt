@@ -15,3 +15,4 @@ endfunction()
 
 # Project targets
 create_test(basic_api)
+create_test(request)
