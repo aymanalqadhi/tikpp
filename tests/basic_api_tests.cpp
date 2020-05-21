@@ -9,33 +9,43 @@
 #include <iostream>
 #include <random>
 
+#define USE_MOCK_SOCKET
+
 namespace {
 
-constexpr auto invalid_ip_address = "Invalid address";
-constexpr auto valid_ip_address   = "1.2.3.4";
+constexpr auto invalid_ip_address = "Invalid address#@!#";
+constexpr auto valid_ip_address   = "127.0.0.1";
+constexpr auto api_port           = 8728;
 
 } // namespace
 
 struct ApiTest : ::testing::Test {
     void SetUp() override {
+#if defined(USE_MOCK_SOCKET)
         api = tikpp::basic_api<tikpp::tests::mocks::socket>::create(
             io, tikpp::api_version::v1);
+#else
+        api = tikpp::api::create(io, tikpp::api_version::v1);
+#endif
     }
 
     void TearDown() override {
     }
 
-    boost::asio::io_context                                        io;
+    boost::asio::io_context io;
+
+#if defined(USE_MOCK_SOCKET)
     std::shared_ptr<tikpp::basic_api<tikpp::tests::mocks::socket>> api;
-    std::random_device                                             random {};
+#else
+    std::shared_ptr<tikpp::api> api;
+#endif
 };
 
 TEST_F(ApiTest, AsyncConnectTest) {
-    std::uniform_int_distribution<std::uint16_t> dist {};
     std::promise<void>                           prom {};
     std::future<void>                            fut {prom.get_future()};
 
-    api->async_open(::invalid_ip_address, dist(random),
+    api->async_open(::invalid_ip_address, ::api_port,
                     [&prom](const auto &err) {
                         EXPECT_TRUE(err);
                         EXPECT_EQ(err, boost::asio::error::invalid_argument);
@@ -46,11 +56,12 @@ TEST_F(ApiTest, AsyncConnectTest) {
     EXPECT_FALSE(api->is_open());
     EXPECT_EQ(api->state(), tikpp::api_state::closed);
 
+#if defined(USE_MOCK_SOCKET)
     prom = std::promise<void> {};
     fut  = prom.get_future();
     api->socket().always_fail(true);
 
-    api->async_open(::valid_ip_address, dist(random), [&prom](const auto &err) {
+    api->async_open(::valid_ip_address, ::api_port, [&prom](const auto &err) {
         EXPECT_TRUE(err);
         EXPECT_EQ(err, boost::asio::error::fault);
         prom.set_value();
@@ -60,11 +71,13 @@ TEST_F(ApiTest, AsyncConnectTest) {
     EXPECT_FALSE(api->is_open());
     EXPECT_EQ(api->state(), tikpp::api_state::closed);
 
+    api->socket().always_fail(false);
+#endif
+
     prom = std::promise<void> {};
     fut  = prom.get_future();
-    api->socket().always_fail(false);
 
-    api->async_open(::valid_ip_address, dist(random), [&prom](const auto &err) {
+    api->async_open(::valid_ip_address, ::api_port, [&prom](const auto &err) {
         EXPECT_FALSE(err);
         EXPECT_EQ(err.value(), 0);
         prom.set_value();
