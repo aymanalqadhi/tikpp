@@ -21,7 +21,10 @@ set(SOURCE_FILES src/api.cpp)
 add_library(${PROJECT_NAME} INTERFACE)
 target_include_directories(${PROJECT_NAME} INTERFACE include/)
 
+# Thiry-party libraries
+add_subdirectory(lib/fmt)
+add_subdirectory(lib/googletest)
+
 # Testing
 enable_testing()
-add_subdirectory(lib/googletest)
 add_subdirectory(tests)
