@@ -85,14 +85,6 @@ struct is_valid_socket<
         has_async_read_some_method<T>::value &&
         has_async_write_some_method<T>::value>> : std::true_type {};
 
-static_assert(accepts_io_context<boost::asio::ip::tcp::socket>::value);
-static_assert(has_async_connect_method<boost::asio::ip::tcp::socket>::value);
-static_assert(has_close_method<boost::asio::ip::tcp::socket>::value);
-static_assert(has_async_read_some_method<boost::asio::ip::tcp::socket>::value);
-static_assert(has_async_write_some_method<boost::asio::ip::tcp::socket>::value);
-static_assert(has_is_open_method<boost::asio::ip::tcp::socket>::value);
-static_assert(is_valid_socket<boost::asio::ip::tcp::socket>::value);
-
 } // namespace tikpp::detail
 
 #endif
