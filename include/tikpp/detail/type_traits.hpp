@@ -33,7 +33,7 @@ template <typename T>
 struct has_async_connect_method<
     T,
     std::void_t<decltype(std::declval<T>().async_connect(
-        std::declval<boost::asio::ip::tcp::endpoint>(),
+        std::declval<const boost::asio::ip::tcp::endpoint &>(),
         std::declval<connect_handler>()))>> : std::true_type {};
 
 template <typename T, typename = void>
@@ -41,6 +41,16 @@ struct has_close_method : std::false_type {};
 
 template <typename T>
 struct has_close_method<T, std::void_t<decltype(std::declval<T>().close())>>
+    : std::true_type {};
+
+template <typename T, typename = void>
+struct has_is_open_method : std::false_type {};
+
+template <typename T>
+struct has_is_open_method<
+    T,
+    std::enable_if_t<
+        std::is_same_v<bool, decltype(std::declval<T>().is_open())>>>
     : std::true_type {};
 
 template <typename T, typename = void>
@@ -71,7 +81,8 @@ struct is_valid_socket<
     T,
     std::enable_if_t<
         accepts_io_context<T>::value && has_async_connect_method<T>::value &&
-        has_close_method<T>::value && has_async_read_some_method<T>::value &&
+        has_close_method<T>::value && has_is_open_method<T>::value &&
+        has_async_read_some_method<T>::value &&
         has_async_write_some_method<T>::value>> : std::true_type {};
 
 static_assert(accepts_io_context<boost::asio::ip::tcp::socket>::value);
@@ -79,6 +90,7 @@ static_assert(has_async_connect_method<boost::asio::ip::tcp::socket>::value);
 static_assert(has_close_method<boost::asio::ip::tcp::socket>::value);
 static_assert(has_async_read_some_method<boost::asio::ip::tcp::socket>::value);
 static_assert(has_async_write_some_method<boost::asio::ip::tcp::socket>::value);
+static_assert(has_is_open_method<boost::asio::ip::tcp::socket>::value);
 static_assert(is_valid_socket<boost::asio::ip::tcp::socket>::value);
 
 } // namespace tikpp::detail
