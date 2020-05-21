@@ -14,16 +14,18 @@ endif()
 
 set(LIBRARY_OUTPUT_PATH lib)
 
-# Project files
-set(SOURCE_FILES src/api.cpp)
-
-# Targets
-add_library(${PROJECT_NAME} INTERFACE)
-target_include_directories(${PROJECT_NAME} INTERFACE include/)
-
 # Thiry-party libraries
 add_subdirectory(lib/fmt)
 add_subdirectory(lib/googletest)
+
+# Project files
+set(SOURCE_FILES src/request.cpp)
+include_directories(include/)
+
+# Targets
+add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
+target_link_libraries(${PROJECT_NAME} fmt::fmt)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Testing
 enable_testing()
