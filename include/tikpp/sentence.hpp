@@ -31,6 +31,10 @@ struct sentence {
         return words_.size();
     }
 
+    [[nodiscard]] inline auto empty() const noexcept -> bool {
+        return words_.empty();
+    }
+
     [[nodiscard]] inline auto operator[](const std::string &key) const noexcept
         -> const std::string & {
         assert(contains(key));
