@@ -6,7 +6,6 @@
 #include <cstdint>
 #include <optional>
 #include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace tikpp {
@@ -14,6 +13,8 @@ namespace tikpp {
 enum class response_type { normal, data, trap, fatal, unknown };
 
 struct response : sentence {
+    response() = default;
+
     response(const std::vector<std::string> &words);
 
     [[nodiscard]] inline auto type() const noexcept -> response_type {
@@ -31,7 +32,7 @@ struct response : sentence {
     }
 
   protected:
-    response_type                type_;
+    response_type                type_ {};
     std::optional<std::uint32_t> tag_;
 };
 
