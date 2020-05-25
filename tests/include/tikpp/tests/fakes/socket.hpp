@@ -1,8 +1,6 @@
 #ifndef TIKPP_TESTS_FAKES_SOCKET_HPP
 #define TIKPP_TESTS_FAKES_SOCKET_HPP
 
-#include "tikpp/detail/type_traits.hpp"
-
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/system_error.hpp>
@@ -24,19 +22,20 @@ struct socket final {
         return io_.get_executor();
     }
 
+    template <typename Handler>
     inline void async_connect(const boost::asio::ip::tcp::endpoint &ep,
-                              tikpp::detail::connect_handler &&     cb) {
+                              Handler &&                            handler) {
         assert(!connected_);
 
         if (fails_) {
-            cb(boost::asio::error::fault);
+            handler(boost::asio::error::fault);
             return;
         }
 
         connected_ = true;
         ep_        = ep;
 
-        cb({});
+        handler(boost::system::error_code {});
     }
 
     inline void close() {
@@ -49,12 +48,13 @@ struct socket final {
         connected_ = false;
     }
 
-    inline void async_read_some(boost::asio::mutable_buffer   buf,
-                                tikpp::detail::read_handler &&cb) {
+    template <typename Handler>
+    inline void async_read_some(boost::asio::mutable_buffer buf,
+                                Handler &&                  handler) {
         assert(connected_);
 
         if (fails_) {
-            cb(boost::asio::error::fault, 0);
+            handler(boost::asio::error::fault, 0);
             return;
         }
 
@@ -62,23 +62,24 @@ struct socket final {
             ibuf_.readsome(static_cast<char *>(buf.data()), buf.size());
 
         if (nread < 0) {
-            cb(boost::asio::error::eof, 0);
+            handler(boost::asio::error::eof, 0);
         } else {
-            cb({}, nread);
+            handler(boost::system::error_code {}, nread);
         }
     }
 
-    inline void async_write_some(boost::asio::const_buffer      buf,
-                                 tikpp::detail::write_handler &&cb) {
+    template <typename Handler>
+    inline void async_write_some(boost::asio::const_buffer buf,
+                                 Handler &&                handler) {
         assert(connected_);
 
         if (fails_) {
-            cb(boost::asio::error::fault, 0);
+            handler(boost::asio::error::fault, 0);
             return;
         }
 
         obuf_.write(static_cast<const char *>(buf.data()), buf.size());
-        cb({}, buf.size());
+        handler(boost::system::error_code {}, buf.size());
     }
 
     [[nodiscard]] inline auto is_open() const noexcept -> bool {
@@ -108,8 +109,6 @@ struct socket final {
     std::stringstream              ibuf_, obuf_;
     boost::asio::ip::tcp::endpoint ep_;
 };
-
-static_assert(tikpp::detail::is_valid_socket<socket>::value);
 
 } // namespace tikpp::tests::fakes
 

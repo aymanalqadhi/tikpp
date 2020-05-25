@@ -1,14 +1,13 @@
 #ifndef TIKPP_BASIC_API_HPP
 #define TIKPP_BASIC_API_HPP
 
+#include "tikpp/detail/operations/async_read_response.hpp"
 #include "tikpp/error_code.hpp"
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
 
-#include "tikpp/detail/operations/async_read_response.hpp"
-#include "tikpp/detail/type_traits.hpp"
-
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/address.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/system/error_code.hpp>
