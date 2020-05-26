@@ -1,7 +1,9 @@
 #ifndef TIKPP_BASIC_API_HPP
 #define TIKPP_BASIC_API_HPP
 
+#include "tikpp/detail/operations/async_connect.hpp"
 #include "tikpp/detail/operations/async_read_response.hpp"
+
 #include "tikpp/error_code.hpp"
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
@@ -47,29 +49,23 @@ class basic_api : public std::enable_shared_from_this<
         }
 
         assert(state() == api_state::closed);
-
-        boost::system::error_code ec {};
-        auto address = boost::asio::ip::address::from_string(host, ec);
-
-        if (ec) {
-            return handler(ec);
-        }
-
         state(api_state::connecting);
-        sock_.async_connect({address, port},
-                            [self = this->shared_from_this(),
-                             handler {std::move(handler)}](const auto &err) {
-                                assert(self->state() == api_state::connecting);
 
-                                if (!err) {
-                                    self->state(api_state::connected);
-                                    self->start();
-                                } else {
-                                    self->state(api_state::closed);
-                                }
+        tikpp::detail::operations::async_connect(
+            sock_, host, port,
+            [self = this->shared_from_this(),
+             handler {std::move(handler)}](const auto &err) {
+                assert(self->state() == api_state::connecting);
 
-                                handler(err);
-                            });
+                if (err) {
+                    self->state(api_state::closed);
+                } else {
+                    self->state(api_state::connected);
+                    self->start();
+                }
+
+                handler(err);
+            });
     }
 
     inline void close() {
