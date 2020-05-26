@@ -6,9 +6,9 @@
 #include "tikpp/error_code.hpp"
 #include "tikpp/response.hpp"
 
+#include <boost/asio/async_result.hpp>
 #include <boost/system/error_code.hpp>
 
-#include <functional>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -65,11 +65,22 @@ struct async_read_response_op final {
     std::vector<std::string> words_;
 };
 
-template <typename AsyncReadStream, typename Handler>
-void async_read_response(AsyncReadStream &sock, Handler &&handler) {
-    async_read_response_op<AsyncReadStream, Handler> {
-        sock, std::forward<Handler>(handler)}
+template <typename AsyncReadStream, typename Token>
+decltype(auto) async_read_response(AsyncReadStream &sock, Token &&token) {
+    using signature_type =
+        void(const boost::system::error_code &, tikpp::response &&);
+    using result_type =
+        boost::asio::async_result<std::decay_t<Token>, signature_type>;
+    using handler_type = typename result_type::completion_handler_type;
+
+    handler_type handler {std::forward<Token>(token)};
+    result_type  result {handler};
+
+    async_read_response_op<AsyncReadStream, handler_type> {sock,
+                                                           std::move(handler)}
         .initiate();
+
+    return result.get();
 }
 
 } // namespace tikpp::detail::operations

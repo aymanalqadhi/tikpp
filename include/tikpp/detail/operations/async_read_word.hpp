@@ -3,12 +3,14 @@
 
 #include "tikpp/detail/operations/async_read_word_length.hpp"
 
+#include <boost/asio/async_result.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <cstdint>
 #include <string>
+#include <type_traits>
 
 namespace tikpp::detail::operations {
 
@@ -48,11 +50,21 @@ struct async_read_word_op final {
     Handler          handler_;
 }; // namespace tikpp::detail::operations
 
-template <typename AsyncReadStream, typename Handler>
-void async_read_word(AsyncReadStream &sock, Handler &&handler) {
-    async_read_word_op<AsyncReadStream, Handler> {
-        sock, std::forward<Handler>(handler)}
+template <typename AsyncReadStream, typename Token>
+decltype(auto) async_read_word(AsyncReadStream &sock, Token &&token) {
+    using signature_type =
+        void(const boost::system::error_code &, std::string &&);
+    using result_type =
+        boost::asio::async_result<std::decay_t<Token>, signature_type>;
+    using handler_type = typename result_type::completion_handler_type;
+
+    handler_type handler {std::forward<Token>(token)};
+    result_type  result {handler};
+
+    async_read_word_op<AsyncReadStream, handler_type> {sock, std::move(handler)}
         .initiate();
+
+    return result.get();
 }
 
 } // namespace tikpp::detail::operations
