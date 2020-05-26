@@ -36,8 +36,6 @@ class basic_api : public std::enable_shared_from_this<
                       basic_api<AsyncStream, ErrorHandler>> {
     static constexpr auto api_version = version;
 
-    using login_handler =
-        std::function<void(const boost::system::error_code &)>;
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
 
@@ -105,20 +103,41 @@ class basic_api : public std::enable_shared_from_this<
                                                 aquire_unique_tag());
     }
 
-    void async_send(std::shared_ptr<request> req, read_handler &&cb) {
+    template <typename Token>
+    void async_send(std::shared_ptr<request> req, Token &&token) {
         assert(req != nullptr);
 
+        using signature_type =
+            void(const boost::system::error_code &, tikpp::response &&);
+        using result_type =
+            boost::asio::async_result<std::decay_t<Token>, signature_type>;
+        using handler_type = typename result_type::completion_handler_type;
+
+        handler_type handler {std::forward<Token>(token)};
+        result_type  result {handler};
+
         io_.post([self = this->shared_from_this(), req {std::move(req)},
-                  cb {std::move(cb)}]() mutable {
+                  handler {std::move(handler)}]() mutable {
             self->send_queue_.emplace_back(
-                std::make_pair(std::move(req), std::move(cb)));
+                std::make_pair(std::move(req), std::move(handler)));
             self->send_next();
         });
+
+        return result.get();
     }
 
+    template <typename Token>
     void async_login(const std::string &name,
                      const std::string &password,
-                     login_handler &&   handler) {
+                     Token &&           token) {
+        using signature_type = void(const boost::system::error_code &);
+        using result_type =
+            boost::asio::async_result<std::decay_t<Token>, signature_type>;
+        using handler_type = typename result_type::completion_handler_type;
+
+        handler_type handler {std::forward<Token>(token)};
+        result_type  result {handler};
+
         if constexpr (version == api_version::v1) {
             auto req1 = make_request<tikpp::commands::v1::login1>();
             async_send(std::move(req1), [this, &name, &password,
@@ -132,7 +151,8 @@ class basic_api : public std::enable_shared_from_this<
                            resp[tikpp::commands::v1::login2::challenge_param]
                                    .size() !=
                                tikpp::commands::v1::login2::challenge_size) {
-                    handler(tikpp::error_code::invalid_response);
+                    handler(tikpp::make_error_code(
+                        tikpp::error_code::invalid_response));
                 } else {
                     auto req2 = make_request<tikpp::commands::v1::login2>(
                         name, password,
@@ -146,11 +166,11 @@ class basic_api : public std::enable_shared_from_this<
                             handler(err);
                         } else if (resp.type() !=
                                    tikpp::response_type::normal) {
-                            handler(
-                                tikpp::error_code::invalid_login_credentials);
+                            handler(tikpp::make_error_code(
+                                tikpp::error_code::invalid_login_credentials));
                         } else {
                             logged_in_ = true;
-                            handler(tikpp::error_code::success);
+                            handler(boost::system::error_code {});
                         }
 
                         return false;
@@ -175,6 +195,8 @@ class basic_api : public std::enable_shared_from_this<
                 return false;
             });
         }
+
+        return result.get();
     }
 
     [[nodiscard]] inline auto socket() noexcept -> AsyncStream & {
@@ -264,7 +286,8 @@ class basic_api : public std::enable_shared_from_this<
 
     inline void on_response(tikpp::response &&resp) {
         if (read_cbs_.find(resp.tag().value()) == read_cbs_.end()) {
-            return on_error(tikpp::error_code::invalid_response_tag);
+            return on_error(tikpp::make_error_code(
+                tikpp::error_code::invalid_response_tag));
         }
 
         if (!read_cbs_[resp.tag().value()]({}, std::move(resp))) {
