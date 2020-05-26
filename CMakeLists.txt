@@ -20,13 +20,14 @@ add_subdirectory(lib/googletest)
 
 # Project files
 set(SOURCE_FILES src/error.cpp
+                 src/crypto.cpp
                  src/request.cpp
                  src/response.cpp)
 include_directories(include/)
 
 # Targets
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} fmt::fmt)
+target_link_libraries(${PROJECT_NAME} fmt::fmt cryptopp)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Testing
