@@ -9,6 +9,7 @@
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
 
+#include <boost/asio/async_result.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/write.hpp>
@@ -35,19 +36,26 @@ class basic_api : public std::enable_shared_from_this<
                       basic_api<AsyncStream, ErrorHandler>> {
     static constexpr auto api_version = version;
 
-    using connect_handler =
-        std::function<void(const boost::system::error_code &)>;
     using login_handler =
         std::function<void(const boost::system::error_code &)>;
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
 
   public:
-    void async_open(const std::string &host,
-                    std::uint16_t      port,
-                    connect_handler && handler) {
+    template <typename Token>
+    decltype(auto)
+    async_open(const std::string &host, std::uint16_t port, Token &&token) {
+        using signature_type = void(const boost::system::error_code &);
+        using result_type =
+            boost::asio::async_result<std::decay_t<Token>, signature_type>;
+        using handler_type = typename result_type::completion_handler_type;
+
+        handler_type handler {std::forward<Token>(token)};
+        result_type  result {handler};
+
         if (state_.load() == api_state::connecting) {
-            return handler(boost::asio::error::in_progress);
+            return handler(boost::asio::error::make_error_code(
+                boost::asio::error::in_progress));
         }
 
         assert(state_.load() == api_state::closed);
@@ -56,12 +64,14 @@ class basic_api : public std::enable_shared_from_this<
         tikpp::detail::operations::async_connect(
             sock_, host, port,
             [self = this->shared_from_this(),
-             handler {std::move(handler)}](const auto &err) {
+             handler {std::move(handler)}](const auto &err) mutable {
                 assert(self->state_.load() == api_state::connecting);
                 self->state_.store(err ? api_state::closed
                                        : api_state::connected);
                 handler(err);
             });
+
+        return result.get();
     }
 
     inline void start() {
