@@ -27,9 +27,12 @@ enum class api_version { v1, v2 };
 
 enum class api_state { closed, connecting, connected, reading };
 
-template <typename AsyncStream, typename ErrorHandler>
+template <typename AsyncStream,
+          typename ErrorHandler,
+          api_version version = api_version::v1>
 class basic_api : public std::enable_shared_from_this<
                       basic_api<AsyncStream, ErrorHandler>> {
+    static constexpr auto api_version = version;
 
     using connect_handler =
         std::function<void(const boost::system::error_code &)>;
@@ -100,10 +103,6 @@ class basic_api : public std::enable_shared_from_this<
         });
     }
 
-    [[nodiscard]] inline auto version() -> api_version {
-        return version_;
-    }
-
     [[nodiscard]] inline auto socket() noexcept -> AsyncStream & {
         return sock_;
     }
@@ -113,20 +112,16 @@ class basic_api : public std::enable_shared_from_this<
     }
 
     static inline auto create(boost::asio::io_context &io,
-                              api_version              ver,
                               ErrorHandler &           error_handler)
         -> std::shared_ptr<basic_api<AsyncStream, ErrorHandler>> {
         return std::shared_ptr<basic_api<AsyncStream, ErrorHandler>>(
-            new basic_api<AsyncStream, ErrorHandler> {io, ver, error_handler});
+            new basic_api<AsyncStream, ErrorHandler> {io, error_handler});
     }
 
   protected:
-    explicit basic_api(boost::asio::io_context &io,
-                       api_version              version,
-                       ErrorHandler &           error_handler)
+    explicit basic_api(boost::asio::io_context &io, ErrorHandler &error_handler)
         : io_ {io},
           sock_ {io},
-          version_ {version},
           error_handler_ {error_handler},
           state_ {api_state::closed},
           current_tag_ {0} {
@@ -209,9 +204,7 @@ class basic_api : public std::enable_shared_from_this<
   private:
     boost::asio::io_context &io_;
     AsyncStream              sock_;
-
-    const api_version      version_;
-    std::atomic<api_state> state_;
+    std::atomic<api_state>   state_;
 
     std::atomic_uint32_t                                          current_tag_;
     std::deque<std::pair<std::shared_ptr<request>, read_handler>> send_queue_;

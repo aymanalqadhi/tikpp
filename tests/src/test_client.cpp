@@ -55,7 +55,7 @@ void api_handler(std::shared_ptr<tikpp::api<api_error_handler>> &&api) {
             req->add_word(word_parts[1], word_parts[2]);
         }
 
-        api->send(std::move(req), [](const auto &err, auto &&resp) {
+        api->async_send(std::move(req), [](const auto &err, auto &&resp) {
             if (err) {
                 std::cerr << "[!] Could not send request: " << err.message()
                           << std::endl;
@@ -83,8 +83,7 @@ auto main(int argc, char *argv[]) -> int {
     boost::asio::io_context io {};
     api_error_handler       error_handler {};
 
-    auto api = tikpp::api<api_error_handler>::create(io, tikpp::api_version::v1,
-                                                     error_handler);
+    auto api = tikpp::api<api_error_handler>::create(io, error_handler);
 
     api->async_open(host, port, [api](const auto &err) mutable {
         if (err) {
