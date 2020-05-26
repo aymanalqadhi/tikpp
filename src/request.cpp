@@ -3,7 +3,6 @@
 #include "fmt/format.h"
 #include <boost/endian.hpp>
 
-#include <algorithm>
 #include <cstdint>
 #include <vector>
 
