@@ -21,6 +21,7 @@ create_test(response)
 create_test(async_read_word_length)
 create_test(async_read_word)
 create_test(async_read_response)
+create_test(async_connect)
 
 # Test client
 add_executable(test_client src/test_client.cpp)
