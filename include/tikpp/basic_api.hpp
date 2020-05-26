@@ -8,7 +8,6 @@
 
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
-#include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -16,7 +15,6 @@
 #include <cassert>
 #include <deque>
 #include <functional>
-#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -31,8 +29,9 @@ enum class api_state {
     connected,
 };
 
-template <typename AsyncStream>
-class basic_api : public std::enable_shared_from_this<basic_api<AsyncStream>> {
+template <typename AsyncStream, typename ErrorHandler>
+class basic_api : public std::enable_shared_from_this<
+                      basic_api<AsyncStream, ErrorHandler>> {
 
     using connect_handler =
         std::function<void(const boost::system::error_code &)>;
@@ -116,22 +115,27 @@ class basic_api : public std::enable_shared_from_this<basic_api<AsyncStream>> {
         return state() != api_state::closed && sock_.is_open();
     }
 
-    static inline auto create(boost::asio::io_context &io, api_version ver)
-        -> std::shared_ptr<basic_api<AsyncStream>> {
-        return std::shared_ptr<basic_api<AsyncStream>>(
-            new basic_api<AsyncStream> {io, ver});
+    static inline auto create(boost::asio::io_context &io,
+                              api_version              ver,
+                              ErrorHandler &           error_handler)
+        -> std::shared_ptr<basic_api<AsyncStream, ErrorHandler>> {
+        return std::shared_ptr<basic_api<AsyncStream, ErrorHandler>>(
+            new basic_api<AsyncStream, ErrorHandler> {io, ver, error_handler});
     }
 
   protected:
-    explicit basic_api(boost::asio::io_context &io, api_version version)
+    explicit basic_api(boost::asio::io_context &io,
+                       api_version              version,
+                       ErrorHandler &           error_handler)
         : io_ {io},
           sock_ {io},
           version_ {version},
+          error_handler_ {error_handler},
           state_ {api_state::closed},
           current_tag_ {0} {
     }
 
-    void send_next() {
+    inline void send_next() {
         assert(!send_queue_.empty());
 
         auto [req, cb] = std::move(send_queue_.front());
@@ -173,7 +177,7 @@ class basic_api : public std::enable_shared_from_this<basic_api<AsyncStream>> {
         read_next_response();
     }
 
-    void read_next_response() {
+    inline void read_next_response() {
         if (!is_open()) {
             return;
         }
@@ -193,7 +197,7 @@ class basic_api : public std::enable_shared_from_this<basic_api<AsyncStream>> {
             });
     }
 
-    void on_response(tikpp::response &&resp) {
+    inline void on_response(tikpp::response &&resp) {
         if (read_cbs_.find(resp.tag().value()) == read_cbs_.end()) {
             on_error(tikpp::error_code::invalid_response_tag);
         } else if (!read_cbs_[resp.tag().value()]({}, std::move(resp))) {
@@ -203,10 +207,9 @@ class basic_api : public std::enable_shared_from_this<basic_api<AsyncStream>> {
         read_next_response();
     }
 
-    void on_error(const boost::system::error_code &err) {
-        // handle error
+    inline void on_error(const boost::system::error_code &err) {
         close();
-        std::cout << "Error: " << err.message() << std::endl;
+        error_handler_.on_error(err);
     }
 
   private:
@@ -219,6 +222,8 @@ class basic_api : public std::enable_shared_from_this<basic_api<AsyncStream>> {
     std::atomic_uint32_t                                          current_tag_;
     std::deque<std::pair<std::shared_ptr<request>, read_handler>> send_queue_;
     std::map<std::uint32_t, read_handler>                         read_cbs_;
+
+    ErrorHandler &error_handler_;
 };
 
 } // namespace tikpp
