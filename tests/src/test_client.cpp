@@ -2,6 +2,8 @@
 #include "tikpp/request.hpp"
 
 #include <boost/asio/io_context.hpp>
+#include <boost/system/error_code.hpp>
+
 #include <future>
 #include <iostream>
 #include <memory>
@@ -10,7 +12,13 @@
 #include <thread>
 #include <vector>
 
-void api_handler(std::shared_ptr<tikpp::api> &&api) {
+struct api_error_handler {
+    void on_error(const boost::system::error_code &err) {
+        std::cout << "[!] An error occured: " << err.message() << std::endl;
+    }
+};
+
+void api_handler(std::shared_ptr<tikpp::api<api_error_handler>> &&api) {
     std::vector<std::string> words {};
     std::string              line {};
     std::regex               patt {R"(([\.=][^=]+)=(.*))"};
@@ -73,7 +81,10 @@ auto main(int argc, char *argv[]) -> int {
     // std::cin >> port;
 
     boost::asio::io_context io {};
-    auto api = tikpp::api::create(io, tikpp::api_version::v1);
+    api_error_handler       error_handler {};
+
+    auto api = tikpp::api<api_error_handler>::create(io, tikpp::api_version::v1,
+                                                     error_handler);
 
     api->async_open(host, port, [api](const auto &err) mutable {
         if (err) {
