@@ -35,7 +35,6 @@ struct socket : ::testing::Test {
              TEST_API_PORT},
             [](const auto &err) {
                 EXPECT_FALSE(err);
-                EXPECT_EQ(err.value(), 0);
             });
         io.run();
         EXPECT_TRUE(sock.is_open());
