@@ -74,18 +74,24 @@ void api_handler(std::shared_ptr<tikpp::api<api_error_handler>> &&api) {
 auto main(int argc, char *argv[]) -> int {
     std::string   host {"127.0.0.1"};
     std::uint16_t port {8728};
+    std::string   username {"admin"};
+    std::string   password {""};
 
     // std::cout << "[+] Host: " << std::flush;
     // std::cin >> host;
     // std::cout << "[+] Port: " << std::flush;
     // std::cin >> port;
+    // std::cout << "[+] Username: " << std::flush;
+    // std::cin >> name;
+    // std::cout << "[+] Password: " << std::flush;
+    // std::cin >> password;
 
     boost::asio::io_context io {};
     api_error_handler       error_handler {};
 
     auto api = tikpp::api<api_error_handler>::create(io, error_handler);
 
-    api->async_open(host, port, [api](const auto &err) mutable {
+    api->async_open(host, port, [&](const auto &err) mutable {
         if (err) {
             std::cerr << "[!] Could not connect: " << err.message()
                       << std::endl;
@@ -95,9 +101,21 @@ auto main(int argc, char *argv[]) -> int {
         std::cout << "[+] Connected successfully" << std::endl;
         api->start();
 
-        std::thread([api = std::move(api)]() mutable {
-            api_handler(std::move(api));
-        }).detach();
+        api->async_login(
+            username, password, [&io, api {std::move(api)}](const auto &err) {
+                if (err) {
+                    std::cerr << "[!] Could not login: " << err.message()
+                              << std::endl;
+                    io.stop();
+                    return;
+                }
+
+                std::cout << "[+] Logged in successfully" << std::endl;
+
+                std::thread([api = std::move(api)]() mutable {
+                    api_handler(std::move(api));
+                }).detach();
+            });
     });
 
     io.run();
