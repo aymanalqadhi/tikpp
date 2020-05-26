@@ -72,13 +72,24 @@ class basic_api : public std::enable_shared_from_this<
         state_.store(api_state::closed);
     }
 
+    [[nodiscard]] inline auto aquire_unique_tag() noexcept {
+        return current_tag_.fetch_add(1);
+    }
+
+    template <typename Command, typename... TArgs>
+    [[nodiscard]] inline auto make_request(TArgs &&... args)
+        -> std::shared_ptr<tikpp::request> {
+        return std::make_shared<Command>(aquire_unique_tag(),
+                                         std::forward<TArgs>(args)...);
+    }
+
     [[nodiscard]] inline auto make_request(std::string command)
         -> std::shared_ptr<tikpp::request> {
         return std::make_shared<tikpp::request>(std::move(command),
-                                                current_tag_.fetch_add(1));
+                                                aquire_unique_tag());
     }
 
-    void send(std::shared_ptr<request> req, read_handler &&cb) {
+    void async_send(std::shared_ptr<request> req, read_handler &&cb) {
         assert(req != nullptr);
 
         io_.post([self = this->shared_from_this(), req {std::move(req)},
