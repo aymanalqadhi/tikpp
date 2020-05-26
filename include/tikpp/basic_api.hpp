@@ -4,6 +4,7 @@
 #include "tikpp/detail/operations/async_connect.hpp"
 #include "tikpp/detail/operations/async_read_response.hpp"
 
+#include "tikpp/commands/login.hpp"
 #include "tikpp/error_code.hpp"
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
@@ -35,6 +36,8 @@ class basic_api : public std::enable_shared_from_this<
     static constexpr auto api_version = version;
 
     using connect_handler =
+        std::function<void(const boost::system::error_code &)>;
+    using login_handler =
         std::function<void(const boost::system::error_code &)>;
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
@@ -103,12 +106,77 @@ class basic_api : public std::enable_shared_from_this<
         });
     }
 
+    void async_login(const std::string &name,
+                     const std::string &password,
+                     login_handler &&   handler) {
+        if constexpr (version == api_version::v1) {
+            auto req1 = make_request<tikpp::commands::v1::login1>();
+            async_send(std::move(req1), [this, &name, &password,
+                                         handler {std::move(handler)}](
+                                            const auto &err, auto &&resp) {
+                if (err) {
+                    handler(err);
+                } else if (resp.type() != tikpp::response_type::normal ||
+                           !resp.contains(
+                               tikpp::commands::v1::login2::challenge_param) ||
+                           resp[tikpp::commands::v1::login2::challenge_param]
+                                   .size() !=
+                               tikpp::commands::v1::login2::challenge_size) {
+                    handler(tikpp::error_code::invalid_response);
+                } else {
+                    auto req2 = make_request<tikpp::commands::v1::login2>(
+                        name, password,
+                        resp[tikpp::commands::v1::login2::challenge_param]);
+
+                    async_send(std::move(req2), [this,
+                                                 handler {std::move(handler)}](
+                                                    const auto &err,
+                                                    auto &&     resp) {
+                        if (err) {
+                            handler(err);
+                        } else if (resp.type() !=
+                                   tikpp::response_type::normal) {
+                            handler(
+                                tikpp::error_code::invalid_login_credentials);
+                        } else {
+                            logged_in_ = true;
+                            handler(tikpp::error_code::success);
+                        }
+
+                        return false;
+                    });
+                }
+
+                return false;
+            });
+        } else {
+            auto req = make_request<tikpp::commands::v2::login>(name, password);
+            async_send(std::move(req), [this, handler {std::move(handler)}](
+                                           const auto &err, auto &&resp) {
+                if (err) {
+                    handler(err);
+                } else if (resp.type() != tikpp::response_type::normal) {
+                    handler(tikpp::error_code::invalid_login_credentials);
+                } else {
+                    logged_in_ = true;
+                    handler(tikpp::error_code::success);
+                }
+
+                return false;
+            });
+        }
+    }
+
     [[nodiscard]] inline auto socket() noexcept -> AsyncStream & {
         return sock_;
     }
 
     [[nodiscard]] inline auto is_open() const noexcept -> bool {
         return state_.load() != api_state::closed && sock_.is_open();
+    }
+
+    [[nodiscard]] inline auto is_logged_in() const noexcept -> bool {
+        return logged_in_;
     }
 
     static inline auto create(boost::asio::io_context &io,
@@ -210,6 +278,7 @@ class basic_api : public std::enable_shared_from_this<
     std::deque<std::pair<std::shared_ptr<request>, read_handler>> send_queue_;
     std::map<std::uint32_t, read_handler>                         read_cbs_;
 
+    bool          logged_in_;
     ErrorHandler &error_handler_;
 };
 
