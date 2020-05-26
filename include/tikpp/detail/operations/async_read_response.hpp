@@ -44,8 +44,7 @@ struct async_read_response_op final {
                              tikpp::error_code::untagged_response),
                          tikpp::response {});
             } else {
-                handler_(boost::system::error_code {},
-                         tikpp::response {std::move(words_)});
+                handler_(boost::system::error_code {}, std::move(resp));
             }
 
             return;
