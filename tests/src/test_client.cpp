@@ -94,6 +94,7 @@ auto main(int argc, char *argv[]) -> int {
         }
 
         std::cout << "[+] Connected successfully" << std::endl;
+        api->start();
 
         std::thread([api = std::move(api)]() mutable {
             api_handler(std::move(api));

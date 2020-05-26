@@ -25,11 +25,7 @@ namespace tikpp {
 
 enum class api_version { v1, v2 };
 
-enum class api_state {
-    closed,
-    connecting,
-    connected,
-};
+enum class api_state { closed, connecting, connected, reading };
 
 template <typename AsyncStream, typename ErrorHandler>
 class basic_api : public std::enable_shared_from_this<
@@ -44,34 +40,36 @@ class basic_api : public std::enable_shared_from_this<
     void async_open(const std::string &host,
                     std::uint16_t      port,
                     connect_handler && handler) {
-        if (state() == api_state::connecting) {
+        if (state_.load() == api_state::connecting) {
             return handler(boost::asio::error::in_progress);
         }
 
-        assert(state() == api_state::closed);
-        state(api_state::connecting);
+        assert(state_.load() == api_state::closed);
+        state_.store(api_state::connecting);
 
         tikpp::detail::operations::async_connect(
             sock_, host, port,
             [self = this->shared_from_this(),
              handler {std::move(handler)}](const auto &err) {
-                assert(self->state() == api_state::connecting);
-
-                if (err) {
-                    self->state(api_state::closed);
-                } else {
-                    self->state(api_state::connected);
-                    self->start();
-                }
-
+                assert(self->state_.load() == api_state::connecting);
+                self->state_.store(err ? api_state::closed
+                                       : api_state::connected);
                 handler(err);
             });
+    }
+
+    inline void start() {
+        assert(is_open());
+        assert(state_.load() != api_state::reading);
+
+        state_.store(api_state::reading);
+        read_next_response();
     }
 
     inline void close() {
         assert(is_open());
         sock_.close();
-        state(api_state::closed);
+        state_.store(api_state::closed);
     }
 
     [[nodiscard]] inline auto make_request(std::string command)
@@ -91,14 +89,6 @@ class basic_api : public std::enable_shared_from_this<
         });
     }
 
-    [[nodiscard]] inline auto state() const noexcept -> api_state {
-        return state_.load();
-    }
-
-    inline void state(api_state state) {
-        state_.store(state);
-    }
-
     [[nodiscard]] inline auto version() -> api_version {
         return version_;
     }
@@ -108,7 +98,7 @@ class basic_api : public std::enable_shared_from_this<
     }
 
     [[nodiscard]] inline auto is_open() const noexcept -> bool {
-        return state() != api_state::closed && sock_.is_open();
+        return state_.load() != api_state::closed && sock_.is_open();
     }
 
     static inline auto create(boost::asio::io_context &io,
@@ -168,13 +158,8 @@ class basic_api : public std::enable_shared_from_this<
             });
     }
 
-    inline void start() {
-        assert(is_open());
-        read_next_response();
-    }
-
     inline void read_next_response() {
-        if (!is_open()) {
+        if (!is_open() || state_.load() != api_state::reading) {
             return;
         }
 
@@ -195,8 +180,10 @@ class basic_api : public std::enable_shared_from_this<
 
     inline void on_response(tikpp::response &&resp) {
         if (read_cbs_.find(resp.tag().value()) == read_cbs_.end()) {
-            on_error(tikpp::error_code::invalid_response_tag);
-        } else if (!read_cbs_[resp.tag().value()]({}, std::move(resp))) {
+            return on_error(tikpp::error_code::invalid_response_tag);
+        }
+
+        if (!read_cbs_[resp.tag().value()]({}, std::move(resp))) {
             read_cbs_.erase(resp.tag().value());
         }
 
