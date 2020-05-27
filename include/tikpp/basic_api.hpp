@@ -3,6 +3,8 @@
 
 #include "tikpp/detail/operations/async_connect.hpp"
 #include "tikpp/detail/operations/async_read_response.hpp"
+#include "tikpp/detail/type_traits/error_handler.hpp"
+#include "tikpp/detail/type_traits/stream.hpp"
 
 #include "tikpp/commands/login.hpp"
 #include "tikpp/error_code.hpp"
@@ -31,7 +33,10 @@ enum class api_state { closed, connecting, connected, reading };
 
 template <typename AsyncStream,
           typename ErrorHandler,
-          api_version version = api_version::v1>
+          api_version version = api_version::v1,
+          typename            = std::enable_if_t<
+              tikpp::detail::type_traits::is_async_stream_v<AsyncStream> &&
+              tikpp::detail::type_traits::has_on_error_v<ErrorHandler>>>
 class basic_api : public std::enable_shared_from_this<
                       basic_api<AsyncStream, ErrorHandler>> {
     static constexpr auto api_version = version;
