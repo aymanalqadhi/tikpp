@@ -99,15 +99,16 @@ struct async_read_word_length_op final {
     std::vector<std::uint8_t> buf_;
 };
 
-template <typename AsyncReadStream, typename Token>
-decltype(auto) async_read_word_length(AsyncReadStream &sock, Token &&token) {
+template <typename AsyncReadStream, typename CompletionToken>
+decltype(auto) async_read_word_length(AsyncReadStream & sock,
+                                      CompletionToken &&token) {
     using signature_type =
         void(const boost::system::error_code &, std::uint32_t);
-    using result_type =
-        boost::asio::async_result<std::decay_t<Token>, signature_type>;
+    using result_type = boost::asio::async_result<std::decay_t<CompletionToken>,
+                                                  signature_type>;
     using handler_type = typename result_type::completion_handler_type;
 
-    handler_type handler {std::forward<Token>(token)};
+    handler_type handler {std::forward<CompletionToken>(token)};
     result_type  result {handler};
 
     async_read_word_length_op<AsyncReadStream, handler_type> {

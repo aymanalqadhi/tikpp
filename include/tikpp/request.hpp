@@ -54,10 +54,9 @@ struct request : sentence {
         words_.emplace(std::make_pair(std::move(key), std::move(value)));
     }
 
-    template <typename... TArgs>
-    inline void
-    add_word(std::string key, const char *fmt, const TArgs &... args) {
-        add_word(std::move(key), fmt::format(fmt, args...));
+    template <typename... Args>
+    inline void add_word(std::string key, const char *fmt, Args &&... args) {
+        add_word(std::move(key), fmt::format(fmt, std::forward<Args>(args)...));
     }
 
     inline void add_param(std::string key, std::string value) {

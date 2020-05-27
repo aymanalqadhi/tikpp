@@ -45,15 +45,17 @@ class basic_api : public std::enable_shared_from_this<
                                             tikpp::response &&)>;
 
   public:
-    template <typename Token>
-    decltype(auto)
-    async_open(const std::string &host, std::uint16_t port, Token &&token) {
+    template <typename CompletionToken>
+    decltype(auto) async_open(const std::string &host,
+                              std::uint16_t      port,
+                              CompletionToken && token) {
         using signature_type = void(const boost::system::error_code &);
         using result_type =
-            boost::asio::async_result<std::decay_t<Token>, signature_type>;
+            boost::asio::async_result<std::decay_t<CompletionToken>,
+                                      signature_type>;
         using handler_type = typename result_type::completion_handler_type;
 
-        handler_type handler {std::forward<Token>(token)};
+        handler_type handler {std::forward<CompletionToken>(token)};
         result_type  result {handler};
 
         if (state_.load() == api_state::connecting) {
@@ -97,12 +99,12 @@ class basic_api : public std::enable_shared_from_this<
 
     template <
         typename Command,
-        typename... TArgs,
+        typename... Args,
         typename = std::enable_if_t<std::is_base_of_v<tikpp::request, Command>>>
-    [[nodiscard]] inline auto make_request(TArgs &&... args)
+    [[nodiscard]] inline auto make_request(Args &&... args)
         -> std::shared_ptr<tikpp::request> {
         return std::make_shared<Command>(aquire_unique_tag(),
-                                         std::forward<TArgs>(args)...);
+                                         std::forward<Args>(args)...);
     }
 
     [[nodiscard]] inline auto make_request(std::string command)
@@ -111,17 +113,18 @@ class basic_api : public std::enable_shared_from_this<
                                                 aquire_unique_tag());
     }
 
-    template <typename Token>
-    void async_send(std::shared_ptr<request> req, Token &&token) {
+    template <typename CompletionToken>
+    void async_send(std::shared_ptr<request> req, CompletionToken &&token) {
         assert(req != nullptr);
 
         using signature_type =
             void(const boost::system::error_code &, tikpp::response &&);
         using result_type =
-            boost::asio::async_result<std::decay_t<Token>, signature_type>;
+            boost::asio::async_result<std::decay_t<CompletionToken>,
+                                      signature_type>;
         using handler_type = typename result_type::completion_handler_type;
 
-        handler_type handler {std::forward<Token>(token)};
+        handler_type handler {std::forward<CompletionToken>(token)};
         result_type  result {handler};
 
         io_.post([self = this->shared_from_this(), req {std::move(req)},
@@ -134,16 +137,17 @@ class basic_api : public std::enable_shared_from_this<
         return result.get();
     }
 
-    template <typename Token>
+    template <typename CompletionToken>
     void async_login(const std::string &name,
                      const std::string &password,
-                     Token &&           token) {
+                     CompletionToken && token) {
         using signature_type = void(const boost::system::error_code &);
         using result_type =
-            boost::asio::async_result<std::decay_t<Token>, signature_type>;
+            boost::asio::async_result<std::decay_t<CompletionToken>,
+                                      signature_type>;
         using handler_type = typename result_type::completion_handler_type;
 
-        handler_type handler {std::forward<Token>(token)};
+        handler_type handler {std::forward<CompletionToken>(token)};
         result_type  result {handler};
 
         if constexpr (version == api_version::v1) {
