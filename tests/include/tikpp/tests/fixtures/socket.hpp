@@ -5,7 +5,10 @@
 
 #include "gtest/gtest.h"
 #include <boost/asio/io_context.hpp>
-#include <boost/asio/ip/tcp.hpp>
+
+#if defined(NO_MOCK_OBJECTS)
+#    include <boost/asio/ip/tcp.hpp>
+#endif
 
 #if !defined(TEST_IP_ADDRESS)
 #    if defined(NO_MOCK_OBJECTS)
@@ -25,17 +28,15 @@
 
 namespace tikpp::tests::fixtures {
 
-struct socket : ::testing::Test {
-    socket() : sock {io} {
+struct SocketTest : ::testing::Test {
+    SocketTest() : sock {io} {
     }
 
     void SetUp() override {
         sock.async_connect(
             {boost::asio::ip::address::from_string(TEST_IP_ADDRESS),
              TEST_API_PORT},
-            [](const auto &err) {
-                EXPECT_FALSE(err);
-            });
+            [](const auto &err) { EXPECT_FALSE(err); });
         io.run();
         EXPECT_TRUE(sock.is_open());
     }

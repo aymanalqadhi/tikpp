@@ -16,7 +16,7 @@
 
 namespace tikpp::tests {
 
-struct AsyncReadWordLengthTest : tikpp::tests::fixtures::socket {};
+struct AsyncReadWordLengthTest : tikpp::tests::fixtures::SocketTest {};
 
 TEST_F(AsyncReadWordLengthTest, WordTest) {
     static constexpr auto test_iterations    = 100;
