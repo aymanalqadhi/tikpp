@@ -90,7 +90,9 @@ class basic_api : public std::enable_shared_from_this<
     inline void close() {
         assert(is_open());
         sock_.close();
+
         state_.store(api_state::closed);
+        logged_in_ = false;
     }
 
     [[nodiscard]] inline auto aquire_unique_tag() noexcept {
@@ -236,7 +238,8 @@ class basic_api : public std::enable_shared_from_this<
           sock_ {io},
           error_handler_ {error_handler},
           state_ {api_state::closed},
-          current_tag_ {0} {
+          current_tag_ {0},
+          logged_in_ {false} {
     }
 
     inline void send_next() {
