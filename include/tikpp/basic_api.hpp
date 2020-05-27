@@ -95,7 +95,10 @@ class basic_api : public std::enable_shared_from_this<
         return current_tag_.fetch_add(1);
     }
 
-    template <typename Command, typename... TArgs>
+    template <
+        typename Command,
+        typename... TArgs,
+        typename = std::enable_if_t<std::is_base_of_v<tikpp::request, Command>>>
     [[nodiscard]] inline auto make_request(TArgs &&... args)
         -> std::shared_ptr<tikpp::request> {
         return std::make_shared<Command>(aquire_unique_tag(),
