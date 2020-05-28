@@ -54,10 +54,8 @@ TEST_F(AsyncReadWordLengthTest, SentenceTest) {
             sock,
             [](const boost::system::error_code &err, auto &&resp) mutable {
                 EXPECT_EQ(resp.type(), tikpp::response_type::data);
-                EXPECT_EQ(resp.size(), words_per_sentence * 2 + 1);
+                EXPECT_EQ(resp.size(), words_per_sentence * 2);
                 EXPECT_TRUE(resp.tag().has_value());
-                EXPECT_EQ(resp.tag().value(),
-                          resp.template get<std::uint32_t>(".tag"));
                 EXPECT_EQ(resp.tag().value(), rand());
 
                 for (std::size_t i {0}; i < words_per_sentence; ++i) {

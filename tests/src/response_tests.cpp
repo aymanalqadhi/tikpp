@@ -80,7 +80,7 @@ TEST(ResponseTest, TagTest) {
         {"!re", "=key1=value1", "=key2=value2", ".attr1=123", ".tag=321"}};
 
     EXPECT_EQ(resp.type(), tikpp::response_type::data);
-    EXPECT_EQ(resp.size(), 4);
+    EXPECT_EQ(resp.size(), 3);
     ASSERT_TRUE(resp.tag().has_value());
     EXPECT_EQ(resp.tag().value(), 321);
 }

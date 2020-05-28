@@ -50,6 +50,7 @@ response::response(const std::vector<std::string> &words) {
 
     if (contains(::tag_key)) {
         tag_.emplace(get<std::uint32_t>(::tag_key));
+        words_.erase(::tag_key);
     }
 }
 
