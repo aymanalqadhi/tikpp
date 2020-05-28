@@ -1,6 +1,7 @@
 #ifndef TIKPP_BASIC_API_HPP
 #define TIKPP_BASIC_API_HPP
 
+#include "tikpp/detail/async_result.hpp"
 #include "tikpp/detail/operations/async_connect.hpp"
 #include "tikpp/detail/operations/async_read_response.hpp"
 #include "tikpp/detail/type_traits/error_handler.hpp"
@@ -11,7 +12,6 @@
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
 
-#include <boost/asio/async_result.hpp>
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/write.hpp>
@@ -49,14 +49,8 @@ class basic_api : public std::enable_shared_from_this<
     decltype(auto) async_open(const std::string &host,
                               std::uint16_t      port,
                               CompletionToken && token) {
-        using signature_type = void(const boost::system::error_code &);
-        using result_type =
-            boost::asio::async_result<std::decay_t<CompletionToken>,
-                                      signature_type>;
-        using handler_type = typename result_type::completion_handler_type;
-
-        handler_type handler {std::forward<CompletionToken>(token)};
-        result_type  result {handler};
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result);
 
         if (state_.load() == api_state::connecting) {
             return handler(boost::asio::error::make_error_code(
@@ -119,15 +113,9 @@ class basic_api : public std::enable_shared_from_this<
     void async_send(std::shared_ptr<request> req, CompletionToken &&token) {
         assert(req != nullptr);
 
-        using signature_type =
-            void(const boost::system::error_code &, tikpp::response &&);
-        using result_type =
-            boost::asio::async_result<std::decay_t<CompletionToken>,
-                                      signature_type>;
-        using handler_type = typename result_type::completion_handler_type;
-
-        handler_type handler {std::forward<CompletionToken>(token)};
-        result_type  result {handler};
+        GENERATE_COMPLETION_HANDLER(
+            void(const boost::system::error_code &, tikpp::response &&), token,
+            handler, result);
 
         io_.post([self = this->shared_from_this(), req {std::move(req)},
                   handler {std::move(handler)}]() mutable {
@@ -143,14 +131,8 @@ class basic_api : public std::enable_shared_from_this<
     void async_login(const std::string &name,
                      const std::string &password,
                      CompletionToken && token) {
-        using signature_type = void(const boost::system::error_code &);
-        using result_type =
-            boost::asio::async_result<std::decay_t<CompletionToken>,
-                                      signature_type>;
-        using handler_type = typename result_type::completion_handler_type;
-
-        handler_type handler {std::forward<CompletionToken>(token)};
-        result_type  result {handler};
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result);
 
         if constexpr (version == api_version::v1) {
             auto req1 = make_request<tikpp::commands::v1::login1>();

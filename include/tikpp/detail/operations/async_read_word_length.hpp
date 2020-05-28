@@ -1,7 +1,8 @@
 #ifndef TIKPP_DETAIL_OPERATIONS_ASYNC_READ_WORD_LENGTH_HPP
 #define TIKPP_DETAIL_OPERATIONS_ASYNC_READ_WORD_LENGTH_HPP
 
-#include <boost/asio/async_result.hpp>
+#include "tikpp/detail/async_result.hpp"
+
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/error.hpp>
 #include <boost/asio/read.hpp>
@@ -102,14 +103,9 @@ struct async_read_word_length_op final {
 template <typename AsyncReadStream, typename CompletionToken>
 decltype(auto) async_read_word_length(AsyncReadStream & sock,
                                       CompletionToken &&token) {
-    using signature_type =
-        void(const boost::system::error_code &, std::uint32_t);
-    using result_type = boost::asio::async_result<std::decay_t<CompletionToken>,
-                                                  signature_type>;
-    using handler_type = typename result_type::completion_handler_type;
-
-    handler_type handler {std::forward<CompletionToken>(token)};
-    result_type  result {handler};
+    GENERATE_COMPLETION_HANDLER(
+        void(const boost::system::error_code &, std::uint32_t), token, handler,
+        result);
 
     async_read_word_length_op<AsyncReadStream, handler_type> {
         sock, std::move(handler)}

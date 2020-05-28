@@ -1,7 +1,8 @@
 #ifndef TIKPP_DETAIL_OPERATIONS_ASYNC_CONNECT_HPP
 #define TIKPP_DETAIL_OPERATIONS_ASYNC_CONNECT_HPP
 
-#include <boost/asio/async_result.hpp>
+#include "tikpp/detail/async_result.hpp"
+
 #include <boost/asio/ip/address.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -15,13 +16,8 @@ decltype(auto) async_connect(AsyncReadStream &  sock,
                              const std::string &host,
                              std::uint16_t      port,
                              CompletionToken && token) {
-    using signature_type = void(const boost::system::error_code &);
-    using result_type = boost::asio::async_result<std::decay_t<CompletionToken>,
-                                                  signature_type>;
-    using handler_type = typename result_type::completion_handler_type;
-
-    handler_type handler {std::forward<CompletionToken>(token)};
-    result_type  result {handler};
+    GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &), token,
+                                handler, result);
 
     boost::system::error_code ec {};
     auto address = boost::asio::ip::address::from_string(host, ec);

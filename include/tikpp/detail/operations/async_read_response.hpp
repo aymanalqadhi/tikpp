@@ -1,12 +1,12 @@
 #ifndef TIKPP_DETAIL_OPERATIONS_ASYNC_READ_RESPONSE_HPP
 #define TIKPP_DETAIL_OPERATIONS_ASYNC_READ_RESPONSE_HPP
 
+#include "tikpp/detail/async_result.hpp"
 #include "tikpp/detail/operations/async_read_word.hpp"
 
 #include "tikpp/error_code.hpp"
 #include "tikpp/response.hpp"
 
-#include <boost/asio/async_result.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <string>
@@ -67,14 +67,9 @@ struct async_read_response_op final {
 template <typename AsyncReadStream, typename CompletionToken>
 decltype(auto) async_read_response(AsyncReadStream & sock,
                                    CompletionToken &&token) {
-    using signature_type =
-        void(const boost::system::error_code &, tikpp::response &&);
-    using result_type = boost::asio::async_result<std::decay_t<CompletionToken>,
-                                                  signature_type>;
-    using handler_type = typename result_type::completion_handler_type;
-
-    handler_type handler {std::forward<CompletionToken>(token)};
-    result_type  result {handler};
+    GENERATE_COMPLETION_HANDLER(
+        void(const boost::system::error_code &, tikpp::response &&), token,
+        handler, result);
 
     async_read_response_op<AsyncReadStream, handler_type> {sock,
                                                            std::move(handler)}

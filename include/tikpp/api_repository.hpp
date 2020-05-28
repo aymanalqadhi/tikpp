@@ -3,8 +3,8 @@
 
 #include "tikpp/basic_api.hpp"
 #include "tikpp/commands/getall.hpp"
+#include "tikpp/detail/async_result.hpp"
 
-#include <boost/asio/async_result.hpp>
 #include <boost/system/error_code.hpp>
 
 #include <iostream>
@@ -20,15 +20,8 @@ struct api_repository {
 
     template <typename CompletionToken>
     void load_all(CompletionToken &&token) {
-        using signature_type = void(const boost::system::error_code &,
-                                    std::shared_ptr<std::vector<Model>> &&);
-        using result_type =
-            boost::asio::async_result<std::decay_t<CompletionToken>,
-                                      signature_type>;
-        using handler_type = typename result_type::completion_handler_type;
-
-        handler_type handler {std::forward<CompletionToken>(token)};
-        result_type  result {handler};
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result)
 
         auto req = api_->template make_request<tikpp::commands::getall>(
             Model::api_path);
