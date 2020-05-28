@@ -20,8 +20,9 @@ struct api_repository {
 
     template <typename CompletionToken>
     void load_all(CompletionToken &&token) {
-        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
-                                    token, handler, result)
+        GENERATE_COMPLETION_HANDLER(
+            void(const boost::system::error_code &, std::vector<Model> &&),
+            token, handler, result)
 
         auto req = api_->template make_request<tikpp::commands::getall>(
             Model::api_path);
@@ -31,12 +32,12 @@ struct api_repository {
                              ret = std::make_shared<std::vector<Model>>()](
                                 const auto &err, auto &&resp) {
                 if (err) {
-                    handler(err, decltype(ret) {nullptr});
+                    handler(err, std::vector<Model> {});
                     return false;
                 }
 
                 if (resp.empty()) {
-                    handler(boost::system::error_code {}, std::move(ret));
+                    handler(boost::system::error_code {}, std::move(*ret));
                     return false;
                 }
 
