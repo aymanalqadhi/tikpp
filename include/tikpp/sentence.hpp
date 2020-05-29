@@ -22,6 +22,11 @@ struct sentence {
         return words_.end();
     }
 
+    [[nodiscard]] inline auto find(const std::string &key) noexcept
+        -> words_map::iterator {
+        return words_.find(key);
+    }
+
     [[nodiscard]] inline auto contains(const std::string &key) const noexcept
         -> bool {
         return words_.find(key) != words_.end();
@@ -35,11 +40,9 @@ struct sentence {
         return words_.empty();
     }
 
-    [[nodiscard]] inline auto operator[](const std::string &key) const noexcept
-        -> const std::string & {
-        assert(contains(key));
-
-        return words_.at(key);
+    [[nodiscard]] inline auto operator[](const std::string &key) noexcept
+        -> std::string & {
+        return words_[key];
     }
 
     template <typename T>
