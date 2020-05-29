@@ -85,4 +85,21 @@ TEST(ResponseTest, TagTest) {
     EXPECT_EQ(resp.tag().value(), 321);
 }
 
+TEST(ResponseTest, EmptyValues) {
+    tikpp::response resp {
+        {"!re", "=key1=", "=key2=", ".attr1="}};
+
+    EXPECT_EQ(resp.type(), tikpp::response_type::data);
+    EXPECT_EQ(resp.size(), 3);
+    ASSERT_FALSE(resp.tag().has_value());
+
+    EXPECT_TRUE(resp.contains("key1"));
+    EXPECT_TRUE(resp.contains("key2"));
+    EXPECT_TRUE(resp.contains(".attr1"));
+
+    EXPECT_TRUE(resp["key1"].empty());
+    EXPECT_TRUE(resp["key2"].empty());
+    EXPECT_TRUE(resp[".attr1"].empty());
+}
+
 } // namespace tikpp::tests
