@@ -4,10 +4,10 @@
 #include "tikpp/basic_api.hpp"
 #include "tikpp/commands/getall.hpp"
 #include "tikpp/detail/async_result.hpp"
+#include "tikpp/models/convert.hpp"
 
 #include <boost/system/error_code.hpp>
 
-#include <iostream>
 #include <memory>
 #include <type_traits>
 
@@ -19,13 +19,13 @@ struct api_repository {
     }
 
     template <typename CompletionToken>
-    void load_all(CompletionToken &&token) {
+    decltype(auto) load_all(CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(
             void(const boost::system::error_code &, std::vector<Model> &&),
             token, handler, result)
 
-        auto req = api_->template make_request<tikpp::commands::getall>(
-            Model::api_path);
+        auto req =
+            api_->template make_request<tikpp::commands::getall<Model>>();
 
         api_->async_send(
             std::move(req), [handler {std::move(handler)},
@@ -41,7 +41,12 @@ struct api_repository {
                     return false;
                 }
 
-                ret->emplace_back(Model::create(resp));
+                tikpp::models::creator<tikpp::response> creator {resp};
+
+                Model item {};
+                item.convert(creator);
+
+                ret->emplace_back(std::move(item));
                 return true;
             });
 
