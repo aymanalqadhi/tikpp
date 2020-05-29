@@ -1,22 +1,27 @@
 #ifndef TIKPP_MODELS_IP_HOTSPOT_USER_HPP
 #define TIKPP_MODELS_IP_HOTSPOT_USER_HPP
 
+#include "tikpp/detail/type_traits/model.hpp"
+
 #include <string>
 
 namespace tikpp::models::ip::hotspot {
 
 struct user final {
-    std::string name;
-    std::string password;
-
     static constexpr auto api_path = "/ip/hotspot/user";
 
-    template <typename Map>
-    static inline auto create(const Map &m) -> user {
-        assert(m.contains("name"));
-        assert(m.contains("password"));
+    std::string name;
+    std::string password;
+    std::string profile;
 
-        return {.name = m["name"], .password = m["password"]};
+    bool disabled;
+
+    template <typename Converter>
+    inline void convert(Converter &c) {
+        c["name"] % name;
+        c["password"] % password;
+        c["profile"] % profile;
+        c["disabled"] % disabled;
     }
 };
 
