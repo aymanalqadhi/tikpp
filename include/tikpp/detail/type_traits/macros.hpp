@@ -7,7 +7,7 @@
     template <typename T, typename = void>                                     \
     struct name : std::false_type {};                                          \
     template <typename T>                                                      \
-    struct name<T, std::enable_if_t<std::is_same_v<                            \
+    struct name<T, std::enable_if_t<std::is_assignable_v<                      \
                        ret, decltype(std::declval<T>().member args)>>>         \
         : std::true_type {};                                                   \
     template <typename T>                                                      \
@@ -22,5 +22,15 @@
         : std::true_type {};                                                   \
     template <typename T>                                                      \
     constexpr auto has_##member##_v = has_##member<T>::value;
+
+#define HAS_STATIC_FUNCTION_FULL(name, func, ret, args)                        \
+    template <typename T, typename = void>                                     \
+    struct name : std::false_type {};                                          \
+    template <typename T>                                                      \
+    struct name<T,                                                             \
+                std::enable_if_t<std::is_assignable_v<ret, T::member args>>>   \
+        : std::true_type {};                                                   \
+    template <typename T>                                                      \
+    constexpr auto name##_v = name<T>::value;
 
 #endif
