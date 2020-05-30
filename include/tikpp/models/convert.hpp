@@ -3,6 +3,7 @@
 
 #include "tikpp/detail/type_traits/model.hpp"
 
+#include "fmt/format.h"
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 
 #include <cassert>
@@ -12,7 +13,7 @@
 namespace tikpp::models {
 
 template <typename T>
-inline std::decay_t<T> convert(const std::string &str) {
+inline auto convert(const std::string &str) -> std::decay_t<T> {
     using type = std::decay_t<T>;
 
     if constexpr (std::is_same_v<type, std::string>) {
@@ -25,6 +26,11 @@ inline std::decay_t<T> convert(const std::string &str) {
     boost::conversion::try_lexical_convert(str, ret);
 
     return ret;
+}
+
+template <typename T>
+inline auto convert_back(T value) -> std::string {
+    return fmt::to_string(value);
 }
 
 template <typename HashMap,
@@ -64,15 +70,7 @@ struct dissolver : hash_map_wrapper<HashMap> {
     struct item_wrapper {
         template <typename T>
         void operator%(T &&value) {
-            if (auto itr = data.find(key); itr != data.end()) {
-                if constexpr (std::is_same_v<std::decay_t<T>, std::string>) {
-                    itr->second = std::forward<T>(value);
-                } else {
-                    itr->second = std::to_string(value);
-                }
-            } else {
-                data[std::move(key)] = std::forward<T>(value);
-            }
+            data["=" + std::move(key)] = convert_back(std::forward<T>(value));
         }
 
         std::string key;
@@ -84,6 +82,7 @@ struct dissolver : hash_map_wrapper<HashMap> {
     }
 };
 
+template <typename Container>
 struct proplist_collector {
     struct dummy_wrapper {
         template <typename T>
@@ -96,7 +95,7 @@ struct proplist_collector {
         return dummy_wrapper {};
     }
 
-    std::vector<std::string> proplist;
+    Container proplist;
 };
 
 } // namespace tikpp::models
