@@ -22,6 +22,10 @@ struct getall : tikpp::request {
         add_param(".proplist", std::move(proplist));
     }
 
+    getall(std::uint32_t tag, std::vector<std::string> q) : getall(tag) {
+        query(std::move(q));
+    }
+
     static constexpr auto command_suffix = "/getall";
 };
 

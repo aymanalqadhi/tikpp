@@ -16,6 +16,12 @@ void request::encode(std::vector<std::uint8_t> &buf) const {
         tikpp::detail::encode_word(fmt::format("{}={}", key, value), buf);
     }
 
+    if (!query_.empty()) {
+        for (const auto &w : query_) {
+            tikpp::detail::encode_word(w, buf);
+        }
+    }
+
     buf.push_back(0x00);
 }
 

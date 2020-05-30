@@ -79,6 +79,14 @@ struct request : sentence {
         add_attribute(std::move(key), fmt::to_string(value));
     }
 
+    inline auto query() const noexcept -> const std::vector<std::string> & {
+        return query_;
+    }
+
+    inline void query(std::vector<std::string> q) {
+        query_ = std::move(q);
+    }
+
     [[nodiscard]] inline auto command() const noexcept -> const std::string & {
         return command_;
     }
@@ -90,8 +98,9 @@ struct request : sentence {
     void encode(std::vector<std::uint8_t> &buf) const;
 
   protected:
-    std::string   command_;
-    std::uint32_t tag_;
+    std::string              command_;
+    std::vector<std::string> query_;
+    std::uint32_t            tag_;
 };
 
 } // namespace tikpp
