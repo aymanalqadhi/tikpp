@@ -2,6 +2,7 @@
 #define TIKPP_API_REPOSITORY_HPP
 
 #include "tikpp/basic_api.hpp"
+#include "tikpp/commands/add.hpp"
 #include "tikpp/commands/getall.hpp"
 #include "tikpp/detail/async_result.hpp"
 #include "tikpp/models/convert.hpp"
@@ -24,7 +25,7 @@ struct api_repository {
     }
 
     template <typename CompletionToken>
-    inline decltype(auto) load_all(CompletionToken &&token) {
+    inline decltype(auto) load(CompletionToken &&token) {
         auto req =
             api_->template make_request<tikpp::commands::getall<Model>>();
         return do_load(std::move(req), std::forward<CompletionToken>(token));
@@ -35,6 +36,33 @@ struct api_repository {
         auto req = api_->template make_request<tikpp::commands::getall<Model>>(
             std::move(query));
         return do_load(std::move(req), std::forward<CompletionToken>(token));
+    }
+
+    template <typename CompletionToken>
+    decltype(auto) add(Model model, CompletionToken &&token) {
+        GENERATE_COMPLETION_HANDLER(
+            void(const boost::system::error_code &, std::string &&), token,
+            handler, result)
+
+        auto req = api_->template make_request<tikpp::commands::add<Model>>(
+            std::move(model));
+
+        api_->async_send(std::move(req), [handler {std::move(handler)}](
+                                             const auto &err, auto &&resp) {
+            if (err) {
+                handler(err, std::string {});
+            } else if (resp.type() != tikpp::response_type::normal ||
+                       !resp.contains("ret")) {
+                handler(tikpp::make_error_code(tikpp::error_code::add_failed),
+                        std::string {});
+            } else {
+                handler(boost::system::error_code {}, std::move(resp["ret"]));
+            }
+
+            return false;
+        });
+
+        return result.get();
     }
 
   private:
