@@ -1,3 +1,6 @@
+#ifndef TIKPP_COMMANDS_GET_ALL_HPP
+#define TIKPP_COMMANDS_GET_ALL_HPP
+
 #include "tikpp/models/convert.hpp"
 #include "tikpp/request.hpp"
 
@@ -6,6 +9,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace tikpp::commands {
 
@@ -13,7 +17,8 @@ template <typename Model>
 struct getall : tikpp::request {
     getall(std::uint32_t tag)
         : request {std::string {Model::api_path} + command_suffix, tag} {
-        tikpp::models::proplist_collector collector {};
+        tikpp::models::proplist_collector<std::vector<std::string>>
+            collector {};
 
         Model m {};
         m.convert(collector);
@@ -30,3 +35,5 @@ struct getall : tikpp::request {
 };
 
 } // namespace tikpp::commands
+
+#endif
