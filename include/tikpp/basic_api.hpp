@@ -282,13 +282,11 @@ class basic_api : public std::enable_shared_from_this<
     }
 
     inline void on_response(tikpp::response &&resp) {
-        if (read_cbs_.find(resp.tag().value()) == read_cbs_.end()) {
-            return on_error(tikpp::make_error_code(
-                tikpp::error_code::invalid_response_tag));
-        }
-
-        if (!read_cbs_[resp.tag().value()]({}, std::move(resp))) {
-            read_cbs_.erase(resp.tag().value());
+        if (auto itr = read_cbs_.find(resp.tag().value());
+            itr != read_cbs_.end()) {
+            if (!itr->second({}, std::move(resp))) {
+                read_cbs_.erase(itr);
+            }
         }
 
         read_next_response();

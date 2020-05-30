@@ -24,10 +24,10 @@ auto error_category::message(int c) const -> std::string {
         return "Fatal response";
     case tikpp::error_code::untagged_response:
         return "Untagged response";
-    case tikpp::error_code::invalid_response_tag:
-        return "Invalid response tag";
     case tikpp::error_code::invalid_login_credentials:
         return "Invalid login credentails";
+    case tikpp::error_code::add_failed:
+        return "Could not add item";
     default:
         return "Unknoww error";
     }
