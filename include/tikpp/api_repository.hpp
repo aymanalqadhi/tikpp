@@ -25,21 +25,24 @@ struct api_repository {
     }
 
     template <typename CompletionToken>
-    inline decltype(auto) load(CompletionToken &&token) {
+    inline decltype(auto) async_load(CompletionToken &&token) {
         auto req =
             api_->template make_request<tikpp::commands::getall<Model>>();
-        return do_load(std::move(req), std::forward<CompletionToken>(token));
+        return do_async_load(std::move(req),
+                             std::forward<CompletionToken>(token));
     }
 
     template <typename CompletionToken>
-    inline decltype(auto) load(query_type query, CompletionToken &&token) {
+    inline decltype(auto) async_load(query_type        query,
+                                     CompletionToken &&token) {
         auto req = api_->template make_request<tikpp::commands::getall<Model>>(
             std::move(query));
-        return do_load(std::move(req), std::forward<CompletionToken>(token));
+        return do_async_load(std::move(req),
+                             std::forward<CompletionToken>(token));
     }
 
     template <typename CompletionToken>
-    decltype(auto) add(Model model, CompletionToken &&token) {
+    decltype(auto) async_add(Model model, CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(
             void(const boost::system::error_code &, std::string &&), token,
             handler, result)
@@ -67,8 +70,8 @@ struct api_repository {
 
   private:
     template <typename CompletionToken>
-    decltype(auto) do_load(std::shared_ptr<tikpp::request> req,
-                           CompletionToken &&              token) {
+    decltype(auto) do_async_load(std::shared_ptr<tikpp::request> req,
+                                 CompletionToken &&              token) {
         GENERATE_COMPLETION_HANDLER(
             void(const boost::system::error_code &, std::vector<Model> &&),
             token, handler, result)
