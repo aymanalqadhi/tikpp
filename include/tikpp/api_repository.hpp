@@ -5,6 +5,7 @@
 #include "tikpp/commands/add.hpp"
 #include "tikpp/commands/getall.hpp"
 #include "tikpp/commands/remove.hpp"
+#include "tikpp/commands/set.hpp"
 #include "tikpp/detail/async_result.hpp"
 #include "tikpp/models/convert.hpp"
 #include "tikpp/models/query.hpp"
@@ -101,6 +102,31 @@ struct api_repository {
                                        CompletionToken &&             token) {
         return async_remove(id.to_string(),
                             std::forward<CompletionToken>(token));
+    }
+
+    template <typename CompletionToken>
+    decltype(auto) async_update(Model model, CompletionToken &&token) {
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result)
+
+        auto req = api_->template make_request<tikpp::commands::set<Model>>(
+            std::move(model));
+
+        api_->async_send(std::move(req), [handler {std::move(handler)}](
+                                             const auto &err, auto &&resp) {
+            if (err) {
+                handler(err);
+            } else if (resp.type() != tikpp::response_type::normal) {
+                handler(
+                    tikpp::make_error_code(tikpp::error_code::update_failed));
+            } else {
+                handler(boost::system::error_code {});
+            }
+
+            return false;
+        });
+
+        return result.get();
     }
 
   private:
