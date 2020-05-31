@@ -7,9 +7,8 @@
 
 namespace tikpp {
 
-template <typename ErrorHandler, api_version version = api_version::v1>
-using api =
-    tikpp::basic_api<boost::asio::ip::tcp::socket, ErrorHandler, version>;
+template <typename ErrorHandler>
+using api = tikpp::basic_api<boost::asio::ip::tcp::socket, ErrorHandler>;
 
 }
 

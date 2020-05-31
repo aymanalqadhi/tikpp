@@ -27,20 +27,15 @@
 
 namespace tikpp {
 
-enum class api_version { v1, v2 };
-
 enum class api_state { closed, connecting, connected, reading };
 
 template <typename AsyncStream,
           typename ErrorHandler,
-          api_version version = api_version::v1,
-          typename            = std::enable_if_t<
+          typename = std::enable_if_t<
               tikpp::detail::type_traits::is_async_stream_v<AsyncStream> &&
               tikpp::detail::type_traits::has_on_error_v<ErrorHandler>>>
 class basic_api : public std::enable_shared_from_this<
                       basic_api<AsyncStream, ErrorHandler>> {
-    static constexpr auto api_version = version;
-
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
 
@@ -133,31 +128,24 @@ class basic_api : public std::enable_shared_from_this<
                      CompletionToken && token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
                                     token, handler, result);
-
-        if constexpr (version == api_version::v1) {
-            auto req1 = make_request<tikpp::commands::v1::login1>();
-            async_send(std::move(req1), [this, &name, &password,
-                                         handler {std::move(handler)}](
-                                            const auto &err, auto &&resp) {
+        async_send(
+            make_request<tikpp::commands::v2::login>(name, password),
+            [this, name, password,
+             handler {std::move(handler)}](const auto &err, auto &&resp) {
                 if (err) {
                     handler(err);
-                } else if (resp.type() != tikpp::response_type::normal ||
-                           !resp.contains(
-                               tikpp::commands::v1::login2::challenge_param) ||
-                           resp[tikpp::commands::v1::login2::challenge_param]
-                                   .size() !=
-                               tikpp::commands::v1::login2::challenge_size) {
+                } else if (resp.type() != tikpp::response_type::normal) {
                     handler(tikpp::make_error_code(
-                        tikpp::error_code::invalid_response));
-                } else {
-                    auto req2 = make_request<tikpp::commands::v1::login2>(
+                        tikpp::error_code::invalid_login_credentials));
+                } else if (resp.contains(
+                               tikpp::commands::v1::login::challenge_param)) {
+                    auto req = make_request<tikpp::commands::v1::login>(
                         name, password,
-                        resp[tikpp::commands::v1::login2::challenge_param]);
-
-                    async_send(std::move(req2), [this,
-                                                 handler {std::move(handler)}](
-                                                    const auto &err,
-                                                    auto &&     resp) {
+                        resp[tikpp::commands::v1::login::challenge_param]);
+                    async_send(std::move(req), [this,
+                                                handler {std::move(handler)}](
+                                                   const auto &err,
+                                                   auto &&     resp) {
                         if (err) {
                             handler(err);
                         } else if (resp.type() !=
@@ -171,26 +159,11 @@ class basic_api : public std::enable_shared_from_this<
 
                         return false;
                     });
-                }
-
-                return false;
-            });
-        } else {
-            auto req = make_request<tikpp::commands::v2::login>(name, password);
-            async_send(std::move(req), [this, handler {std::move(handler)}](
-                                           const auto &err, auto &&resp) {
-                if (err) {
-                    handler(err);
-                } else if (resp.type() != tikpp::response_type::normal) {
-                    handler(tikpp::error_code::invalid_login_credentials);
                 } else {
-                    logged_in_ = true;
-                    handler(tikpp::error_code::success);
+                    handler(boost::system::error_code {});
                 }
-
                 return false;
             });
-        }
 
         return result.get();
     }
