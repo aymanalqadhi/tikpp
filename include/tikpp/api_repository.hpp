@@ -129,6 +129,23 @@ struct api_repository {
         return result.get();
     }
 
+    template <typename CompletionToken>
+    inline decltype(auto) async_stream(CompletionToken &&token) {
+        auto req =
+            api_->template make_request<tikpp::commands::getall<Model>>();
+        return do_async_stream(std::move(req),
+                               std::forward<CompletionToken>(token));
+    }
+
+    template <typename CompletionToken>
+    inline decltype(auto) async_stream(query_type        query,
+                                       CompletionToken &&token) {
+        auto req = api_->template make_request<tikpp::commands::getall<Model>>(
+            std::move(query));
+        return do_async_stream(std::move(req),
+                               std::forward<CompletionToken>(token));
+    }
+
   private:
     template <typename CompletionToken>
     decltype(auto) do_async_load(std::shared_ptr<tikpp::request> req,
@@ -159,6 +176,41 @@ struct api_repository {
                 ret->emplace_back(std::move(item));
                 return true;
             });
+
+        return result.get();
+    }
+
+    template <typename CompletionToken>
+    decltype(auto) do_async_stream(std::shared_ptr<tikpp::request> req,
+                                   CompletionToken &&              token) {
+        GENERATE_COMPLETION_HANDLER(
+            void(const boost::system::error_code &, Model &&), token, handler,
+            result)
+
+        api_->async_send(std::move(req), [handler {std::move(handler)}](
+                                             const auto &err, auto &&resp) {
+            if (err) {
+                handler(err, Model {});
+            } else if (resp.type() == tikpp::response_type::normal &&
+                       resp.empty()) {
+                handler(tikpp::make_error_code(tikpp::error_code::list_end),
+                        Model {});
+            } else if (resp.type() != tikpp::response_type::data) {
+                handler(
+                    tikpp::make_error_code(tikpp::error_code::invalid_response),
+                    Model {});
+            } else if (!resp.empty()) {
+                tikpp::models::creator<tikpp::response> creator {resp};
+
+                Model item {};
+                item.convert(creator);
+
+                handler(boost::system::error_code {}, std::move(item));
+                return true;
+            }
+
+            return false;
+        });
 
         return result.get();
     }
