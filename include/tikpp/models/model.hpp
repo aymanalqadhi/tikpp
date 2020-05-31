@@ -2,6 +2,7 @@
 #define TIKPP_MODELS_MODEL_HPP
 
 #include "tikpp/models/convert.hpp"
+#include "tikpp/models/types/identity.hpp"
 #include "tikpp/request.hpp"
 
 #include <string>
@@ -10,7 +11,7 @@
 namespace tikpp::models {
 
 struct model {
-    std::string id;
+    tikpp::models::types::identity id;
 
     template <template <typename> typename Converter, typename Map>
     inline void convert(Converter<Map> &c) {
