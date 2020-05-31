@@ -11,12 +11,17 @@
 namespace tikpp::models {
 
 struct model {
-    tikpp::models::types::identity id;
+    auto id() const noexcept -> const tikpp::models::types::identity & {
+        return id_;
+    }
 
     template <typename Converter>
     inline void convert(Converter &c) {
-        c[".id"] % id;
+        c[".id"] % id_;
     }
+
+  private:
+    tikpp::models::types::identity id_;
 };
 
 } // namespace tikpp::models
