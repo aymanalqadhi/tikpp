@@ -12,25 +12,25 @@ struct query {
     query(std::string &&word) : words {std::move(word)} {
     }
 
-    inline query &operator&&(const query &q) {
+    inline auto operator&&(const query &q) -> query & {
         extend(q);
         words.push_back("?#&");
 
         return *this;
     }
 
-    inline query &operator||(const query &q) {
+    inline auto operator||(const query &q) -> query & {
         extend(q);
         words.push_back("?#|");
         return *this;
     }
 
-    inline query &operator!() {
+    inline auto operator!() -> query & {
         words.push_back("?#!");
         return *this;
     }
 
-    inline operator std::vector<std::string>&() {
+    inline operator std::vector<std::string> &() {
         return words;
     }
 
@@ -93,6 +93,14 @@ template <typename... Token>
 inline decltype(auto) make_tokens(Token &&... tokens) {
     return std::make_tuple(query_token {std::forward<Token>(tokens)}...);
 }
+
+namespace literals {
+auto operator""_t(const char *str, std::size_t len)
+    -> tikpp::models::query_token {
+    return {std::string {str, len}};
+}
+
+} // namespace literals
 
 } // namespace tikpp::models
 
