@@ -30,6 +30,8 @@ auto error_category::message(int c) const -> std::string {
         return "Could not add item";
     case tikpp::error_code::remove_failed:
         return "Could not remove item";
+    case tikpp::error_code::update_failed:
+        return "Could not update item";
     default:
         return "Unknoww error";
     }

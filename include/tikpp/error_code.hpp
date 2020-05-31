@@ -30,7 +30,8 @@ enum class [[nodiscard]] error_code {
     untagged_response         = 3,
     invalid_login_credentials = 4,
     add_failed                = 5,
-    remove_failed             = 6
+    remove_failed             = 6,
+    update_failed             = 7
 };
 
 auto error_category() -> const boost::system::error_category &;
