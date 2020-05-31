@@ -45,9 +45,9 @@ struct api_repository {
 
     template <typename CompletionToken>
     decltype(auto) async_add(Model model, CompletionToken &&token) {
-        GENERATE_COMPLETION_HANDLER(
-            void(const boost::system::error_code &, std::string &&), token,
-            handler, result)
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &,
+                                         tikpp::models::types::identity &&),
+                                    token, handler, result)
 
         auto req = api_->template make_request<tikpp::commands::add<Model>>(
             std::move(model));
@@ -55,13 +55,14 @@ struct api_repository {
         api_->async_send(std::move(req), [handler {std::move(handler)}](
                                              const auto &err, auto &&resp) {
             if (err) {
-                handler(err, std::string {});
+                handler(err, 0);
             } else if (resp.type() != tikpp::response_type::normal ||
                        !resp.contains("ret")) {
                 handler(tikpp::make_error_code(tikpp::error_code::add_failed),
-                        std::string {});
+                        0);
             } else {
-                handler(boost::system::error_code {}, std::move(resp["ret"]));
+                handler(boost::system::error_code {},
+                        tikpp::models::types::identity {resp["ret"]});
             }
 
             return false;
