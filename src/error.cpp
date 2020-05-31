@@ -28,6 +28,8 @@ auto error_category::message(int c) const -> std::string {
         return "Invalid login credentails";
     case tikpp::error_code::add_failed:
         return "Could not add item";
+    case tikpp::error_code::remove_failed:
+        return "Could not remove item";
     default:
         return "Unknoww error";
     }

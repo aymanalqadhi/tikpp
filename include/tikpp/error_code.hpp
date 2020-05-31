@@ -25,11 +25,12 @@ class error_category : public boost::system::error_category {
 
 enum class [[nodiscard]] error_code {
     success                   = 0,
-    invalid_response          = 2,
-    fatal_response            = 3,
-    untagged_response         = 4,
-    invalid_login_credentials = 6,
-    add_failed                = 7
+    invalid_response          = 1,
+    fatal_response            = 2,
+    untagged_response         = 3,
+    invalid_login_credentials = 4,
+    add_failed                = 5,
+    remove_failed             = 6
 };
 
 auto error_category() -> const boost::system::error_category &;
