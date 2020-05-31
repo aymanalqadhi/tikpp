@@ -16,9 +16,9 @@ struct user final : tikpp::models::model {
 
     bool disabled;
 
-    template <template <typename> typename Converter, typename Map>
-    inline void convert(Converter<Map> &c) {
-        model::convert<Converter, Map>(c);
+    template <typename Converter>
+    inline void convert(Converter &c) {
+        model::convert(c);
 
         c["name"] % name;
         c["password"] % password;

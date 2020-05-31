@@ -12,6 +12,11 @@ struct add : tikpp::request {
         : request {std::string {Model::api_path} + command_suffix, tag} {
         tikpp::models::dissolver<add<Model>> dissolver {*this};
         model.convert(dissolver);
+
+        if (auto itr = words_.find("=.id"); itr != words_.end()) {
+            words_.erase(itr);
+        }
+
     }
 
     static constexpr auto command_suffix = "/add";
