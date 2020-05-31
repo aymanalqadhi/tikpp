@@ -6,7 +6,6 @@
 #include "fmt/format.h"
 #include <boost/lexical_cast/try_lexical_convert.hpp>
 
-#include <cassert>
 #include <string>
 #include <unordered_map>
 
@@ -20,6 +19,8 @@ inline auto convert(const std::string &str) -> std::decay_t<T> {
         return str;
     } else if constexpr (std::is_same_v<type, bool>) {
         return str == "true" || str == "yes";
+    } else if constexpr (std::is_constructible_v<T, decltype(str)>) {
+        return T {str};
     }
 
     type ret {};
