@@ -32,6 +32,10 @@ auto error_category::message(int c) const -> std::string {
         return "Could not remove item";
     case tikpp::error_code::update_failed:
         return "Could not update item";
+    case tikpp::error_code::listen_failed:
+        return "Could not listen on items list";
+    case tikpp::error_code::list_end:
+        return "End of list reached";
     default:
         return "Unknoww error";
     }
