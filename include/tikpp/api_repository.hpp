@@ -4,9 +4,11 @@
 #include "tikpp/basic_api.hpp"
 #include "tikpp/commands/add.hpp"
 #include "tikpp/commands/getall.hpp"
+#include "tikpp/commands/remove.hpp"
 #include "tikpp/detail/async_result.hpp"
 #include "tikpp/models/convert.hpp"
 #include "tikpp/models/query.hpp"
+#include "tikpp/models/types/identity.hpp"
 
 #include <boost/system/error_code.hpp>
 
@@ -66,6 +68,38 @@ struct api_repository {
         });
 
         return result.get();
+    }
+
+    template <typename CompletionToken>
+    decltype(auto) async_remove(std::string id, CompletionToken &&token) {
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result)
+
+        auto req =
+            api_->template make_request<tikpp::commands::remove<Model>>(id);
+
+        api_->async_send(std::move(req), [handler {std::move(handler)}](
+                                             const auto &err, auto &&resp) {
+            if (err) {
+                handler(err);
+            } else if (resp.type() != tikpp::response_type::normal) {
+                handler(
+                    tikpp::make_error_code(tikpp::error_code::remove_failed));
+            } else {
+                handler(boost::system::error_code {});
+            }
+
+            return false;
+        });
+
+        return result.get();
+    }
+
+    template <typename CompletionToken>
+    inline decltype(auto) async_remove(tikpp::models::types::identity id,
+                                       CompletionToken &&             token) {
+        return async_remove(id.to_string(),
+                            std::forward<CompletionToken>(token));
     }
 
   private:
