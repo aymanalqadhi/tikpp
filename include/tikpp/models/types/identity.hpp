@@ -11,6 +11,9 @@ namespace tikpp::models::types {
 struct identity {
     identity() = default;
 
+    identity(std::uint32_t id) : value {id} {
+    }
+
     identity(const std::string &str) {
         if (str.empty() || str[0] != '*') {
             value = 0;
