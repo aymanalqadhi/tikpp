@@ -18,13 +18,13 @@ struct async_transfer_handler {
 
 HAS_MEMBER_FUNCTION(async_write_some,
                     (std::declval<boost::asio::const_buffer>(),
-                     std::declval<async_transfer_handler>()));
+                     std::declval<async_transfer_handler>()))
 
 HAS_MEMBER_FUNCTION(async_read_some,
                     (std::declval<boost::asio::mutable_buffer>(),
-                     std::declval<async_transfer_handler>()));
+                     std::declval<async_transfer_handler>()))
 
-HAS_MEMBER_FUNCTION(get_executor, ());
+HAS_MEMBER_FUNCTION(get_executor, ())
 
 template <typename T>
 constexpr auto                  is_async_write_stream_v =
