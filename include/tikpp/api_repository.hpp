@@ -7,7 +7,7 @@
 #include "tikpp/commands/remove.hpp"
 #include "tikpp/commands/set.hpp"
 #include "tikpp/detail/async_result.hpp"
-#include "tikpp/models/convert.hpp"
+#include "tikpp/models/converters.hpp"
 #include "tikpp/models/query.hpp"
 #include "tikpp/models/types/identity.hpp"
 
