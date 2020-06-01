@@ -134,31 +134,27 @@ class basic_api : public std::enable_shared_from_this<
              handler {std::move(handler)}](const auto &err, auto &&resp) {
                 if (err) {
                     handler(err);
-                } else if (resp.type() != tikpp::response_type::normal) {
-                    handler(tikpp::make_error_code(
-                        tikpp::error_code::invalid_login_credentials));
+                } else if (resp.error()) {
+                    handler(resp.error());
                 } else if (resp.contains(
                                tikpp::commands::v1::login::challenge_param)) {
                     auto req = make_request<tikpp::commands::v1::login>(
                         name, password,
                         resp[tikpp::commands::v1::login::challenge_param]);
-                    async_send(std::move(req), [this,
-                                                handler {std::move(handler)}](
-                                                   const auto &err,
-                                                   auto &&     resp) {
-                        if (err) {
-                            handler(err);
-                        } else if (resp.type() !=
-                                   tikpp::response_type::normal) {
-                            handler(tikpp::make_error_code(
-                                tikpp::error_code::invalid_login_credentials));
-                        } else {
-                            logged_in_ = true;
-                            handler(boost::system::error_code {});
-                        }
+                    async_send(std::move(req),
+                               [this, handler {std::move(handler)}](
+                                   const auto &err, auto &&resp) {
+                                   if (err) {
+                                       handler(err);
+                                   } else if (resp.error()) {
+                                       handler(resp.error());
+                                   } else {
+                                       logged_in_ = true;
+                                       handler(boost::system::error_code {});
+                                   }
 
-                        return false;
-                    });
+                                   return false;
+                               });
                 } else {
                     handler(boost::system::error_code {});
                 }

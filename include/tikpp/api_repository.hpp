@@ -57,10 +57,8 @@ struct api_repository {
                                              const auto &err, auto &&resp) {
             if (err) {
                 handler(err, 0);
-            } else if (resp.type() != tikpp::response_type::normal ||
-                       !resp.contains("ret")) {
-                handler(tikpp::make_error_code(tikpp::error_code::add_failed),
-                        0);
+            } else if (resp.error()) {
+                handler(resp.error(), 0);
             } else {
                 handler(boost::system::error_code {},
                         tikpp::models::types::identity {resp["ret"]});
@@ -84,9 +82,8 @@ struct api_repository {
                                              const auto &err, auto &&resp) {
             if (err) {
                 handler(err);
-            } else if (resp.type() != tikpp::response_type::normal) {
-                handler(
-                    tikpp::make_error_code(tikpp::error_code::remove_failed));
+            } else if (resp.error()) {
+                handler(tikpp::make_error_code(resp.error()));
             } else {
                 handler(boost::system::error_code {});
             }
@@ -116,9 +113,8 @@ struct api_repository {
                                              const auto &err, auto &&resp) {
             if (err) {
                 handler(err);
-            } else if (resp.type() != tikpp::response_type::normal) {
-                handler(
-                    tikpp::make_error_code(tikpp::error_code::update_failed));
+            } else if (resp.error()) {
+                handler(resp.error());
             } else {
                 handler(boost::system::error_code {});
             }
@@ -191,6 +187,8 @@ struct api_repository {
                                              const auto &err, auto &&resp) {
             if (err) {
                 handler(err, Model {});
+            } else if (resp.error()) {
+                handler(resp.error(), Model {});
             } else if (resp.type() == tikpp::response_type::normal &&
                        resp.empty()) {
                 handler(tikpp::make_error_code(tikpp::error_code::list_end),
@@ -216,7 +214,7 @@ struct api_repository {
     }
 
     ApiPtr api_;
-};
+}; // namespace tikpp
 
 template <typename Model, typename ApiPtr>
 inline auto make_repository(ApiPtr api) -> api_repository<Model, ApiPtr> {
