@@ -49,7 +49,7 @@ TEST(ResponseTest, UnknownTypeTest) {
 
 TEST(ResponseTest, ParamsTest) {
     tikpp::response resp {
-        {"!re", "=key1=value1", "=key2=1234", "=key3=1234.1234", "=key4=1"}};
+        {"!re", "=key1=value1", "=key2=1234", "=key3=1234.1234", "=key4=true"}};
 
     EXPECT_EQ(resp.type(), tikpp::response_type::data);
     EXPECT_EQ(resp.size(), 4);
@@ -63,7 +63,7 @@ TEST(ResponseTest, ParamsTest) {
 
 TEST(ResponseTest, AttributesTest) {
     tikpp::response resp {{"!done", ".attr1=value1", ".attr2=1234",
-                           ".attr3=1234.1234", ".attr4=1"}};
+                           ".attr3=1234.1234", ".attr4=true"}};
 
     EXPECT_EQ(resp.type(), tikpp::response_type::normal);
     EXPECT_EQ(resp.size(), 4);
@@ -86,8 +86,7 @@ TEST(ResponseTest, TagTest) {
 }
 
 TEST(ResponseTest, EmptyValues) {
-    tikpp::response resp {
-        {"!re", "=key1=", "=key2=", ".attr1="}};
+    tikpp::response resp {{"!re", "=key1=", "=key2=", ".attr1="}};
 
     EXPECT_EQ(resp.type(), tikpp::response_type::data);
     EXPECT_EQ(resp.size(), 3);
