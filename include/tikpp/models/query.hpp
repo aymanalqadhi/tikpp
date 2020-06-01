@@ -15,6 +15,11 @@ struct query {
     query(std::vector<std::string> w) : words {std::move(w)} {
     }
 
+    inline auto operator==(const query &q) const noexcept -> bool {
+        return std::equal(q.words.begin(), q.words.end(), words.begin(),
+                          words.end());
+    }
+
     inline auto operator!() -> query {
         query ret {words};
 
@@ -27,34 +32,31 @@ struct query {
         return ret;
     }
 
-    inline auto operator&&(query q) -> query {
-        if (std::equal(q.words.begin(), q.words.end(), words.begin(),
-                       words.end())) {
+    inline auto operator&&(query q) -> query & {
+        if (*this == q) {
             return *this;
         }
 
-        query ret {words};
-        ret.extend(q);
-        ret.words.push_back("?#&");
+        extend(q);
+        words.push_back("?#&");
 
-        return ret;
+        return *this;
     }
 
-    inline auto operator||(query q) -> query {
-        if (std::equal(q.words.begin(), q.words.end(), words.begin(),
-                       words.end())) {
+    inline auto operator||(query q) -> query & {
+        if (*this == q) {
             return *this;
         }
 
-        query ret {words};
-        ret.extend(q);
-        ret.words.push_back("?#|");
+        extend(q);
+        words.push_back("?#|");
 
-        return ret;
+        return *this;
     }
 
-    inline auto operator^(query q) -> query {
-        return (*this && !q) || (!*this && q);
+    inline auto operator^(query q) -> query & {
+        query tmp {words};
+        return (*this && !q) || (!tmp && q);
     }
 
     inline operator std::vector<std::string> &() {
