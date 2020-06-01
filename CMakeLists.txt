@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 # Project name
 project(tikpp CXX)
+set(MAIN_PROJECT_NAME ${PROJECT_NAME})
 
 # Project options
 set(CMAKE_CXX_STANDARD 17)
