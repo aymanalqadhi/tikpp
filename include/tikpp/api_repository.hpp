@@ -18,6 +18,8 @@
 #include <type_traits>
 #include <vector>
 
+#include <iostream>
+
 namespace tikpp {
 
 template <typename Model, typename ApiPtr>
@@ -53,19 +55,20 @@ struct api_repository {
         auto req = api_->template make_request<tikpp::commands::add<Model>>(
             std::move(model));
 
-        api_->async_send(std::move(req), [handler {std::move(handler)}](
-                                             const auto &err, auto &&resp) {
-            if (err) {
-                handler(err, 0);
-            } else if (resp.error()) {
-                handler(resp.error(), 0);
-            } else {
-                handler(boost::system::error_code {},
-                        tikpp::models::types::identity {resp["ret"]});
-            }
+        api_->async_send(
+            std::move(req), [handler {std::move(handler)}](
+                                const auto &err, auto &&resp) mutable {
+                if (err) {
+                    handler(err, 0);
+                } else if (resp.error()) {
+                    handler(resp.error(), 0);
+                } else {
+                    handler(boost::system::error_code {},
+                            tikpp::models::types::identity {resp["ret"]});
+                }
 
-            return false;
-        });
+                return false;
+            });
 
         return result.get();
     }
@@ -78,18 +81,19 @@ struct api_repository {
         auto req =
             api_->template make_request<tikpp::commands::remove<Model>>(id);
 
-        api_->async_send(std::move(req), [handler {std::move(handler)}](
-                                             const auto &err, auto &&resp) {
-            if (err) {
-                handler(err);
-            } else if (resp.error()) {
-                handler(tikpp::make_error_code(resp.error()));
-            } else {
-                handler(boost::system::error_code {});
-            }
+        api_->async_send(std::move(req),
+                         [handler {std::move(handler)}](const auto &err,
+                                                        auto &&resp) mutable {
+                             if (err) {
+                                 handler(err);
+                             } else if (resp.error()) {
+                                 handler(tikpp::make_error_code(resp.error()));
+                             } else {
+                                 handler(boost::system::error_code {});
+                             }
 
-            return false;
-        });
+                             return false;
+                         });
 
         return result.get();
     }
@@ -109,18 +113,19 @@ struct api_repository {
         auto req = api_->template make_request<tikpp::commands::set<Model>>(
             std::move(model));
 
-        api_->async_send(std::move(req), [handler {std::move(handler)}](
-                                             const auto &err, auto &&resp) {
-            if (err) {
-                handler(err);
-            } else if (resp.error()) {
-                handler(resp.error());
-            } else {
-                handler(boost::system::error_code {});
-            }
+        api_->async_send(std::move(req),
+                         [handler {std::move(handler)}](const auto &err,
+                                                        auto &&resp) mutable {
+                             if (err) {
+                                 handler(err);
+                             } else if (resp.error()) {
+                                 handler(resp.error());
+                             } else {
+                                 handler(boost::system::error_code {});
+                             }
 
-            return false;
-        });
+                             return false;
+                         });
 
         return result.get();
     }
@@ -153,7 +158,7 @@ struct api_repository {
         api_->async_send(
             std::move(req), [handler {std::move(handler)},
                              ret = std::make_shared<std::vector<Model>>()](
-                                const auto &err, auto &&resp) {
+                                const auto &err, auto &&resp) mutable {
                 if (err) {
                     handler(err, std::vector<Model> {});
                     return false;
@@ -184,7 +189,8 @@ struct api_repository {
             result)
 
         api_->async_send(std::move(req), [handler {std::move(handler)}](
-                                             const auto &err, auto &&resp) {
+                                             const auto &err,
+                                             auto &&     resp) mutable {
             if (err) {
                 handler(err, Model {});
             } else if (resp.error()) {
