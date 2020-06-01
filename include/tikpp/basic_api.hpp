@@ -48,8 +48,9 @@ class basic_api : public std::enable_shared_from_this<
                                     token, handler, result);
 
         if (state_.load() == api_state::connecting) {
-            return handler(boost::asio::error::make_error_code(
+            handler(boost::asio::error::make_error_code(
                 boost::asio::error::in_progress));
+            return result.get();
         }
 
         assert(state_.load() == api_state::closed);
@@ -123,15 +124,15 @@ class basic_api : public std::enable_shared_from_this<
     }
 
     template <typename CompletionToken>
-    void async_login(const std::string &name,
-                     const std::string &password,
-                     CompletionToken && token) {
+    decltype(auto) async_login(const std::string &name,
+                               const std::string &password,
+                               CompletionToken && token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
                                     token, handler, result);
         async_send(
             make_request<tikpp::commands::v2::login>(name, password),
-            [this, name, password,
-             handler {std::move(handler)}](const auto &err, auto &&resp) {
+            [this, name, password, handler {std::move(handler)}](
+                const auto &err, auto &&resp) mutable {
                 if (err) {
                     handler(err);
                 } else if (resp.error()) {
@@ -143,7 +144,7 @@ class basic_api : public std::enable_shared_from_this<
                         resp[tikpp::commands::v1::login::challenge_param]);
                     async_send(std::move(req),
                                [this, handler {std::move(handler)}](
-                                   const auto &err, auto &&resp) {
+                                   const auto &err, auto &&resp) mutable {
                                    if (err) {
                                        handler(err);
                                    } else if (resp.error()) {
@@ -269,14 +270,13 @@ class basic_api : public std::enable_shared_from_this<
   private:
     boost::asio::io_context &io_;
     AsyncStream              sock_;
+    ErrorHandler &           error_handler_;
     std::atomic<api_state>   state_;
+    std::atomic_uint32_t     current_tag_;
+    bool                     logged_in_;
 
-    std::atomic_uint32_t                                          current_tag_;
     std::deque<std::pair<std::shared_ptr<request>, read_handler>> send_queue_;
     std::map<std::uint32_t, read_handler>                         read_cbs_;
-
-    bool          logged_in_;
-    ErrorHandler &error_handler_;
 };
 
 } // namespace tikpp
