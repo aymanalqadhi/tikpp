@@ -3,6 +3,8 @@
 
 #include "tikpp/sentence.hpp"
 
+#include <boost/system/error_code.hpp>
+
 #include <cstdint>
 #include <optional>
 #include <string>
@@ -26,6 +28,11 @@ struct response : sentence {
         return tag_;
     }
 
+    [[nodiscard]] inline auto error() const noexcept
+        -> const boost::system::error_code & {
+        return error_;
+    }
+
     [[nodiscard]] static inline auto
     is_valid_response(const std::vector<std::string> &words) -> bool {
         return !words.empty() && words[0][0] == '!';
@@ -34,6 +41,7 @@ struct response : sentence {
   protected:
     response_type                type_ {};
     std::optional<std::uint32_t> tag_;
+    boost::system::error_code    error_ {};
 };
 
 } // namespace tikpp
