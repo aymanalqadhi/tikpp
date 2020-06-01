@@ -1,8 +1,6 @@
 #ifndef TIKPP_COMMANDS_REMOVE_HPP
 #define TIKPP_COMMANDS_REMOVE_HPP
 
-#include "tikpp/models/convert.hpp"
-#include "tikpp/models/types/identity.hpp"
 #include "tikpp/request.hpp"
 
 #include <cstdint>
