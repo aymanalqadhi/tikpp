@@ -12,22 +12,49 @@ struct query {
     query(std::string &&word) : words {std::move(word)} {
     }
 
-    inline auto operator&&(const query &q) -> query & {
-        extend(q);
-        words.push_back("?#&");
-
-        return *this;
+    query(std::vector<std::string> w) : words {std::move(w)} {
     }
 
-    inline auto operator||(const query &q) -> query & {
-        extend(q);
-        words.push_back("?#|");
-        return *this;
+    inline auto operator!() -> query {
+        query ret {words};
+
+        if (ret.words.back() == "?#!") {
+            ret.words.pop_back();
+        } else {
+            ret.words.push_back("?#!");
+        }
+
+        return ret;
     }
 
-    inline auto operator!() -> query & {
-        words.push_back("?#!");
-        return *this;
+    inline auto operator&&(query q) -> query {
+        if (std::equal(q.words.begin(), q.words.end(), words.begin(),
+                       words.end())) {
+            return *this;
+        }
+
+        query ret {words};
+        ret.extend(q);
+        ret.words.push_back("?#&");
+
+        return ret;
+    }
+
+    inline auto operator||(query q) -> query {
+        if (std::equal(q.words.begin(), q.words.end(), words.begin(),
+                       words.end())) {
+            return *this;
+        }
+
+        query ret {words};
+        ret.extend(q);
+        ret.words.push_back("?#|");
+
+        return ret;
+    }
+
+    inline auto operator^(query q) -> query {
+        return (*this && !q) || (!*this && q);
     }
 
     inline operator std::vector<std::string> &() {
@@ -80,10 +107,6 @@ struct query_token {
     template <typename T>
     inline auto operator>=(const T &t) -> query {
         return *this > t || *this == t;
-    }
-
-    friend std::ostream &operator<<(std::ostream &os, const query_token &t) {
-        return os << t.name;
     }
 
     std::string name;
