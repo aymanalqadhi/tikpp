@@ -26,14 +26,23 @@ class error_category : public boost::system::error_category {
 enum class [[nodiscard]] error_code : int {
     success = 0,
     invalid_response,
-    fatal_response,
     untagged_response,
-    invalid_login_credentials,
-    add_failed,
-    remove_failed,
-    update_failed,
-    listen_failed,
-    list_end};
+    unknown_response_type,
+    fatal_response,
+    no_such_item,
+    invalid_argument,
+    interrupted,
+    script_failure,
+    general_failure,
+    api_failure,
+    tty_failure,
+    return_value,
+    item_already_exists,
+    login_failure,
+    list_end,
+    unknown_error_category,
+    unknown_error
+};
 
 auto error_category() -> const boost::system::error_category &;
 

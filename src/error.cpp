@@ -20,22 +20,35 @@ auto error_category::message(int c) const -> std::string {
         return "Success";
     case tikpp::error_code::invalid_response:
         return "Invalid response";
-    case tikpp::error_code::fatal_response:
-        return "Fatal response";
     case tikpp::error_code::untagged_response:
         return "Untagged response";
-    case tikpp::error_code::invalid_login_credentials:
-        return "Invalid login credentails";
-    case tikpp::error_code::add_failed:
-        return "Could not add item";
-    case tikpp::error_code::remove_failed:
-        return "Could not remove item";
-    case tikpp::error_code::update_failed:
-        return "Could not update item";
-    case tikpp::error_code::listen_failed:
-        return "Could not listen on items list";
+    case tikpp::error_code::unknown_response_type:
+        return "Unknown response type";
+    case tikpp::error_code::fatal_response:
+        return "Fatal response";
+    case tikpp::error_code::no_such_item:
+        return "No such item";
+    case tikpp::error_code::invalid_argument:
+        return "Invalid argument";
+    case tikpp::error_code::interrupted:
+        return "Command execution was interrupted";
+    case tikpp::error_code::script_failure:
+        return "Script related failure";
+    case tikpp::error_code::general_failure:
+        return "General failure";
+    case tikpp::error_code::api_failure:
+        return "API related failure";
+    case tikpp::error_code::tty_failure:
+        return "TTY related failure";
+    case tikpp::error_code::login_failure:
+        return "Could not login";
+    case tikpp::error_code::item_already_exists:
+        return "Item already exists";
     case tikpp::error_code::list_end:
         return "End of list reached";
+    case tikpp::error_code::unknown_error_category:
+        return "Unknoww error category";
+
     default:
         return "Unknoww error";
     }
