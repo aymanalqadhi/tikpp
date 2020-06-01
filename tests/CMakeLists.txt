@@ -11,7 +11,9 @@ include_directories(include/)
 # Project functions
 function(create_test test_name)
     add_executable(${test_name} src/${test_name}_tests.cpp)
-    target_link_libraries(${test_name} ${MAIN_PROJECT_NAME} gtest gtest_main tikpp)
+    target_link_libraries(${test_name} ${MAIN_PROJECT_NAME}
+                                       gtest
+                                       gtest_main)
     add_test(NAME ${test_name} COMMAND ${test_name})
 endfunction()
 
@@ -22,6 +24,13 @@ create_test(async_read_word_length)
 create_test(async_read_word)
 create_test(async_read_response)
 create_test(async_connect)
+create_test(types_identity)
+create_test(proplist_collector)
+create_test(models_creator)
+create_test(models_dissolver)
+create_test(query)
+create_test(commands_add)
+create_test(commands_set)
 
 # Test client
 add_executable(test_client src/test_client.cpp)
