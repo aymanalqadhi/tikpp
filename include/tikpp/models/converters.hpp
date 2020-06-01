@@ -1,38 +1,13 @@
-#ifndef TIKPP_MODELS_CONVERT_HPP
-#define TIKPP_MODELS_CONVERT_HPP
+#ifndef TIKPP_MODELS_CONVERTERS_HPP
+#define TIKPP_MODELS_CONVERTERS_HPP
 
+#include "tikpp/detail/convert.hpp"
 #include "tikpp/detail/type_traits/model.hpp"
-
-#include "fmt/format.h"
-#include <boost/lexical_cast/try_lexical_convert.hpp>
 
 #include <string>
 #include <unordered_map>
 
 namespace tikpp::models {
-
-template <typename T>
-inline auto convert(const std::string &str) -> std::decay_t<T> {
-    using type = std::decay_t<T>;
-
-    if constexpr (std::is_same_v<type, std::string>) {
-        return str;
-    } else if constexpr (std::is_same_v<type, bool>) {
-        return str == "true" || str == "yes";
-    } else if constexpr (std::is_constructible_v<T, decltype(str)>) {
-        return T {str};
-    }
-
-    type ret {};
-    boost::conversion::try_lexical_convert(str, ret);
-
-    return ret;
-}
-
-template <typename T>
-inline auto convert_back(T value) -> std::string {
-    return fmt::to_string(value);
-}
 
 template <typename HashMap,
           typename = std::enable_if_t<
@@ -50,7 +25,7 @@ struct creator : hash_map_wrapper<HashMap> {
     struct item_wrapper {
         template <typename T>
         inline void operator%(T &rhs) {
-            rhs = convert<T>(value);
+            rhs = tikpp::detail::convert<T>(value);
         }
 
         const std::string &value;
@@ -71,7 +46,8 @@ struct dissolver : hash_map_wrapper<HashMap> {
     struct item_wrapper {
         template <typename T>
         void operator%(T &&value) {
-            data["=" + std::move(key)] = convert_back(std::forward<T>(value));
+            data["=" + key] =
+                tikpp::detail::convert_back(std::forward<T>(value));
         }
 
         std::string key;
