@@ -1,7 +1,6 @@
 #ifndef TIKPP_MODELS_MODEL_HPP
 #define TIKPP_MODELS_MODEL_HPP
 
-#include "tikpp/models/convert.hpp"
 #include "tikpp/models/types/identity.hpp"
 #include "tikpp/request.hpp"
 

@@ -1,7 +1,7 @@
 #ifndef TIKPP_SENTENCE_HPP
 #define TIKPP_SENTENCE_HPP
 
-#include <boost/lexical_cast.hpp>
+#include "tikpp/detail/convert.hpp"
 
 #include <cassert>
 #include <string>
@@ -48,7 +48,7 @@ struct sentence {
     template <typename T>
     [[nodiscard]] inline auto get(const std::string &key) const noexcept -> T {
         assert(contains(key));
-        return boost::lexical_cast<T>(words_.at(key));
+        return tikpp::detail::convert<T>(words_.at(key));
     }
 
   protected:
