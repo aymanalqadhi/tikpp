@@ -18,8 +18,6 @@
 #include <type_traits>
 #include <vector>
 
-#include <iostream>
-
 namespace tikpp {
 
 template <typename Model, typename ApiPtr>
