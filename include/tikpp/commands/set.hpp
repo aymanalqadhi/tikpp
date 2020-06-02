@@ -12,7 +12,7 @@ template <typename Model>
 struct set : tikpp::request {
     set(std::uint32_t tag, Model model)
         : request {std::string {Model::api_path} + command_suffix, tag} {
-        tikpp::models::dissolver<set<Model>> dissolver {*this};
+        tikpp::models::update_dissolver<set<Model>> dissolver {*this};
         model.convert(dissolver);
     }
 
