@@ -40,6 +40,8 @@ auto error_category::message(int c) const -> std::string {
         return "API related failure";
     case tikpp::error_code::tty_failure:
         return "TTY related failure";
+    case tikpp::error_code::unknown_parameter:
+        return "Unknown parameter";
     case tikpp::error_code::login_failure:
         return "Could not login";
     case tikpp::error_code::item_already_exists:

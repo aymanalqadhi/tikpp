@@ -38,6 +38,7 @@ enum class [[nodiscard]] error_code : int {
     tty_failure,
     return_value,
     item_already_exists,
+    unknown_parameter,
     login_failure,
     list_end,
     unknown_error_category,
