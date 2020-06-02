@@ -11,26 +11,35 @@ namespace tikpp::models::types {
 struct identity {
     identity() = default;
 
-    identity(std::uint32_t id) : value {id} {
+    identity(std::uint32_t id) : value_ {id} {
     }
 
     identity(const std::string &str) {
         if (str.empty() || str[0] != '*') {
-            value = 0;
+            value_ = 0;
         } else {
-            value = std::strtoul(str.c_str() + 1, nullptr, 16);
+            value_ = std::strtoul(str.c_str() + 1, nullptr, 16);
         }
     }
 
-    inline auto to_string() const noexcept -> std::string {
-        return fmt::format("*{:X}", value);
-    }
-
     inline operator std::uint32_t() const noexcept {
-        return value;
+        return value_;
     }
 
-    std::uint32_t value;
+    inline auto value() const noexcept -> std::uint32_t {
+        return value_;
+    }
+
+    inline auto to_string() const noexcept -> std::string {
+        return fmt::format("*{:X}", value_);
+    }
+
+    friend std::ostream &operator<<(std::ostream &os, const identity &id) {
+        return os << id.to_string();
+    }
+
+  private:
+    std::uint32_t value_;
 };
 
 std::istream &operator>>(std::istream &in, identity &id) {
@@ -44,10 +53,7 @@ std::istream &operator>>(std::istream &in, identity &id) {
 namespace literals {
 
 auto operator""_i(unsigned long long int id) -> identity {
-    identity ret {};
-    ret.value = id;
-
-    return ret;
+    return identity {static_cast<std::uint32_t>(id)};
 }
 
 } // namespace literals
@@ -62,7 +68,7 @@ struct fmt::formatter<tikpp::models::types::identity> {
 
     template <typename FormatContext>
     auto format(const tikpp::models::types::identity &id, FormatContext &ctx) {
-        return format_to(ctx.out(), "*{:X}", id.value);
+        return format_to(ctx.out(), "*{:X}", id.value());
     }
 };
 
