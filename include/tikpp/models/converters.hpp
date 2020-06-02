@@ -3,8 +3,11 @@
 
 #include "tikpp/detail/convert.hpp"
 #include "tikpp/detail/type_traits/model.hpp"
+#include "tikpp/models/types/one_way.hpp"
+#include "tikpp/models/types/readonly.hpp"
 
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 
 namespace tikpp::models {
@@ -28,6 +31,11 @@ struct creator : hash_map_wrapper<HashMap> {
             rhs = tikpp::detail::convert<T>(value);
         }
 
+        template <template <typename> typename Wrapper, typename T>
+        void operator%(Wrapper<T> &rhs) {
+            rhs = Wrapper<T> {std::move(tikpp::detail::convert<T>(value))};
+        }
+
         const std::string &value;
     };
 
@@ -41,13 +49,32 @@ struct creator : hash_map_wrapper<HashMap> {
     }
 };
 
-template <typename HashMap>
+template <typename HashMap, bool include_readonly = false>
 struct dissolver : hash_map_wrapper<HashMap> {
     struct item_wrapper {
         template <typename T>
-        void operator%(T &&value) {
-            data["=" + key] =
-                tikpp::detail::convert_back(std::forward<T>(value));
+        void operator%(const T &value) {
+            data["=" + key] = tikpp::detail::convert_back(value);
+        }
+
+        template <
+            template <typename>
+            typename Wrapper,
+            typename T,
+            typename = std::enable_if_t<
+                tikpp::detail::type_traits::is_value_wrapper_v<Wrapper, T>>>
+        void operator%(const Wrapper<T> &value) {
+            using wrapper_type = std::decay_t<Wrapper<T>>;
+
+            if constexpr ((std::is_same_v<wrapper_type,
+                                          tikpp::models::types::readonly<T>> &&
+                           !include_readonly) ||
+                          std::is_same_v<wrapper_type,
+                                         tikpp::models::types::one_way<T>>) {
+                return;
+            }
+
+            data["=" + key] = tikpp::detail::convert_back(value.value());
         }
 
         std::string key;
@@ -58,6 +85,9 @@ struct dissolver : hash_map_wrapper<HashMap> {
         return item_wrapper {std::move(key), hash_map_wrapper<HashMap>::data};
     }
 };
+
+template <typename HashMap>
+struct update_dissolver : dissolver<HashMap, true> {};
 
 template <typename Container>
 struct proplist_collector {
