@@ -37,7 +37,7 @@ inline auto convert(const std::string &str) -> std::decay_t<T> {
 }
 
 template <typename T>
-inline auto convert_back(T value) -> std::string {
+inline auto convert_back(const T &value) -> std::string {
     return fmt::to_string(value);
 }
 
