@@ -7,8 +7,6 @@ namespace tikpp::models::types {
 
 template <typename T>
 struct readonly {
-    using type = T;
-
     readonly() = default;
 
     readonly(T &&val) : value_ {std::forward<T>(val)} {

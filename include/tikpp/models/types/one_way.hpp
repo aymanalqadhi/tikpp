@@ -7,8 +7,6 @@ namespace tikpp::models::types {
 
 template <typename T>
 struct one_way {
-    using type = T;
-
     one_way() = default;
 
     one_way(T &&val) : value_ {std::forward<T>(val)} {
