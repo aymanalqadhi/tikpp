@@ -3,6 +3,7 @@
 
 #include "tikpp/models/model.hpp"
 #include "tikpp/models/types/one_way.hpp"
+#include "tikpp/models/types/bytes.hpp"
 
 #include <cstdint>
 #include <string>
@@ -30,11 +31,13 @@ struct user : tikpp::models::model {
 };
 
 struct user_detail : user {
-    tikpp::models::types::one_way<std::uint64_t> bytes_in;
-    tikpp::models::types::one_way<std::uint64_t> bytes_out;
+    using bytes = tikpp::models::types::bytes;
 
-    std::uint64_t limit_bytes_in;
-    std::uint64_t limit_bytes_out;
+    tikpp::models::types::one_way<bytes> bytes_in;
+    tikpp::models::types::one_way<bytes> bytes_out;
+
+    bytes limit_bytes_in;
+    bytes limit_bytes_out;
 
     template <template <typename> typename Converter, typename Map>
     inline void convert(Converter<Map> &c) {
