@@ -18,8 +18,9 @@ constexpr auto tag_key      = ".tag";
 constexpr auto category_key = "category";
 constexpr auto message_key  = "message";
 
-constexpr auto login_failure_message    = "cannot log in";
-constexpr auto already_existing_message = "already have";
+constexpr auto login_failure_message     = "cannot log in";
+constexpr auto already_existing_message  = "already have";
+constexpr auto unknown_parameter_message = "unknown parameter";
 
 const std::regex param_pattern {R"(=([^=]+)=(.*))", std::regex::extended};
 const std::regex attribute_pattern {R"((\.[^=]+)=(.*))", std::regex::extended};
@@ -67,6 +68,9 @@ void set_error_code(tikpp::response &resp, boost::system::error_code &error) {
         } else if (message.find(::already_existing_message) !=
                    std::string::npos) {
             return set_error(tikpp::error_code::item_already_exists);
+        } else if (message.find(::unknown_parameter_message) !=
+                   std::string::npos) {
+            return set_error(tikpp::error_code::unknown_parameter);
         }
     }
 
