@@ -18,18 +18,31 @@ function(create_test test_name)
 endfunction()
 
 # Project targets
+create_test(util_random)
+
+create_test(convert)
+create_test(convert_back)
+
 create_test(request)
 create_test(response)
 create_test(async_read_word_length)
 create_test(async_read_word)
 create_test(async_read_response)
 create_test(async_connect)
+
 create_test(types_identity)
+create_test(types_logic_wrapper)
+create_test(types_arithmetic_wrapper)
 create_test(types_bytes)
+create_test(types_one_way)
+create_test(types_two_way)
+create_test(types_duration)
+
 create_test(proplist_collector)
 create_test(models_creator)
 create_test(models_dissolver)
 create_test(query)
+
 create_test(commands_add)
 create_test(commands_set)
 
