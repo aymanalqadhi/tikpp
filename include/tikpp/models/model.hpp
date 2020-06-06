@@ -14,9 +14,12 @@ namespace tikpp::models {
 struct model {
     tikpp::models::types::readonly<tikpp::models::types::identity> id;
 
+    bool is_disabled;
+
     template <template <typename> typename Converter, typename Map>
     inline void convert(Converter<Map> &c) {
         c[".id"] % id;
+        c["disabled"] % is_disabled;
     }
 };
 
