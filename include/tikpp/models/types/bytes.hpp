@@ -2,28 +2,26 @@
 #define TIKPP_MODELS_TYPES_BYTES_HPP
 
 #include "tikpp/detail/convert.hpp"
+#include "tikpp/models/types/arithmetic_wrapper.hpp"
+#include "tikpp/models/types/logic_wrapper.hpp"
 
-#include <fmt/format.h>
-#include <fmt/printf.h>
+#include "fmt/format.h"
 
-#include <cmath>
 #include <cstdint>
 #include <string>
 
 namespace tikpp::models::types {
 
-struct bytes {
-    bytes() = default;
+struct bytes : tikpp::models::types::arithmetic_wrapper<bytes, std::uint64_t>,
+               tikpp::models::types::logic_wrapper<std::uint64_t> {
 
-    bytes(std::uint64_t b) : bytes_ {b} {
+    bytes(std::uint64_t b)
+        : arithmetic_wrapper<bytes, std::uint64_t> {bytes_},
+          logic_wrapper<std::uint64_t> {bytes_},
+          bytes_ {b} {
     }
 
-    inline operator std::uint64_t &() noexcept {
-        return bytes_;
-    }
-
-    inline auto value() const noexcept -> std::uint64_t {
-        return bytes_;
+    bytes() : bytes {0UL} {
     }
 
     inline auto kb() const noexcept -> double {
@@ -46,7 +44,12 @@ struct bytes {
         return tb() / 1024.0;
     }
 
-    auto to_string() const noexcept -> std::string {
+    inline auto operator=(const bytes &b) -> bytes & {
+        bytes_ = b.bytes_;
+        return *this;
+    }
+
+    auto to_human_readable_string() const noexcept -> std::string {
         switch (static_cast<int>(floor(log2l(bytes_)) / 10)) {
         case 1:
             return fmt::format("{:.2f} KB", kb());
@@ -63,69 +66,15 @@ struct bytes {
         }
     }
 
-    inline auto operator+(const bytes &b) const noexcept -> bytes {
-        return {value() + b.value()};
-    }
-
-    inline auto operator+=(const bytes &b) noexcept -> bytes & {
-        bytes_ += b.value();
-        return *this;
-    }
-
-    inline auto operator-(const bytes &b) const noexcept -> bytes {
-        return {value() - b.value()};
-    }
-
-    inline auto operator-=(const bytes &b) noexcept -> bytes & {
-        bytes_ -= b.value();
-        return *this;
-    }
-
-    inline auto operator*(const bytes &b) const noexcept -> bytes {
-        return {value() * b.value()};
-    }
-
-    inline auto operator*=(const bytes &b) noexcept -> bytes & {
-        bytes_ *= b.value();
-        return *this;
-    }
-
-    inline auto operator/(const bytes &b) const noexcept -> bytes {
-        return {value() / b.value()};
-    }
-
-    inline auto operator/=(const bytes &b) noexcept -> bytes & {
-        bytes_ /= b.value();
-        return *this;
-    }
-
-    inline auto operator==(const bytes &b) const noexcept -> bool {
-        return bytes_ == b.bytes_;
-    }
-
-    inline auto operator!=(const bytes &b) const noexcept -> bool {
-        return bytes_ != b.bytes_;
-    }
-
-    inline auto operator<(const bytes &b) const noexcept -> bool {
-        return bytes_ < b.bytes_;
-    }
-
-    inline auto operator>(const bytes &b) const noexcept -> bool {
-        return bytes_ > b.bytes_;
-    }
-
-    inline auto operator<=(const bytes &b) const noexcept -> bool {
-        return bytes_ <= b.bytes_;
-    }
-
-    inline auto operator>=(const bytes &b) const noexcept -> bool {
-        return bytes_ >= b.bytes_;
+    inline auto to_string() const noexcept -> std::string {
+        return fmt::to_string(bytes_);
     }
 
     friend std::ostream &operator<<(std::ostream &os, const bytes &b) {
-        return os << b.to_string();
+        return os << b.to_human_readable_string();
     }
+
+    using arithmetic_wrapper<bytes, std::uint64_t>::operator=;
 
   private:
     std::uint64_t bytes_;
@@ -177,7 +126,7 @@ struct fmt::formatter<tikpp::models::types::bytes> {
 
     template <typename FormatContext>
     auto format(const tikpp::models::types::bytes &b, FormatContext &ctx) {
-        return format_to(ctx.out(), "{}", b.value());
+        return format_to(ctx.out(), b.to_string());
     }
 };
 
