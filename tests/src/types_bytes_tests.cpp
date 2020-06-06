@@ -51,10 +51,10 @@ TEST(BytesTypeTests, ToStringTest) {
     bytes b3 {21783123};
     bytes b4 {946084014};
 
-    EXPECT_EQ(b1.to_string(), "120.08 GB");
-    EXPECT_EQ(b2.to_string(), "39.92 TB");
-    EXPECT_EQ(b3.to_string(), "20.77 MB");
-    EXPECT_EQ(b4.to_string(), "902.26 MB");
+    EXPECT_EQ(b1.to_human_readable_string(), "120.08 GB");
+    EXPECT_EQ(b2.to_human_readable_string(), "39.92 TB");
+    EXPECT_EQ(b3.to_human_readable_string(), "20.77 MB");
+    EXPECT_EQ(b4.to_human_readable_string(), "902.26 MB");
 }
 
 TEST(BytesTypeTests, LiteralsTest) {
