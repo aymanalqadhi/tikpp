@@ -44,7 +44,7 @@ static inline auto rparse_uint(const std::string &str, std::size_t pos) noexcept
         ret += integeral_pow<T>(10, pos - i) * (c - '0');
     }
 
-    if constexpr (std::is_unsigned_v<T>) {
+    if constexpr (std::is_signed_v<T>) {
         if (c == '-') {
             ret = ~ret + 1;
         }
@@ -69,7 +69,7 @@ static inline auto parse_uint(const std::string &str,
         ret = ret * 10 + (c - '0');
     }
 
-    if constexpr (std::is_unsigned_v<T>) {
+    if constexpr (std::is_signed_v<T>) {
         if (str[pos] == '-') {
             ret = ~ret + 1;
         }
