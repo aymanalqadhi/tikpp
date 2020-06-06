@@ -33,4 +33,17 @@
     template <typename T>                                                      \
     constexpr auto name##_v = name<T>::value;
 
+#define HAS_OPERATOR(name, op)                                                 \
+    template <typename T, typename = void>                                     \
+    struct has_##name##_operator : std::false_type {};                         \
+                                                                               \
+    template <typename T>                                                      \
+    struct has_##name##_operator<                                              \
+        T, std::void_t<decltype(std::declval<T &>()                            \
+                                    op std::declval<const T &>())>>            \
+        : std::true_type {};                                                   \
+                                                                               \
+    template <typename T>                                                      \
+    constexpr auto has_##name##_operator_v = has_##name##_operator<T>::value;
+
 #endif
