@@ -113,6 +113,11 @@ struct duration
                    tikpp::detail::parse_uint<rep_type>(str, pos2 + 1)});
     }
 
+    friend std::ostream &operator<<(std::ostream &            os,
+                                    const duration<Duration> &dur) {
+        return os << dur.to_human_readable_string();
+    }
+
     using arithmetic_wrapper<duration<Duration>, Duration>::operator=;
 
   private:
