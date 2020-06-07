@@ -16,9 +16,9 @@ struct bytes : tikpp::models::types::arithmetic_wrapper<bytes, std::uint64_t>,
                tikpp::models::types::logic_wrapper<std::uint64_t> {
 
     bytes(std::uint64_t b)
-        : arithmetic_wrapper<bytes, std::uint64_t> {bytes_},
-          logic_wrapper<std::uint64_t> {bytes_},
-          bytes_ {b} {
+        : bytes_ {b},
+          arithmetic_wrapper<bytes, std::uint64_t> {bytes_},
+          logic_wrapper<std::uint64_t> {bytes_} {
     }
 
     bytes() : bytes {0UL} {
