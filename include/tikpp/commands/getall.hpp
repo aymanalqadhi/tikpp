@@ -1,7 +1,7 @@
 #ifndef TIKPP_COMMANDS_GET_ALL_HPP
 #define TIKPP_COMMANDS_GET_ALL_HPP
 
-#include "tikpp/models/converters.hpp"
+#include "tikpp/models/proplist_collector.hpp"
 #include "tikpp/request.hpp"
 
 #include "fmt/format.h"
