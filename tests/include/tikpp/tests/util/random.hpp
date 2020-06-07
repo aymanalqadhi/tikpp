@@ -3,6 +3,7 @@
 
 #include "fmt/format.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cstddef>
 #include <limits>
@@ -65,7 +66,8 @@ std::string random_string(std::size_t len, random_string_options opts) {
         fmt::format_to(std::back_inserter(pool), sym);
     }
 
-    std::uniform_int_distribution<std::size_t> dist(0, pool.size() - 1);
+    std::shuffle(pool.begin(), pool.end(), rng);
+    std::uniform_int_distribution<std::size_t> dist {0, pool.size() - 1};
 
     while (len--) {
         fmt::format_to(std::back_inserter(ret), "{}", pool[dist(rng)]);
