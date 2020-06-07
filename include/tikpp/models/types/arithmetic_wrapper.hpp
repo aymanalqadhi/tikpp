@@ -16,17 +16,15 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_plus_operator_v<U>>>
-    inline auto operator+(const T &rhs) const noexcept
-        -> W {
+    inline auto operator+(const T &rhs) const noexcept -> W {
         static_assert(std::is_same_v<U, T>);
-        return W {value_ + rhs
-    };}
+        return W {value_ + rhs};
+    }
 
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_minus_operator_v<U>>>
-    inline auto operator-(const T &rhs) const noexcept
-        -> W {
+    inline auto operator-(const T &rhs) const noexcept -> W {
         static_assert(std::is_same_v<U, T>);
         return W {value_ - rhs};
     }
@@ -34,8 +32,7 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_multiply_operator_v<U>>>
-    inline auto operator*(const T &rhs) const noexcept
-        -> W {
+    inline auto operator*(const T &rhs) const noexcept -> W {
         static_assert(std::is_same_v<U, T>);
         return W {value_ * rhs};
     }
@@ -43,8 +40,7 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_divide_operator_v<U>>>
-    inline auto operator/(const T &rhs) const noexcept
-        -> W {
+    inline auto operator/(const T &rhs) const noexcept -> W {
         static_assert(std::is_same_v<U, T>);
         return W {value_ / rhs};
     }
@@ -78,8 +74,7 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_assign_operator_v<U>>>
-    inline auto operator+=(const T &rhs) noexcept
-        -> W & {
+    inline auto operator+=(const T &rhs) noexcept -> W & {
         static_assert(std::is_same_v<U, T>);
         value_ += rhs;
         return *static_cast<W *>(this);
@@ -88,8 +83,7 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_minus_assign_operator_v<U>>>
-    inline auto operator-=(const T &rhs) noexcept
-        -> W & {
+    inline auto operator-=(const T &rhs) noexcept -> W & {
         static_assert(std::is_same_v<U, T>);
         value_ -= rhs;
         return *static_cast<W *>(this);
@@ -99,8 +93,7 @@ struct arithmetic_wrapper {
         typename U = T,
         typename   = std::enable_if_t<
             tikpp::detail::type_traits::has_multiply_assign_operator_v<U>>>
-    inline auto operator*=(const T &rhs) noexcept
-        -> W & {
+    inline auto operator*=(const T &rhs) noexcept -> W & {
         static_assert(std::is_same_v<U, T>);
         value_ *= rhs;
         return *static_cast<W *>(this);
@@ -109,8 +102,7 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_divide_assign_operator_v<U>>>
-    inline auto operator/=(const T &rhs) noexcept
-        -> W & {
+    inline auto operator/=(const T &rhs) noexcept -> W & {
         static_assert(std::is_same_v<U, T>);
         value_ /= rhs;
         return *static_cast<W *>(this);
@@ -119,8 +111,7 @@ struct arithmetic_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<
                   tikpp::detail::type_traits::has_mod_assign_operator_v<U>>>
-    inline auto operator%=(const T &rhs) noexcept
-        -> W & {
+    inline auto operator%=(const T &rhs) noexcept -> W & {
         static_assert(std::is_same_v<U, T>);
         value_ %= rhs;
         return *static_cast<W *>(this);

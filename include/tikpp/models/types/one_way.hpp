@@ -17,7 +17,7 @@ struct one_way : tikpp::models::types::arithmetic_wrapper<one_way<T>, T>,
           logic_wrapper<T> {value_} {
     }
 
-    one_way(const T &value) : one_way(static_cast<T>(value)) {
+    one_way(const T& value) : one_way(static_cast<T>(value)) {
     }
 
     one_way() : one_way {T {}} {
