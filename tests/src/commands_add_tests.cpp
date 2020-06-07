@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-using model_type = tikpp::tests::fakes::model;
+using model_type = tikpp::tests::fakes::model1;
 
 using namespace std::literals;
 
