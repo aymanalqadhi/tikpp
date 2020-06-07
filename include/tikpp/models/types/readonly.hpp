@@ -12,6 +12,9 @@ struct readonly {
     readonly(T &&val) : value_ {std::forward<T>(val)} {
     }
 
+    readonly(const T &val) : value_ {static_cast<T>(val)} {
+    }
+
     inline operator const T &() const noexcept {
         return value_;
     }
