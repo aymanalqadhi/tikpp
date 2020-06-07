@@ -32,17 +32,20 @@ struct dissolver {
 
         template <typename T>
         void operator%(const tikpp::models::types::readonly<T> &w) {
-        }
-
-        template <typename T>
-        void operator%(const tikpp::models::types::one_way<T> &w) {
-            if (is_creating) {
+            if constexpr (!is_creating) {
                 dissolve(w.value());
             }
         }
 
         template <typename T>
-        void operator%(const tikpp::models::types::two_way<T> &w) {
+        void operator%(const tikpp::models::types::one_way<T> &w) {
+            if constexpr (is_creating) {
+                dissolve(w.value());
+            }
+        }
+
+        template <typename T>
+        void operator%(tikpp::models::types::two_way<T> &w) {
             if constexpr (!is_creating) {
                 if (!w.changed()) {
                     return;
@@ -50,6 +53,7 @@ struct dissolver {
             }
 
             dissolve(w.value());
+            w.changed(false);
         }
 
         std::string key;
@@ -64,10 +68,10 @@ struct dissolver {
 };
 
 template <typename HashMap>
-using creation_dissolver = dissolver<HashMap, true>;
+struct creation_dissolver : dissolver<HashMap, true> {};
 
 template <typename HashMap>
-using updating_dissolver = dissolver<HashMap, false>;
+struct updating_dissolver : dissolver<HashMap, false> {};
 
 } // namespace tikpp::models
 
