@@ -1,7 +1,7 @@
 #ifndef TIKPP_COMMANDS_SET_HPP
 #define TIKPP_COMMANDS_SET_HPP
 
-#include "tikpp/models/converters.hpp"
+#include "tikpp/models/dissolver.hpp"
 #include "tikpp/request.hpp"
 
 #include <cstdint>
@@ -12,7 +12,7 @@ template <typename Model>
 struct set : tikpp::request {
     set(std::uint32_t tag, Model model)
         : request {std::string {Model::api_path} + command_suffix, tag} {
-        tikpp::models::update_dissolver<set<Model>> dissolver {*this};
+        tikpp::models::updating_dissolver<set<Model>> dissolver {*this};
         model.convert(dissolver);
     }
 
