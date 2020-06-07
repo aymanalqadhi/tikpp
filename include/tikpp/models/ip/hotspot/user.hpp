@@ -44,8 +44,8 @@ struct user_detail : user {
     tikpp::models::types::one_way<bool>        is_dynamic;
     tikpp::models::types::one_way<bool>        is_default;
 
-    template <template <typename> typename Converter, typename Map>
-    inline void convert(Converter<Map> &c) {
+    template <typename Converter>
+    inline void convert(Converter &c) {
         user::convert(c);
 
         c["limit-bytes-in"] % limit_bytes_in;
