@@ -1,5 +1,5 @@
-#ifndef TIKPP_MODELS_MODEL_HPP
-#define TIKPP_MODELS_MODEL_HPP
+#ifndef TIKPP_DATA_MODEL_HPP
+#define TIKPP_DATA_MODEL_HPP
 
 #include "tikpp/models/types/identity.hpp"
 #include "tikpp/models/types/wrapper.hpp"
@@ -8,7 +8,7 @@
 #include <string>
 #include <type_traits>
 
-namespace tikpp::models {
+namespace tikpp::data {
 
 struct model {
     template <typename T>
@@ -30,6 +30,6 @@ struct model {
     }
 };
 
-} // namespace tikpp::models
+} // namespace tikpp::data
 
 #endif
