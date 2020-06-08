@@ -10,8 +10,8 @@
 #include "tikpp/commands/set.hpp"
 
 #include "tikpp/data/converters/creator.hpp"
+#include "tikpp/data/query.hpp"
 
-#include "tikpp/models/query.hpp"
 #include "tikpp/models/types/identity.hpp"
 
 #include <boost/system/error_code.hpp>
@@ -25,7 +25,7 @@ namespace tikpp::data {
 
 template <typename Model, typename ApiPtr>
 struct repository {
-    using query_type = decltype(std::declval<tikpp::models::query>().words);
+    using query_type = decltype(std::declval<tikpp::data::query>().words);
 
     explicit repository(ApiPtr api) : api_ {std::move(api)} {
     }

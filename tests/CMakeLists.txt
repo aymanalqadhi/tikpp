@@ -39,7 +39,7 @@ create_test(types_duration)
 create_test(data_converter_proplist_collector)
 create_test(data_converter_creator)
 create_test(data_converter_dissolver)
-create_test(query)
+create_test(data_query)
 
 create_test(commands_add)
 create_test(commands_set)

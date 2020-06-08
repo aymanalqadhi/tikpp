@@ -1,4 +1,4 @@
-#include "tikpp/models/query.hpp"
+#include "tikpp/data/query.hpp"
 
 #include "fmt/format.h"
 #include "gtest/gtest.h"
@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-using namespace tikpp::models::literals;
+using namespace tikpp::data::literals;
 
 namespace {
 
@@ -17,12 +17,12 @@ constexpr auto test_rhs = 12345;
 namespace tikpp::tests {
 
 struct QueryTokenOperatorTest : testing::Test {
-    tikpp::models::query_token token {"test_token"};
+    tikpp::data::query_token token {"test_token"};
 };
 
 TEST(QueryTests, LiteralsTest) {
     auto [gtoken1, gtoken2, gtoken3] =
-        tikpp::models::make_tokens("token1", "token2", "token3");
+        tikpp::data::make_tokens("token1", "token2", "token3");
     auto ltoken1 = "token1"_t, ltoken2 = "token2"_t, ltoken3 = "token3"_t;
 
     EXPECT_EQ(gtoken1.name, ltoken1.name);
@@ -113,7 +113,7 @@ TEST(QueryLogicalOperators, LogicalOrTest) {
 }
 
 TEST(QueryLogicalOperators, LogicalXorTest) {
-    auto [t1, t2] = tikpp::models::make_tokens("token1", "token2");
+    auto [t1, t2] = tikpp::data::make_tokens("token1", "token2");
 
     auto xor_query =
         (t1 == ::test_rhs) ^ (t2 != ::test_rhs && t1 <= ::test_rhs);

@@ -1,12 +1,12 @@
-#ifndef TIKPP_MODELS_QUERY_HPP
-#define TIKPP_MODELS_QUERY_HPP
+#ifndef TIKPP_DATA_QUERY_HPP
+#define TIKPP_DATA_QUERY_HPP
 
 #include "fmt/format.h"
 
 #include <string>
 #include <vector>
 
-namespace tikpp::models {
+namespace tikpp::data {
 
 struct query {
     query(std::string &&word) : words {std::move(word)} {
@@ -121,12 +121,12 @@ inline decltype(auto) make_tokens(Token &&... tokens) {
 
 namespace literals {
 auto operator""_t(const char *str, std::size_t len)
-    -> tikpp::models::query_token {
+    -> tikpp::data::query_token {
     return {std::string {str, len}};
 }
 
 } // namespace literals
 
-} // namespace tikpp::models
+} // namespace tikpp::data
 
 #endif
