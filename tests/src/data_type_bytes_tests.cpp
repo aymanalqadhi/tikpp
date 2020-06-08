@@ -1,12 +1,12 @@
-#include "tikpp/models/types/bytes.hpp"
+#include "tikpp/data/types/bytes.hpp"
 
 #include "gtest/gtest.h"
 
 #include <cmath>
 
-using namespace tikpp::models::types::literals;
+using namespace tikpp::data::types::literals;
 
-using tikpp::models::types::bytes;
+using tikpp::data::types::bytes;
 
 namespace {
 

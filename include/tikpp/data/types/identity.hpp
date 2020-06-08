@@ -1,12 +1,12 @@
-#ifndef TIKPP_MODELS_TYPES_INDENTITY_HPP
-#define TIKPP_MODELS_TYPES_INDENTITY_HPP
+#ifndef TIKPP_DATA_TYPES_INDENTITY_HPP
+#define TIKPP_DATA_TYPES_INDENTITY_HPP
 
 #include "fmt/format.h"
 
 #include <cstdint>
 #include <string>
 
-namespace tikpp::models::types {
+namespace tikpp::data::types {
 
 struct identity {
     identity() = default;
@@ -58,16 +58,16 @@ auto operator""_i(unsigned long long int id) -> identity {
 
 } // namespace literals
 
-} // namespace tikpp::models::types
+} // namespace tikpp::data::types
 
 template <>
-struct fmt::formatter<tikpp::models::types::identity> {
+struct fmt::formatter<tikpp::data::types::identity> {
     constexpr auto parse(format_parse_context &ctx) {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const tikpp::models::types::identity &id, FormatContext &ctx) {
+    auto format(const tikpp::data::types::identity &id, FormatContext &ctx) {
         return format_to(ctx.out(), "*{:X}", id.value());
     }
 };

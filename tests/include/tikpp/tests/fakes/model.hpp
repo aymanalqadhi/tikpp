@@ -1,8 +1,8 @@
 #ifndef TIKPP_TESTS_FAKES_MODEL_HPP
 #define TIKPP_TESTS_FAKES_MODEL_HPP
 
-#include "tikpp/models/types/identity.hpp"
-#include "tikpp/models/types/wrapper.hpp"
+#include "tikpp/data/types/identity.hpp"
+#include "tikpp/data/types/wrapper.hpp"
 
 #include <cstdint>
 #include <string>
@@ -33,11 +33,11 @@ struct model1 {
 struct model2 {
     static constexpr auto api_path = "/tikpp/tests/fakes/model2";
 
-    tikpp::models::types::readonly<tikpp::models::types::identity> id;
+    tikpp::data::types::readonly<tikpp::data::types::identity> id;
 
-    tikpp::models::types::two_way<std::string>  two_way_data;
-    tikpp::models::types::one_way<std::string>  one_way_data;
-    tikpp::models::types::readonly<std::string> readonly_data;
+    tikpp::data::types::two_way<std::string>  two_way_data;
+    tikpp::data::types::one_way<std::string>  one_way_data;
+    tikpp::data::types::readonly<std::string> readonly_data;
 
     template <typename Convertor>
     void convert(Convertor &c) {

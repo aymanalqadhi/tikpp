@@ -2,7 +2,7 @@
 #define TIKPP_DATA_CONVERTERS_DISSOLVER_HPP
 
 #include "tikpp/detail/convert.hpp"
-#include "tikpp/models/types/wrapper.hpp"
+#include "tikpp/data/types/wrapper.hpp"
 
 #include <string>
 #include <utility>
@@ -28,21 +28,21 @@ struct dissolver {
         }
 
         template <typename T>
-        void operator%(const tikpp::models::types::readonly<T> &w) {
+        void operator%(const tikpp::data::types::readonly<T> &w) {
             if constexpr (!is_creating) {
                 dissolve(w.value());
             }
         }
 
         template <typename T>
-        void operator%(const tikpp::models::types::one_way<T> &w) {
+        void operator%(const tikpp::data::types::one_way<T> &w) {
             if constexpr (is_creating) {
                 dissolve(w.value());
             }
         }
 
         template <typename T>
-        void operator%(tikpp::models::types::two_way<T> &w) {
+        void operator%(tikpp::data::types::two_way<T> &w) {
             if constexpr (!is_creating) {
                 if (!w.changed()) {
                     return;

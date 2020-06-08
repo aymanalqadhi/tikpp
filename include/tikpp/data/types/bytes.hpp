@@ -1,17 +1,17 @@
-#ifndef TIKPP_MODELS_TYPES_BYTES_HPP
-#define TIKPP_MODELS_TYPES_BYTES_HPP
+#ifndef TIKPP_DATA_TYPES_BYTES_HPP
+#define TIKPP_DATA_TYPES_BYTES_HPP
 
+#include "tikpp/data/types/wrapper.hpp"
 #include "tikpp/detail/convert.hpp"
-#include "tikpp/models/types/wrapper.hpp"
 
 #include "fmt/format.h"
 
 #include <cstdint>
 #include <string>
 
-namespace tikpp::models::types {
+namespace tikpp::data::types {
 
-struct bytes : tikpp::models::types::stateless_wrapper<std::uint64_t> {
+struct bytes : tikpp::data::types::stateless_wrapper<std::uint64_t> {
 
     bytes(std::uint64_t b) : stateless_wrapper<std::uint64_t> {std::move(b)} {
     }
@@ -103,18 +103,18 @@ inline auto operator""_pb(unsigned long long int b) -> bytes {
 
 } // namespace literals
 
-} // namespace tikpp::models::types
+} // namespace tikpp::data::types
 
 namespace fmt {
 
 template <>
-struct fmt::formatter<tikpp::models::types::bytes> {
+struct fmt::formatter<tikpp::data::types::bytes> {
     constexpr auto parse(format_parse_context &ctx) {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const tikpp::models::types::bytes &b, FormatContext &ctx) {
+    auto format(const tikpp::data::types::bytes &b, FormatContext &ctx) {
         return format_to(ctx.out(), b.to_string());
     }
 };

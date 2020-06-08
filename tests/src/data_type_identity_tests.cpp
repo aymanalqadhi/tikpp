@@ -1,10 +1,10 @@
-#include "tikpp/models/types/identity.hpp"
+#include "tikpp/data/types/identity.hpp"
 
 #include "gtest/gtest.h"
 
-using namespace tikpp::models::types::literals;
+using namespace tikpp::data::types::literals;
 
-using tikpp::models::types::identity;
+using tikpp::data::types::identity;
 
 namespace tikpp::tests {
 

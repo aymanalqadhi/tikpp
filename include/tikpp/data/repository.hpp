@@ -4,15 +4,14 @@
 #include "tikpp/basic_api.hpp"
 #include "tikpp/detail/async_result.hpp"
 
+#include "tikpp/data/converters/creator.hpp"
+#include "tikpp/data/query.hpp"
+#include "tikpp/data/types/identity.hpp"
+
 #include "tikpp/commands/add.hpp"
 #include "tikpp/commands/getall.hpp"
 #include "tikpp/commands/remove.hpp"
 #include "tikpp/commands/set.hpp"
-
-#include "tikpp/data/converters/creator.hpp"
-#include "tikpp/data/query.hpp"
-
-#include "tikpp/models/types/identity.hpp"
 
 #include <boost/system/error_code.hpp>
 
@@ -50,7 +49,7 @@ struct repository {
     template <typename CompletionToken>
     decltype(auto) async_add(Model model, CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &,
-                                         tikpp::models::types::identity &&),
+                                         tikpp::data::types::identity &&),
                                     token, handler, result)
 
         auto req = api_->template make_request<tikpp::commands::add<Model>>(
@@ -65,7 +64,7 @@ struct repository {
                     handler(resp.error(), 0);
                 } else {
                     handler(boost::system::error_code {},
-                            tikpp::models::types::identity {resp["ret"]});
+                            tikpp::data::types::identity {resp["ret"]});
                 }
 
                 return false;
@@ -100,7 +99,7 @@ struct repository {
     }
 
     template <typename CompletionToken>
-    inline decltype(auto) async_remove(tikpp::models::types::identity id,
+    inline decltype(auto) async_remove(tikpp::data::types::identity id,
                                        CompletionToken &&             token) {
         return async_remove(id.to_string(),
                             std::forward<CompletionToken>(token));

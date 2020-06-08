@@ -1,8 +1,8 @@
 #ifndef TIKPP_DATA_MODEL_HPP
 #define TIKPP_DATA_MODEL_HPP
 
-#include "tikpp/models/types/identity.hpp"
-#include "tikpp/models/types/wrapper.hpp"
+#include "tikpp/data/types/identity.hpp"
+#include "tikpp/data/types/wrapper.hpp"
 #include "tikpp/request.hpp"
 
 #include <string>
@@ -12,15 +12,15 @@ namespace tikpp::data {
 
 struct model {
     template <typename T>
-    using readonly = tikpp::models::types::readonly<T>;
+    using readonly = tikpp::data::types::readonly<T>;
 
     template <typename T>
-    using one_way = tikpp::models::types::one_way<T>;
+    using one_way = tikpp::data::types::one_way<T>;
 
     template <typename T>
-    using two_way = tikpp::models::types::two_way<T>;
+    using two_way = tikpp::data::types::two_way<T>;
 
-    readonly<tikpp::models::types::identity> id;
+    readonly<tikpp::data::types::identity> id;
     two_way<bool>                            is_disabled;
 
     template <template <typename> typename Converter, typename Map>

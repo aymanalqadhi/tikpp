@@ -1,4 +1,4 @@
-#include "tikpp/models/types/duration.hpp"
+#include "tikpp/data/types/duration.hpp"
 #include "tikpp/tests/util/random.hpp"
 
 #include "tikpp/detail/type_traits/operators.hpp"
@@ -25,7 +25,7 @@ constexpr auto test_string_size = 0xFF;
 namespace tikpp::tests {
 
 TEST(DurationTypeTests, OperatorsTest) {
-    tikpp::models::types::duration<test_duration_type> dur {1};
+    tikpp::data::types::duration<test_duration_type> dur {1};
 
     EXPECT_EQ(dur.value(), test_duration_type {1});
 
@@ -49,7 +49,7 @@ TEST(DurationTypeTests, ToStringTest) {
     auto rnd = test_duration_type {tikpp::tests::util::random<test_rep_type>()};
     auto secs = std::chrono::duration_cast<std::chrono::seconds>(rnd).count();
 
-    tikpp::models::types::duration<test_duration_type> dur {rnd};
+    tikpp::data::types::duration<test_duration_type> dur {rnd};
     EXPECT_EQ(dur.to_string(), fmt::format("{}s", secs));
 }
 
@@ -63,8 +63,8 @@ TEST(DurationTypeTests, ToHumanReadableString) {
     auto rnd = test_duration_type {tikpp::tests::util::random<test_rep_type>()};
     auto secs = std::chrono::duration_cast<std::chrono::seconds>(rnd).count();
 
-    tikpp::models::types::duration<test_duration_type> dur {rnd};
-    std::string                                        expected {};
+    tikpp::data::types::duration<test_duration_type> dur {rnd};
+    std::string                                      expected {};
 
     const auto append_unit = [&secs, &expected](const std::string &label,
                                                 std::size_t mul) noexcept {
@@ -101,7 +101,7 @@ TEST(DurationTypeTests, InvalidStringTest) {
                              random_string_options::alpha |
                                  random_string_options::mixed_case);
 
-    auto dur = tikpp::models::types::duration<std::chrono::seconds>(str);
+    auto dur = tikpp::data::types::duration<std::chrono::seconds>(str);
     EXPECT_EQ(0, dur.value().count());
 }
 
@@ -113,7 +113,7 @@ TEST(DurationTypeTests, UniversialFormatTest) {
     auto weeks = tikpp::tests::util::random<test_rep_type>();
 
     auto str = fmt::format("{}w{}d{}h{}m{}s", weeks, days, hours, mins, secs);
-    auto dur = tikpp::models::types::duration<test_duration_type> {str};
+    auto dur = tikpp::data::types::duration<test_duration_type> {str};
 
     EXPECT_EQ(std::chrono::duration_cast<test_duration_type>(
                   (std::chrono::hours {weeks} * 24 * 7) +
@@ -129,7 +129,7 @@ TEST(DurationTypeTests, HHMMSSFormatTest) {
     auto hours = tikpp::tests::util::random<test_rep_type>();
 
     auto str = fmt::format("{}:{}:{}", hours, mins, secs);
-    auto dur = tikpp::models::types::duration<test_duration_type>(str);
+    auto dur = tikpp::data::types::duration<test_duration_type>(str);
 
     EXPECT_EQ(std::chrono::duration_cast<test_duration_type>(
                   std::chrono::hours {hours} + std::chrono::minutes {mins} +
@@ -146,7 +146,7 @@ TEST(DurationTypeTests, MixedFormatTest) {
 
     auto str = fmt::format("{}w{}d{}h{}m{}s{}:{}:{}", weeks, days, hours, mins,
                            secs, hours, mins, secs);
-    auto dur = tikpp::models::types::duration<test_duration_type>(str);
+    auto dur = tikpp::data::types::duration<test_duration_type>(str);
 
     EXPECT_EQ(std::chrono::duration_cast<test_duration_type>(
                   (std::chrono::hours {weeks} * 24 * 7) +

@@ -1,18 +1,18 @@
-#ifndef TIKPP_MODELS_TYPES_DURATION_HPP
-#define TIKPP_MODELS_TYPES_DURATION_HPP
+#ifndef TIKPP_DATA_TYPES_DURATION_HPP
+#define TIKPP_DATA_TYPES_DURATION_HPP
 
+#include "tikpp/data/types/wrapper.hpp"
 #include "tikpp/detail/convert.hpp"
-#include "tikpp/models/types/wrapper.hpp"
 
 #include "fmt/format.h"
 
 #include <chrono>
 #include <string>
 
-namespace tikpp::models::types {
+namespace tikpp::data::types {
 
 template <typename Duration = std::chrono::seconds>
-struct duration : tikpp::models::types::stateless_wrapper<Duration> {
+struct duration : tikpp::data::types::stateless_wrapper<Duration> {
     using rep_type = typename Duration::rep;
 
     duration(std::chrono::duration<rep_type> value)
@@ -133,19 +133,19 @@ std::istream &operator>>(std::istream &in, duration<Duration> &d) {
     return in;
 }
 
-} // namespace tikpp::models::types
+} // namespace tikpp::data::types
 
 namespace fmt {
 
 template <typename Rep>
-struct fmt::formatter<tikpp::models::types::duration<Rep>> {
+struct fmt::formatter<tikpp::data::types::duration<Rep>> {
     constexpr auto parse(format_parse_context &ctx) {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const tikpp::models::types::duration<Rep> &d,
-                FormatContext &                            ctx) {
+    auto format(const tikpp::data::types::duration<Rep> &d,
+                FormatContext &                          ctx) {
         return format_to(ctx.out(), d.to_string());
     }
 };

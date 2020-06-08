@@ -1,10 +1,10 @@
-#include "tikpp/models/types/wrapper.hpp"
+#include "tikpp/data/types/wrapper.hpp"
 #include "tikpp/tests/util/random.hpp"
 
 #include "gtest/gtest.h"
 
 using test_type    = unsigned long;
-using test_wrapper = tikpp::models::types::two_way<test_type>;
+using test_wrapper = tikpp::data::types::two_way<test_type>;
 
 namespace tikpp::tests {
 

@@ -1,4 +1,4 @@
-#include "tikpp/models/types/wrapper.hpp"
+#include "tikpp/data/types/wrapper.hpp"
 #include "tikpp/tests/util/random.hpp"
 
 #include "gtest/gtest.h"
@@ -7,7 +7,7 @@ using test_type = unsigned long;
 
 namespace tikpp::tests {
 
-using test_wrapper = tikpp::models::types::one_way<test_type>;
+using test_wrapper = tikpp::data::types::one_way<test_type>;
 
 TEST(OneWayBinderTypeTests, ArithmeticTest) {
     auto rnd1 = tikpp::tests::util::random<test_type>();

@@ -1,12 +1,12 @@
-#ifndef TIKPP_MODELS_TYPES_WRAPPER_HPP
-#define TIKPP_MODELS_TYPES_WRAPPER_HPP
+#ifndef TIKPP_DATA_TYPES_WRAPPER_HPP
+#define TIKPP_DATA_TYPES_WRAPPER_HPP
 
 #include "tikpp/detail/type_traits/operators.hpp"
 
 #include <type_traits>
 #include <utility>
 
-namespace tikpp::models::types {
+namespace tikpp::data::types {
 
 template <typename T>
 struct stateless_value_wrapper {
@@ -189,6 +189,6 @@ struct two_way : stateful_wrapper<T> {
     using stateful_wrapper<T>::operator=;
 };
 
-} // namespace tikpp::models::types
+} // namespace tikpp::data::types
 
 #endif

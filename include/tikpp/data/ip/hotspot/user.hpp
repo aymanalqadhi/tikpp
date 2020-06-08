@@ -3,9 +3,9 @@
 
 #include "tikpp/data/model.hpp"
 
-#include "tikpp/models/types/bytes.hpp"
-#include "tikpp/models/types/duration.hpp"
-#include "tikpp/models/types/wrapper.hpp"
+#include "tikpp/data/types/bytes.hpp"
+#include "tikpp/data/types/duration.hpp"
+#include "tikpp/data/types/wrapper.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -31,8 +31,8 @@ struct user : tikpp::data::model {
 };
 
 struct user_detail : user {
-    using bytes    = tikpp::models::types::bytes;
-    using duration = tikpp::models::types::duration<std::chrono::seconds>;
+    using bytes    = tikpp::data::types::bytes;
+    using duration = tikpp::data::types::duration<std::chrono::seconds>;
 
     one_way<bytes>    bytes_in;
     one_way<bytes>    bytes_out;
