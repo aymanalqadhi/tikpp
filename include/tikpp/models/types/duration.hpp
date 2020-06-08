@@ -2,8 +2,7 @@
 #define TIKPP_MODELS_TYPES_DURATION_HPP
 
 #include "tikpp/detail/convert.hpp"
-#include "tikpp/models/types/arithmetic_wrapper.hpp"
-#include "tikpp/models/types/logic_wrapper.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 
 #include "fmt/format.h"
 
@@ -13,15 +12,11 @@
 namespace tikpp::models::types {
 
 template <typename Duration = std::chrono::seconds>
-struct duration
-    : tikpp::models::types::arithmetic_wrapper<duration<Duration>, Duration>,
-      tikpp::models::types::logic_wrapper<Duration> {
+struct duration : tikpp::models::types::stateless_wrapper<Duration> {
     using rep_type = typename Duration::rep;
 
     duration(std::chrono::duration<rep_type> value)
-        : value_ {std::chrono::duration_cast<Duration>(value)},
-          arithmetic_wrapper<duration<Duration>, Duration> {value_},
-          logic_wrapper<Duration> {value_} {
+        : stateless_wrapper<Duration> {std::move(value)} {
     }
 
     duration(const std::string &str)
@@ -36,10 +31,13 @@ struct duration
     duration(rep_type value) : duration(Duration {value}) {
     }
 
+    duration() : duration(Duration {0UL}) {
+    }
+
     inline auto to_string() const noexcept -> std::string {
         return fmt::format(
             "{}s",
-            std::chrono::duration_cast<std::chrono::seconds>(value_).count());
+            std::chrono::duration_cast<std::chrono::seconds>(value()).count());
     }
 
     inline auto to_human_readable_string() const noexcept -> std::string {
@@ -52,36 +50,40 @@ struct duration
         std::string ret {};
 
         auto secs =
-            std::chrono::duration_cast<std::chrono::seconds>(value_).count();
+            std::chrono::duration_cast<std::chrono::seconds>(value()).count();
 
-        const auto append_unit = [&secs, &ret](const std::string &label,
-                                               std::size_t mul) noexcept {
-            auto amount = secs / mul;
+        if (secs > 0) {
+            const auto append_unit = [&secs, &ret](const std::string &label,
+                                                   std::size_t mul) noexcept {
+                auto amount = secs / mul;
 
-            if (amount > 0) {
-                if (amount > 1) {
-                    fmt::format_to(std::back_inserter(ret), "{} {}s", amount,
-                                   label);
-                } else {
-                    fmt::format_to(std::back_inserter(ret), "{} {}", amount,
-                                   label);
+                if (amount > 0) {
+                    if (amount > 1) {
+                        fmt::format_to(std::back_inserter(ret), "{} {}s",
+                                       amount, label);
+                    } else {
+                        fmt::format_to(std::back_inserter(ret), "{} {}", amount,
+                                       label);
+                    }
+
+                    secs -= amount * mul;
+
+                    if (secs > 0) {
+                        fmt::format_to(std::back_inserter(ret), ", ");
+                    }
                 }
+            };
 
-                secs -= amount * mul;
+            append_unit("Week", weeks_mul);
+            append_unit("Day", days_mul);
+            append_unit("Hour", hours_mul);
+            append_unit("Minute", minutes_mul);
+            append_unit("Second", seconds_mul);
 
-                if (secs > 0) {
-                    fmt::format_to(std::back_inserter(ret), ", ");
-                }
-            }
-        };
+            return ret;
+        }
 
-        append_unit("Week", weeks_mul);
-        append_unit("Day", days_mul);
-        append_unit("Hour", hours_mul);
-        append_unit("Minute", minutes_mul);
-        append_unit("Second", seconds_mul);
-
-        return ret;
+        return "0 Seconds";
     }
 
     template <typename Unit>
@@ -118,12 +120,36 @@ struct duration
         return os << dur.to_human_readable_string();
     }
 
-    using arithmetic_wrapper<duration<Duration>, Duration>::operator=;
-
-  private:
-    Duration value_;
+    using stateless_wrapper<Duration>::operator=;
+    using stateless_wrapper<Duration>::value;
 };
 
+template <typename Duration>
+std::istream &operator>>(std::istream &in, duration<Duration> &d) {
+    std::string str {};
+    in >> str;
+
+    d = duration<Duration> {str};
+    return in;
+}
+
 } // namespace tikpp::models::types
+
+namespace fmt {
+
+template <typename Rep>
+struct fmt::formatter<tikpp::models::types::duration<Rep>> {
+    constexpr auto parse(format_parse_context &ctx) {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const tikpp::models::types::duration<Rep> &d,
+                FormatContext &                            ctx) {
+        return format_to(ctx.out(), d.to_string());
+    }
+};
+
+} // namespace fmt
 
 #endif
