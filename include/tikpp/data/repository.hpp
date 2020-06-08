@@ -1,12 +1,14 @@
-#ifndef TIKPP_API_REPOSITORY_HPP
-#define TIKPP_API_REPOSITORY_HPP
+#ifndef TIKPP_DATA_REPOSITORY_HPP
+#define TIKPP_DATA_REPOSITORY_HPP
 
 #include "tikpp/basic_api.hpp"
+#include "tikpp/detail/async_result.hpp"
+
 #include "tikpp/commands/add.hpp"
 #include "tikpp/commands/getall.hpp"
 #include "tikpp/commands/remove.hpp"
 #include "tikpp/commands/set.hpp"
-#include "tikpp/detail/async_result.hpp"
+
 #include "tikpp/models/creator.hpp"
 #include "tikpp/models/query.hpp"
 #include "tikpp/models/types/identity.hpp"
@@ -18,13 +20,13 @@
 #include <type_traits>
 #include <vector>
 
-namespace tikpp {
+namespace tikpp::data {
 
 template <typename Model, typename ApiPtr>
-struct api_repository {
+struct repository {
     using query_type = decltype(std::declval<tikpp::models::query>().words);
 
-    explicit api_repository(ApiPtr api) : api_ {std::move(api)} {
+    explicit repository(ApiPtr api) : api_ {std::move(api)} {
     }
 
     template <typename CompletionToken>
@@ -221,10 +223,10 @@ struct api_repository {
 }; // namespace tikpp
 
 template <typename Model, typename ApiPtr>
-inline auto make_repository(ApiPtr api) -> api_repository<Model, ApiPtr> {
-    return api_repository<Model, ApiPtr> {api};
+inline auto make_repository(ApiPtr api) -> repository<Model, ApiPtr> {
+    return repository<Model, ApiPtr> {api};
 }
 
-} // namespace tikpp
+} // namespace tikpp::data
 
 #endif
