@@ -1,5 +1,6 @@
 #include "tikpp/detail/operations/async_connect.hpp"
 #include "tikpp/tests/fakes/socket.hpp"
+#include "tikpp/io_context.hpp"
 
 #include "gtest/gtest.h"
 #include <boost/asio/async_result.hpp>
@@ -16,7 +17,7 @@ constexpr auto api_port           = 8728;
 namespace tikpp::tests {
 
 TEST(AsyncConnectTest, ValidityTest) {
-    boost::asio::io_context io {};
+    tikpp::io_context io {};
 
 #if defined(NO_MOCK_OBJECTS)
     boost::asio::ip::tcp::socket sock {io};

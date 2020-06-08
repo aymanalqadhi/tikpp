@@ -1,10 +1,10 @@
 #ifndef TIKPP_TESTS_FIXTURES_SOCKET_HPP
 #define TIKPP_TESTS_FIXTURES_SOCKET_HPP
 
+#include "tikpp/io_context.hpp"
 #include "tikpp/tests/fakes/socket.hpp"
 
 #include "gtest/gtest.h"
-#include <boost/asio/io_context.hpp>
 
 #if defined(NO_MOCK_OBJECTS)
 #    include <boost/asio/ip/tcp.hpp>
@@ -41,7 +41,7 @@ struct SocketTest : ::testing::Test {
         EXPECT_TRUE(sock.is_open());
     }
 
-    boost::asio::io_context io;
+    tikpp::io_context io;
 
 #if defined(NO_MOCK_OBJECTS)
     boost::asio::ip::tcp::socket sock;

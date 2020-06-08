@@ -9,10 +9,10 @@
 
 #include "tikpp/commands/login.hpp"
 #include "tikpp/error_code.hpp"
+#include "tikpp/io_context.hpp"
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
 
-#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/write.hpp>
 #include <boost/system/error_code.hpp>
@@ -177,15 +177,15 @@ class basic_api : public std::enable_shared_from_this<
         return logged_in_;
     }
 
-    static inline auto create(boost::asio::io_context &io,
-                              ErrorHandler &           error_handler)
+    static inline auto create(tikpp::io_context &io,
+                              ErrorHandler &     error_handler)
         -> std::shared_ptr<basic_api<AsyncStream, ErrorHandler>> {
         return std::shared_ptr<basic_api<AsyncStream, ErrorHandler>>(
             new basic_api<AsyncStream, ErrorHandler> {io, error_handler});
     }
 
   protected:
-    explicit basic_api(boost::asio::io_context &io, ErrorHandler &error_handler)
+    explicit basic_api(tikpp::io_context &io, ErrorHandler &error_handler)
         : io_ {io},
           sock_ {io},
           error_handler_ {error_handler},
@@ -268,12 +268,12 @@ class basic_api : public std::enable_shared_from_this<
     }
 
   private:
-    boost::asio::io_context &io_;
-    AsyncStream              sock_;
-    ErrorHandler &           error_handler_;
-    std::atomic<api_state>   state_;
-    std::atomic_uint32_t     current_tag_;
-    bool                     logged_in_;
+    tikpp ::io_context &   io_;
+    AsyncStream            sock_;
+    ErrorHandler &         error_handler_;
+    std::atomic<api_state> state_;
+    std::atomic_uint32_t   current_tag_;
+    bool                   logged_in_;
 
     std::deque<std::pair<std::shared_ptr<request>, read_handler>> send_queue_;
     std::map<std::uint32_t, read_handler>                         read_cbs_;

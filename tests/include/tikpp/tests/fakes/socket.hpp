@@ -1,7 +1,8 @@
 #ifndef TIKPP_TESTS_FAKES_SOCKET_HPP
 #define TIKPP_TESTS_FAKES_SOCKET_HPP
 
-#include <boost/asio/io_context.hpp>
+#include "tikpp/io_context.hpp"
+
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/system_error.hpp>
 
@@ -12,9 +13,9 @@
 namespace tikpp::tests::fakes {
 
 struct socket final {
-    using executor_type = boost::asio::io_context::executor_type;
+    using executor_type = tikpp::io_context::executor_type;
 
-    socket(boost::asio::io_context &io)
+    socket(tikpp::io_context &io)
         : io_ {io}, connected_ {false}, fails_ {false} {
     }
 
@@ -104,7 +105,7 @@ struct socket final {
     }
 
   private:
-    boost::asio::io_context &      io_;
+    tikpp::io_context &            io_;
     bool                           connected_, fails_;
     std::stringstream              ibuf_, obuf_;
     boost::asio::ip::tcp::endpoint ep_;
