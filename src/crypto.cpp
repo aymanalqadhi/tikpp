@@ -1,4 +1,4 @@
-#include "tikpp/crypto.hpp"
+#include "tikpp/detail/crypto.hpp"
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 
@@ -58,7 +58,7 @@ inline void encode_hex_string(const std::array<std::uint8_t, size> &buf,
 
 } // namespace
 
-namespace tikpp {
+namespace tikpp::detail {
 
 auto hash_password(const std::string &plain, const std::string &cha)
     -> std::string {
@@ -85,4 +85,4 @@ auto hash_password(const std::string &plain, const std::string &cha)
     return tmp;
 }
 
-} // namespace tikpp
+} // namespace tikpp::detail

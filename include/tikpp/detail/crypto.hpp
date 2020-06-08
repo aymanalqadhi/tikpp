@@ -1,13 +1,13 @@
-#ifndef TIKPP_UTIL_HPP
-#define TIKPP_UTIL_HPP
+#ifndef TIKPP_DETAIL_CRYPTO_HPP
+#define TIKPP_DETAIL_CRYPTO_HPP
 
 #include <string>
 
-namespace tikpp {
+namespace tikpp::detail {
 
 auto hash_password(const std::string &plain, const std::string &cha)
     -> std::string;
 
-} // namespace tikpp
+} // namespace tikpp::detail
 
 #endif

@@ -1,4 +1,4 @@
-#include "tikpp/crypto.hpp"
+#include "tikpp/detail/crypto.hpp"
 #include "tikpp/request.hpp"
 
 #include <cstdint>
@@ -15,8 +15,9 @@ struct login final : tikpp::request {
           const std::string &cha)
         : request {command, tag} {
         add_param(name_param, name);
-        add_param(password_param,
-                  fmt::format("00{}", tikpp::hash_password(password, cha)));
+        add_param(
+            password_param,
+            fmt::format("00{}", tikpp::detail::hash_password(password, cha)));
     }
 
     static constexpr auto command         = "/login";
