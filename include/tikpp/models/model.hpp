@@ -2,7 +2,7 @@
 #define TIKPP_MODELS_MODEL_HPP
 
 #include "tikpp/models/types/identity.hpp"
-#include "tikpp/models/types/readonly.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 #include "tikpp/request.hpp"
 
 #include <string>
@@ -11,9 +11,17 @@
 namespace tikpp::models {
 
 struct model {
-    tikpp::models::types::readonly<tikpp::models::types::identity> id;
+    template <typename T>
+    using readonly = tikpp::models::types::readonly<T>;
 
-    bool is_disabled;
+    template <typename T>
+    using one_way = tikpp::models::types::one_way<T>;
+
+    template <typename T>
+    using two_way = tikpp::models::types::two_way<T>;
+
+    readonly<tikpp::models::types::identity> id;
+    two_way<bool>                            is_disabled;
 
     template <template <typename> typename Converter, typename Map>
     inline void convert(Converter<Map> &c) {

@@ -2,8 +2,7 @@
 #define TIKPP_MODELS_TYPES_BYTES_HPP
 
 #include "tikpp/detail/convert.hpp"
-#include "tikpp/models/types/arithmetic_wrapper.hpp"
-#include "tikpp/models/types/logic_wrapper.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 
 #include "fmt/format.h"
 
@@ -12,13 +11,9 @@
 
 namespace tikpp::models::types {
 
-struct bytes : tikpp::models::types::arithmetic_wrapper<bytes, std::uint64_t>,
-               tikpp::models::types::logic_wrapper<std::uint64_t> {
+struct bytes : tikpp::models::types::stateless_wrapper<std::uint64_t> {
 
-    bytes(std::uint64_t b)
-        : bytes_ {b},
-          arithmetic_wrapper<bytes, std::uint64_t> {bytes_},
-          logic_wrapper<std::uint64_t> {bytes_} {
+    bytes(std::uint64_t b) : stateless_wrapper<std::uint64_t> {std::move(b)} {
     }
 
     bytes() : bytes {0UL} {
@@ -44,13 +39,8 @@ struct bytes : tikpp::models::types::arithmetic_wrapper<bytes, std::uint64_t>,
         return tb() / 1024.0;
     }
 
-    inline auto operator=(const bytes &b) -> bytes & {
-        bytes_ = b.bytes_;
-        return *this;
-    }
-
     auto to_human_readable_string() const noexcept -> std::string {
-        switch (static_cast<int>(floor(log2l(bytes_)) / 10)) {
+        switch (static_cast<int>(floor(log2l(value())) / 10)) {
         case 1:
             return fmt::format("{:.2f} KB", kb());
         case 2:
@@ -67,17 +57,14 @@ struct bytes : tikpp::models::types::arithmetic_wrapper<bytes, std::uint64_t>,
     }
 
     inline auto to_string() const noexcept -> std::string {
-        return fmt::to_string(bytes_);
+        return fmt::to_string(value());
     }
 
     friend std::ostream &operator<<(std::ostream &os, const bytes &b) {
         return os << b.to_human_readable_string();
     }
 
-    using arithmetic_wrapper<bytes, std::uint64_t>::operator=;
-
-  private:
-    std::uint64_t bytes_;
+    using stateless_wrapper<std::uint64_t>::operator=;
 };
 
 std::istream &operator>>(std::istream &in, bytes &b) {
@@ -118,6 +105,8 @@ inline auto operator""_pb(unsigned long long int b) -> bytes {
 
 } // namespace tikpp::models::types
 
+namespace fmt {
+
 template <>
 struct fmt::formatter<tikpp::models::types::bytes> {
     constexpr auto parse(format_parse_context &ctx) {
@@ -129,5 +118,7 @@ struct fmt::formatter<tikpp::models::types::bytes> {
         return format_to(ctx.out(), b.to_string());
     }
 };
+
+} // namespace fmt
 
 #endif

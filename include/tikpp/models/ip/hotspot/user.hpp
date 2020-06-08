@@ -3,8 +3,10 @@
 
 #include "tikpp/models/model.hpp"
 #include "tikpp/models/types/bytes.hpp"
-#include "tikpp/models/types/one_way.hpp"
+#include "tikpp/models/types/duration.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 
+#include <chrono>
 #include <cstdint>
 #include <string>
 
@@ -13,11 +15,9 @@ namespace tikpp::models::ip::hotspot {
 struct user : tikpp::models::model {
     static constexpr auto api_path = "/ip/hotspot/user";
 
-    std::string name;
-    std::string password;
-    std::string profile;
-
-    bool disabled;
+    two_way<std::string> name;
+    two_way<std::string> password;
+    two_way<std::string> profile;
 
     template <typename Converter>
     inline void convert(Converter &c) {
@@ -26,38 +26,36 @@ struct user : tikpp::models::model {
         c["name"] % name;
         c["password"] % password;
         c["profile"] % profile;
-        c["disabled"] % disabled;
     }
 };
 
 struct user_detail : user {
-    using bytes = tikpp::models::types::bytes;
+    using bytes    = tikpp::models::types::bytes;
+    using duration = tikpp::models::types::duration<std::chrono::seconds>;
 
-    bytes       limit_bytes_in;
-    bytes       limit_bytes_out;
-    bytes       limit_bytes_total;
-    std::string limit_uptime;
+    one_way<bytes>    bytes_in;
+    one_way<bytes>    bytes_out;
+    one_way<duration> uptime;
+    one_way<bool>     is_dynamic;
 
-    tikpp::models::types::one_way<bytes>       bytes_in;
-    tikpp::models::types::one_way<bytes>       bytes_out;
-    tikpp::models::types::one_way<std::string> uptime;
-    tikpp::models::types::one_way<bool>        is_dynamic;
-    tikpp::models::types::one_way<bool>        is_default;
+    two_way<bytes>    limit_bytes_in;
+    two_way<bytes>    limit_bytes_out;
+    two_way<bytes>    limit_bytes_total;
+    two_way<duration> limit_uptime;
 
     template <typename Converter>
     inline void convert(Converter &c) {
         user::convert(c);
 
-        c["limit-bytes-in"] % limit_bytes_in;
-        c["limit-bytes-out"] % limit_bytes_out;
-        c["limit-bytes-total"] % limit_bytes_total;
-        c["limit-uptime"] % (limit_uptime = "2313283712391839s");
-
         c["bytes-in"] % bytes_in;
         c["bytes-out"] % bytes_out;
         c["uptime"] % uptime;
-        c["default"] % is_default;
         c["dynamic"] % is_dynamic;
+
+        c["limit-bytes-in"] % limit_bytes_in;
+        c["limit-bytes-out"] % limit_bytes_out;
+        c["limit-bytes-total"] % limit_bytes_total;
+        c["limit-uptime"] % limit_uptime;
     }
 };
 

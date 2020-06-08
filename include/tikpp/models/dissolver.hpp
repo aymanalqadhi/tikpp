@@ -2,12 +2,9 @@
 #define TIKPP_MODELS_DISSOLVER_HPP
 
 #include "tikpp/detail/convert.hpp"
-#include "tikpp/models/types/one_way.hpp"
-#include "tikpp/models/types/readonly.hpp"
-#include "tikpp/models/types/two_way.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 
 #include <string>
-#include <type_traits>
 #include <utility>
 
 namespace tikpp::models {
