@@ -78,7 +78,7 @@ TEST(BytesTypeTests, LiteralsTest) {
 }
 
 TEST(BytesTypeTests, ArthimeticOperatorsTest) {
-    auto b1 = 1_gb + 512_mb;
+    auto b1 = bytes {1_gb + 512_mb};
 
     EXPECT_EQ(b1.value(), (1024 + 512) * 1024 * 1024);
     EXPECT_EQ(b1.kb(), (1024 + 512) * 1024);

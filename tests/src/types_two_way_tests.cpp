@@ -1,13 +1,12 @@
-#include "tikpp/models/types/two_way.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 #include "tikpp/tests/util/random.hpp"
 
 #include "gtest/gtest.h"
 
-using test_type = unsigned long;
+using test_type    = unsigned long;
+using test_wrapper = tikpp::models::types::two_way<test_type>;
 
 namespace tikpp::tests {
-
-using test_wrapper = tikpp::models::types::two_way<test_type>;
 
 TEST(TwoWayBinderTypeTests, ChangeTest) {
     auto rnd1 = tikpp::tests::util::random<test_type>();
@@ -18,7 +17,7 @@ TEST(TwoWayBinderTypeTests, ChangeTest) {
     EXPECT_FALSE(w1.changed());
     EXPECT_FALSE(w2.changed());
 
-    test_wrapper w3 = w1 + w2;
+    test_wrapper w3 {w1 + w2};
 
     EXPECT_FALSE(w1.changed());
     EXPECT_FALSE(w2.changed());

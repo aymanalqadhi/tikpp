@@ -1,4 +1,4 @@
-#include "tikpp/models/types/one_way.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 #include "tikpp/tests/util/random.hpp"
 
 #include "gtest/gtest.h"

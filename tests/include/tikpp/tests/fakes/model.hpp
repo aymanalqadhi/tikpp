@@ -2,9 +2,7 @@
 #define TIKPP_TESTS_FAKES_MODEL_HPP
 
 #include "tikpp/models/types/identity.hpp"
-#include "tikpp/models/types/one_way.hpp"
-#include "tikpp/models/types/readonly.hpp"
-#include "tikpp/models/types/two_way.hpp"
+#include "tikpp/models/types/wrapper.hpp"
 
 #include <cstdint>
 #include <string>

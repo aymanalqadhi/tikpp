@@ -38,10 +38,10 @@ TEST(DurationTypeTests, OperatorsTest) {
     dur -= test_duration_type {2};
     EXPECT_EQ(dur.value(), 123s);
 
-    dur.value() *= 2;
+    dur = dur.value() * 2;
     EXPECT_EQ(dur.value(), 246s);
 
-    dur.value() /= 123;
+    dur = dur.value() / 123;
     EXPECT_EQ(dur.value(), 2s);
 }
 
