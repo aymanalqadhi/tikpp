@@ -6,23 +6,20 @@
 #include <boost/asio/buffer.hpp>
 #include <boost/system/error_code.hpp>
 
+#include <functional>
 #include <type_traits>
 
 namespace tikpp::detail::type_traits {
 
-struct async_transfer_handler {
-    void operator()(const boost::system::error_code & /* err */,
-                    std::size_t /* tx */) {
-    }
-};
-
 HAS_MEMBER_FUNCTION(async_write_some,
                     (std::declval<boost::asio::const_buffer>(),
-                     std::declval<async_transfer_handler>()))
+                     std::declval<std::function<void(
+                         const boost::system::error_code &, std::size_t)>>()))
 
 HAS_MEMBER_FUNCTION(async_read_some,
                     (std::declval<boost::asio::mutable_buffer>(),
-                     std::declval<async_transfer_handler>()))
+                     std::declval<std::function<void(
+                         const boost::system::error_code &, std::size_t)>>()))
 
 HAS_MEMBER_FUNCTION(get_executor, ())
 
