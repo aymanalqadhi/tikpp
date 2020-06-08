@@ -36,9 +36,9 @@ create_test(types_one_way)
 create_test(types_two_way)
 create_test(types_duration)
 
-create_test(proplist_collector)
-create_test(models_creator)
-create_test(models_dissolver)
+create_test(data_converter_proplist_collector)
+create_test(data_converter_creator)
+create_test(data_converter_dissolver)
 create_test(query)
 
 create_test(commands_add)

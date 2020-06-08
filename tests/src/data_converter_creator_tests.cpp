@@ -1,5 +1,5 @@
 #include "tikpp/detail/type_traits/model.hpp"
-#include "tikpp/models/creator.hpp"
+#include "tikpp/data/converters/creator.hpp"
 
 #include "tikpp/tests/fakes/model.hpp"
 #include "tikpp/tests/util/random.hpp"
@@ -20,7 +20,7 @@ TEST(ModelsCreatorTests, DefaultValuesTest1) {
     tikpp::tests::fakes::model1 model {};
     map_type                    map {};
 
-    tikpp::models::creator<map_type> creator {map};
+    tikpp::data::converters::creator<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_EQ(model.prop1, "");
@@ -42,7 +42,7 @@ TEST(ModelsCreatorTests, CreationTest1) {
     map["prop5"] = std::to_string(0xABCDEF01U);
     map["prop6"] = std::to_string(0xABCDEF0123456789UL);
 
-    tikpp::models::creator<map_type> creator {map};
+    tikpp::data::converters::creator<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_EQ(model.prop1, "test_string");
@@ -57,7 +57,7 @@ TEST(ModelsCreatorTests, DefaultValuesTest2) {
     tikpp::tests::fakes::model2 model {};
     map_type                    map {};
 
-    tikpp::models::creator<map_type> creator {map};
+    tikpp::data::converters::creator<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_EQ(model.id.value().to_string(), "*0");
@@ -82,7 +82,7 @@ TEST(ModelsCreatorTests, CreationTest2) {
     map["one-way-data"]  = str2;
     map["two-way-data"]  = str3;
 
-    tikpp::models::creator<map_type> creator {map};
+    tikpp::data::converters::creator<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_EQ(model.id.value().value(), 0xABCD);

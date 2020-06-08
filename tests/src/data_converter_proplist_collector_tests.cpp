@@ -1,4 +1,4 @@
-#include "tikpp/models/proplist_collector.hpp"
+#include "tikpp/data/converters/proplist_collector.hpp"
 #include "tikpp/tests/fakes/model.hpp"
 
 #include "gtest/gtest.h"
@@ -10,8 +10,9 @@
 namespace tikpp::tests {
 
 TEST(PropListTests, CollectingTest) {
-    tikpp::tests::fakes::model1                                 model {};
-    tikpp::models::proplist_collector<std::vector<std::string>> collector {};
+    tikpp::tests::fakes::model1 model {};
+    tikpp::data::converters::proplist_collector<std::vector<std::string>>
+        collector {};
 
     model.convert(collector);
 

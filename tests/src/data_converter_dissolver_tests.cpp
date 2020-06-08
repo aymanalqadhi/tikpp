@@ -1,5 +1,5 @@
 #include "tikpp/detail/type_traits/model.hpp"
-#include "tikpp/models/dissolver.hpp"
+#include "tikpp/data/converters/dissolver.hpp"
 
 #include "tikpp/tests/fakes/model.hpp"
 #include "tikpp/tests/util/random.hpp"
@@ -21,7 +21,7 @@ TEST(CreationModelsDissolverTests, DefaultValuesTest1) {
     tikpp::tests::fakes::model1 model {};
     map_type                    map {};
 
-    tikpp::models::creation_dissolver<map_type> creator {map};
+    tikpp::data::converters::creation_dissolver<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_TRUE(map.find("=prop1") != map.end());
@@ -50,7 +50,7 @@ TEST(CreationModelsDissolverTests, DissolvingTest1) {
     model.prop5 = 0xABCDEF01U;
     model.prop6 = 0xABCDEF0123456789UL;
 
-    tikpp::models::creation_dissolver<map_type> creator {map};
+    tikpp::data::converters::creation_dissolver<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_TRUE(map.find("=prop1") != map.end());
@@ -72,7 +72,7 @@ TEST(CreationModelsDissolverTests, DefaultValuesTest2) {
     tikpp::tests::fakes::model2 model {};
     map_type                    map {};
 
-    tikpp::models::creation_dissolver<map_type> cd {map};
+    tikpp::data::converters::creation_dissolver<map_type> cd {map};
     model.convert(cd);
 
     EXPECT_EQ(map.find("=id"), map.end());
@@ -84,7 +84,7 @@ TEST(CreationModelsDissolverTests, DefaultValuesTest2) {
     EXPECT_TRUE(map["=two-way-data"].empty());
 
     map.clear();
-    tikpp::models::updating_dissolver<map_type> ud {map};
+    tikpp::data::converters::updating_dissolver<map_type> ud {map};
     model.convert(ud);
 
     EXPECT_FALSE(model.two_way_data.changed());
@@ -115,7 +115,7 @@ TEST(CreationModelsDissolverTests, DissolvingTest2) {
     model.one_way_data  = str2;
     model.two_way_data  = {str3};
 
-    tikpp::models::creation_dissolver<map_type> cd {map};
+    tikpp::data::converters::creation_dissolver<map_type> cd {map};
     model.convert(cd);
 
     EXPECT_FALSE(model.two_way_data.changed());
@@ -127,7 +127,7 @@ TEST(CreationModelsDissolverTests, DissolvingTest2) {
     EXPECT_EQ(map["=one-way-data"], str2);
     EXPECT_EQ(map["=two-way-data"], str3);
 
-    tikpp::models::updating_dissolver<map_type> ud {map};
+    tikpp::data::converters::updating_dissolver<map_type> ud {map};
 
     map.clear();
     model.convert(ud);
