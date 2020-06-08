@@ -31,8 +31,6 @@ create_test(async_read_response)
 create_test(async_connect)
 
 create_test(types_identity)
-create_test(types_logic_wrapper)
-create_test(types_arithmetic_wrapper)
 create_test(types_bytes)
 create_test(types_one_way)
 create_test(types_two_way)
