@@ -23,8 +23,7 @@ struct getall : tikpp::request {
         Model m {};
         m.convert(collector);
 
-        auto proplist = boost::join(collector.proplist, ",");
-        add_param(".proplist", std::move(proplist));
+        add_param(".proplist", boost::join(collector.proplist, ","));
     }
 
     getall(std::uint32_t tag, std::vector<std::string> q) : getall(tag) {
