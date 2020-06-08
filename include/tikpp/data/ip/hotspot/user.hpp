@@ -1,7 +1,8 @@
-#ifndef TIKPP_MODELS_IP_HOTSPOT_USER_HPP
-#define TIKPP_MODELS_IP_HOTSPOT_USER_HPP
+#ifndef TIKPP_DATA_IP_HOTSPOT_USER_HPP
+#define TIKPP_DATA_IP_HOTSPOT_USER_HPP
 
-#include "tikpp/models/model.hpp"
+#include "tikpp/data/model.hpp"
+
 #include "tikpp/models/types/bytes.hpp"
 #include "tikpp/models/types/duration.hpp"
 #include "tikpp/models/types/wrapper.hpp"
@@ -10,9 +11,9 @@
 #include <cstdint>
 #include <string>
 
-namespace tikpp::models::ip::hotspot {
+namespace tikpp ::data::ip::hotspot {
 
-struct user : tikpp::models::model {
+struct user : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user";
 
     two_way<std::string> name;
@@ -59,6 +60,6 @@ struct user_detail : user {
     }
 };
 
-} // namespace tikpp::models::ip::hotspot
+} // namespace tikpp::data::ip::hotspot
 
 #endif
