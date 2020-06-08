@@ -1,7 +1,7 @@
 #ifndef TIKPP_COMMANDS_GET_ALL_HPP
 #define TIKPP_COMMANDS_GET_ALL_HPP
 
-#include "tikpp/models/proplist_collector.hpp"
+#include "tikpp/data/converters/proplist_collector.hpp"
 #include "tikpp/request.hpp"
 
 #include "fmt/format.h"
@@ -17,7 +17,7 @@ template <typename Model>
 struct getall : tikpp::request {
     getall(std::uint32_t tag)
         : request {std::string {Model::api_path} + command_suffix, tag} {
-        tikpp::models::proplist_collector<std::vector<std::string>>
+        tikpp::data::converters::proplist_collector<std::vector<std::string>>
             collector {};
 
         Model m {};

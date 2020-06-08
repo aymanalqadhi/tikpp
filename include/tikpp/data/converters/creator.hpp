@@ -1,11 +1,11 @@
-#ifndef TIKPP_MODELS_CREATOR_HPP
-#define TIKPP_MODELS_CREATOR_HPP
+#ifndef TIKPP_DATA_CONVERTERS_CREATOR_HPP
+#define TIKPP_DATA_CONVERTERS_CREATOR_HPP
 
 #include "tikpp/detail/convert.hpp"
 
 #include <utility>
 
-namespace tikpp::models {
+namespace tikpp::data::converters {
 
 template <typename HashMap>
 struct creator {
@@ -37,6 +37,6 @@ struct creator {
     HashMap &data;
 };
 
-} // namespace tikpp::models
+} // namespace tikpp::data::converters
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef TIKPP_MODELS_DISSOLVER_HPP
-#define TIKPP_MODELS_DISSOLVER_HPP
+#ifndef TIKPP_DATA_CONVERTERS_DISSOLVER_HPP
+#define TIKPP_DATA_CONVERTERS_DISSOLVER_HPP
 
 #include "tikpp/detail/convert.hpp"
 #include "tikpp/models/types/wrapper.hpp"
@@ -7,7 +7,7 @@
 #include <string>
 #include <utility>
 
-namespace tikpp::models {
+namespace tikpp::data::converters {
 
 template <typename HashMap, bool is_creating>
 struct dissolver {
@@ -70,6 +70,6 @@ struct creation_dissolver : dissolver<HashMap, true> {};
 template <typename HashMap>
 struct updating_dissolver : dissolver<HashMap, false> {};
 
-} // namespace tikpp::models
+} // namespace tikpp::data::converters
 
 #endif

@@ -9,7 +9,8 @@
 #include "tikpp/commands/remove.hpp"
 #include "tikpp/commands/set.hpp"
 
-#include "tikpp/models/creator.hpp"
+#include "tikpp/data/converters/creator.hpp"
+
 #include "tikpp/models/query.hpp"
 #include "tikpp/models/types/identity.hpp"
 
@@ -169,7 +170,8 @@ struct repository {
                     return false;
                 }
 
-                tikpp::models::creator<tikpp::response> creator {resp};
+                tikpp::data::converters::creator<tikpp::response> creator {
+                    resp};
 
                 Model item {};
                 item.convert(creator);
@@ -204,7 +206,8 @@ struct repository {
                     tikpp::make_error_code(tikpp::error_code::invalid_response),
                     Model {});
             } else if (!resp.empty()) {
-                tikpp::models::creator<tikpp::response> creator {resp};
+                tikpp::data::converters::creator<tikpp::response> creator {
+                    resp};
 
                 Model item {};
                 item.convert(creator);

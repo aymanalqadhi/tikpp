@@ -1,10 +1,10 @@
-#ifndef TIKPP_MODELS_PROPLIST_COLLECTOR_HPP
-#define TIKPP_MODELS_PROPLIST_COLLECTOR_HPP
+#ifndef TIKPP_DATA_CONVERTERS_PROPLIST_COLLECTOR_HPP
+#define TIKPP_DATA_CONVERTERS_PROPLIST_COLLECTOR_HPP
 
 #include <string>
 #include <utility>
 
-namespace tikpp::models {
+namespace tikpp::data::converters {
 
 template <typename Container>
 struct proplist_collector {
@@ -22,6 +22,6 @@ struct proplist_collector {
     Container proplist;
 };
 
-} // namespace tikpp::models
+} // namespace tikpp::data::converters
 
 #endif
