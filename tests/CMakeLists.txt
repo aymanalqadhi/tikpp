@@ -18,17 +18,18 @@ function(create_test test_name)
 endfunction()
 
 # Project targets
-create_test(util_random)
+create_test(testing_util_random)
 
 create_test(convert)
 create_test(convert_back)
 
 create_test(request)
 create_test(response)
-create_test(async_read_word_length)
-create_test(async_read_word)
-create_test(async_read_response)
-create_test(async_connect)
+
+create_test(operation_async_read_word_length)
+create_test(operation_async_read_word)
+create_test(operation_async_read_response)
+create_test(operation_async_connect)
 
 create_test(data_converter_proplist_collector)
 create_test(data_converter_creator)
@@ -40,8 +41,8 @@ create_test(data_type_one_way)
 create_test(data_type_two_way)
 create_test(data_type_duration)
 
-create_test(commands_add)
-create_test(commands_set)
+create_test(command_add)
+create_test(command_set)
 
 # Test client
 add_executable(test_client src/test_client.cpp)
