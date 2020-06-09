@@ -1,5 +1,5 @@
-#include "tikpp/detail/type_traits/model.hpp"
 #include "tikpp/data/converters/dissolver.hpp"
+#include "tikpp/detail/type_traits/model.hpp"
 
 #include "tikpp/tests/fakes/model.hpp"
 #include "tikpp/tests/util/random.hpp"
@@ -110,10 +110,11 @@ TEST(CreationModelsDissolverTests, DissolvingTest2) {
     auto str3 = tikpp::tests::util::random_string(
         0xFF, tikpp::tests::util::random_string_options::mixed);
 
-    model.id            = {value1};
-    model.readonly_data = str1;
-    model.one_way_data  = str2;
-    model.two_way_data  = {str3};
+    model.id =
+        tikpp::data::types::readonly<tikpp::data::types::identity> {value1};
+    model.readonly_data = tikpp::data::types::readonly {str1};
+    model.one_way_data  = tikpp::data::types::one_way {str2};
+    model.two_way_data  = str3;
 
     tikpp::data::converters::creation_dissolver<map_type> cd {map};
     model.convert(cd);

@@ -159,13 +159,13 @@ using stateful_wrapper = type_wrapper<stateful_value_wrapper, T>;
 
 template <typename T>
 struct readonly {
+    explicit readonly(T &&val) : value_ {std::move(val)} {
+    }
+
+    explicit readonly(const T &val) : value_ {val} {
+    }
+
     readonly() = default;
-
-    readonly(T &&val) : value_ {std::forward<T>(val)} {
-    }
-
-    readonly(const T &val) : value_ {static_cast<T>(val)} {
-    }
 
     inline operator const T &() const noexcept {
         return value_;
@@ -180,8 +180,14 @@ struct readonly {
 };
 
 template <typename T>
-struct one_way : stateless_wrapper<T> {
-    using stateless_wrapper<T>::operator=;
+struct one_way : readonly<T> {
+    explicit one_way(T &&val) : readonly<T> {std::move(val)} {
+    }
+
+    explicit one_way(const T &val) : readonly<T> {val} {
+    }
+
+    one_way() = default;
 };
 
 template <typename T>
