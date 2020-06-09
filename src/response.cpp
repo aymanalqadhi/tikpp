@@ -3,9 +3,11 @@
 
 #include <boost/system/error_code.hpp>
 
+#include <array>
 #include <cassert>
-#include <regex>
 #include <string>
+#include <unordered_map>
+#include <vector>
 
 namespace {
 
@@ -14,54 +16,36 @@ constexpr auto data_type_word   = "!re";
 constexpr auto trap_type_word   = "!trap";
 constexpr auto fatal_type_word  = "!fatal";
 
-constexpr auto tag_key      = ".tag";
-constexpr auto category_key = "category";
-constexpr auto message_key  = "message";
-
 constexpr auto login_failure_message     = "cannot log in";
 constexpr auto already_existing_message  = "already have";
 constexpr auto unknown_parameter_message = "unknown parameter";
 
-const std::regex param_pattern {R"(=([^=]+)=(.*))", std::regex::extended};
-const std::regex attribute_pattern {R"((\.[^=]+)=(.*))", std::regex::extended};
+constexpr std::array error_categories {
+    tikpp::error_code::no_such_item,    tikpp::error_code::invalid_argument,
+    tikpp::error_code::interrupted,     tikpp::error_code::script_failure,
+    tikpp::error_code::general_failure, tikpp::error_code::api_failure,
+    tikpp::error_code::tty_failure,     tikpp::error_code::return_value,
+};
 
-void set_error_code(tikpp::response &resp, boost::system::error_code &error) {
+void set_error_code(tikpp::response &          resp,
+                    boost::system::error_code &error) noexcept {
     assert(resp.type() == tikpp::response_type::fatal ||
            resp.type() == tikpp::response_type::trap);
 
-    auto set_error = [&error](tikpp::error_code err) {
+    const auto set_error = [&error](tikpp::error_code err) noexcept {
         error = tikpp::make_error_code(err);
     };
 
-    if (resp.type() == tikpp::response_type::fatal) {
-        return set_error(tikpp::error_code::fatal_response);
-    }
-
-    if (resp.contains(::category_key)) {
-        switch (resp.get<int>(::category_key)) {
-        case 0:
-            return set_error(tikpp::error_code::no_such_item);
-        case 1:
-            return set_error(tikpp::error_code::invalid_argument);
-        case 2:
-            return set_error(tikpp::error_code::interrupted);
-        case 3:
-            return set_error(tikpp::error_code::script_failure);
-        case 4:
-            return set_error(tikpp::error_code::general_failure);
-        case 5:
-            return set_error(tikpp::error_code::api_failure);
-        case 6:
-            return set_error(tikpp::error_code::tty_failure);
-        case 7:
-            return set_error(tikpp::error_code::return_value);
-        default:
-            return set_error(tikpp::error_code::unknown_error_category);
+    if (resp.contains("category")) {
+        if (auto c = resp.get<unsigned int>("category"); c < 7) {
+            return set_error(error_categories[c]);
         }
+
+        return set_error(tikpp::error_code::unknown_error_category);
     }
 
-    if (resp.contains(::message_key)) {
-        const auto &message = resp[message_key];
+    if (resp.contains("message")) {
+        const auto &message = resp["message"];
 
         if (message.find(::login_failure_message) != std::string::npos) {
             return set_error(tikpp::error_code::login_failure);
@@ -77,6 +61,35 @@ void set_error_code(tikpp::response &resp, boost::system::error_code &error) {
     set_error(tikpp::error_code::unknown_error);
 }
 
+bool extract_param(
+    const std::string &                           word,
+    std::unordered_map<std::string, std::string> &words) noexcept {
+    std::size_t pos;
+
+    if (word.size() == 0 || word[0] != '=' ||
+        (pos = word.find('=', 1)) == std::string::npos) {
+        return false;
+    }
+
+    words.emplace(
+        std::make_pair(word.substr(1, pos - 1), word.substr(pos + 1)));
+    return true;
+}
+
+bool extract_attribute(
+    const std::string &                           word,
+    std::unordered_map<std::string, std::string> &words) noexcept {
+    std::size_t pos;
+
+    if (word.size() == 0 || word[0] != '.' ||
+        (pos = word.find('=', 1)) == std::string::npos) {
+        return false;
+    }
+
+    words.emplace(std::make_pair(word.substr(0, pos), word.substr(pos + 1)));
+    return true;
+}
+
 } // namespace
 
 namespace tikpp {
@@ -84,21 +97,13 @@ namespace tikpp {
 response::response(const std::vector<std::string> &words) {
     assert(is_valid_response(words));
 
-    std::smatch matches {};
-
     for (const auto &word : words) {
-        if (!std::regex_match(word, matches, ::param_pattern) &&
-            !std::regex_match(word, matches, ::attribute_pattern)) {
-            continue;
-        }
-
-        assert(matches.size() == 3);
-        words_.emplace(std::make_pair(matches[1].str(), matches[2].str()));
+        ::extract_param(word, words_) || ::extract_attribute(word, words_);
     }
 
-    if (contains(::tag_key)) {
-        tag_.emplace(get<std::uint32_t>(::tag_key));
-        words_.erase(::tag_key);
+    if (contains(".tag")) {
+        tag_.emplace(get<std::uint32_t>(".tag"));
+        words_.erase(".tag");
     }
 
     const auto &type_word = words[0];
@@ -111,8 +116,8 @@ response::response(const std::vector<std::string> &words) {
         type_ = response_type::trap;
         ::set_error_code(*this, error_);
     } else if (type_word == ::fatal_type_word) {
-        type_ = response_type::fatal;
-        ::set_error_code(*this, error_);
+        type_  = response_type::fatal;
+        error_ = tikpp::make_error_code(tikpp::error_code::fatal_response);
     } else {
         type_ = response_type::unknown;
         error_ =
