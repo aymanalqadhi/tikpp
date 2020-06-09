@@ -21,12 +21,10 @@ struct model {
     using read_write = tikpp::data::types::read_write<T>;
 
     sticky<tikpp::data::types::identity> id;
-    read_write<bool>                     is_disabled;
 
-    template <template <typename> typename Converter, typename Map>
-    inline void convert(Converter<Map> &c) {
+    template <typename Converter>
+    inline void convert(Converter &c) {
         c[".id"] % id;
-        c["disabled"] % is_disabled;
     }
 };
 
