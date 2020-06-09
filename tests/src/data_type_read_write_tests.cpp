@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 
 using test_type    = unsigned long;
-using test_wrapper = tikpp::data::types::two_way<test_type>;
+using test_wrapper = tikpp::data::types::read_write<test_type>;
 
 namespace tikpp::tests {
 

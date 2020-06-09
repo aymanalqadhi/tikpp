@@ -76,26 +76,26 @@ TEST(CreationModelsDissolverTests, DefaultValuesTest2) {
     model.convert(cd);
 
     EXPECT_EQ(map.find("=id"), map.end());
-    EXPECT_EQ(map.find("=readonly-data"), map.end());
-    EXPECT_NE(map.find("=one-way-data"), map.end());
-    EXPECT_NE(map.find("=two-way-data"), map.end());
+    EXPECT_EQ(map.find("=sticky-data"), map.end());
+    EXPECT_NE(map.find("=read-only-data"), map.end());
+    EXPECT_NE(map.find("=read-write-data"), map.end());
 
-    EXPECT_TRUE(map["=one-way-data"].empty());
-    EXPECT_TRUE(map["=two-way-data"].empty());
+    EXPECT_TRUE(map["=read-only-data"].empty());
+    EXPECT_TRUE(map["=read-write-data"].empty());
 
     map.clear();
     tikpp::data::converters::updating_dissolver<map_type> ud {map};
     model.convert(ud);
 
-    EXPECT_FALSE(model.two_way_data.changed());
+    EXPECT_FALSE(model.read_write_data.changed());
     EXPECT_NE(map.find("=id"), map.end());
-    EXPECT_NE(map.find("=readonly-data"), map.end());
-    EXPECT_EQ(map.find("=one-way-data"), map.end());
-    EXPECT_EQ(map.find("=two-way-data"), map.end());
+    EXPECT_NE(map.find("=sticky-data"), map.end());
+    EXPECT_EQ(map.find("=read-only-data"), map.end());
+    EXPECT_EQ(map.find("=read-write-data"), map.end());
 
     EXPECT_EQ(map["=id"], "*0");
-    EXPECT_TRUE(map["=readonly-data"].empty());
-    EXPECT_TRUE(map["=two-way-data"].empty());
+    EXPECT_TRUE(map["=sticky-data"].empty());
+    EXPECT_TRUE(map["=read-write-data"].empty());
 }
 
 TEST(CreationModelsDissolverTests, DissolvingTest2) {
@@ -111,46 +111,46 @@ TEST(CreationModelsDissolverTests, DissolvingTest2) {
         0xFF, tikpp::tests::util::random_string_options::mixed);
 
     model.id =
-        tikpp::data::types::readonly<tikpp::data::types::identity> {value1};
-    model.readonly_data = tikpp::data::types::readonly {str1};
-    model.one_way_data  = tikpp::data::types::one_way {str2};
-    model.two_way_data  = str3;
+        tikpp::data::types::sticky<tikpp::data::types::identity> {value1};
+    model.sticky_data     = tikpp::data::types::sticky {str1};
+    model.read_only_data  = tikpp::data::types::read_only {str2};
+    model.read_write_data = str3;
 
     tikpp::data::converters::creation_dissolver<map_type> cd {map};
     model.convert(cd);
 
-    EXPECT_FALSE(model.two_way_data.changed());
+    EXPECT_FALSE(model.read_write_data.changed());
     EXPECT_EQ(map.find("=id"), map.end());
-    EXPECT_EQ(map.find("=readonly-data"), map.end());
-    EXPECT_NE(map.find("=one-way-data"), map.end());
-    EXPECT_NE(map.find("=two-way-data"), map.end());
+    EXPECT_EQ(map.find("=sticky-data"), map.end());
+    EXPECT_NE(map.find("=read-only-data"), map.end());
+    EXPECT_NE(map.find("=read-write-data"), map.end());
 
-    EXPECT_EQ(map["=one-way-data"], str2);
-    EXPECT_EQ(map["=two-way-data"], str3);
+    EXPECT_EQ(map["=read-only-data"], str2);
+    EXPECT_EQ(map["=read-write-data"], str3);
 
     tikpp::data::converters::updating_dissolver<map_type> ud {map};
 
     map.clear();
     model.convert(ud);
 
-    EXPECT_FALSE(model.two_way_data.changed());
+    EXPECT_FALSE(model.read_write_data.changed());
 
     EXPECT_NE(map.find("=id"), map.end());
-    EXPECT_NE(map.find("=readonly-data"), map.end());
-    EXPECT_EQ(map.find("=one-way-data"), map.end());
-    EXPECT_EQ(map.find("=two-way-data"), map.end());
+    EXPECT_NE(map.find("=sticky-data"), map.end());
+    EXPECT_EQ(map.find("=read-only-data"), map.end());
+    EXPECT_EQ(map.find("=read-write-data"), map.end());
 
     EXPECT_EQ(map["=id"], fmt::format("*{:X}", value1));
-    EXPECT_EQ(map["=readonly-data"], str1);
+    EXPECT_EQ(map["=sticky-data"], str1);
 
-    model.two_way_data = {str3};
-    EXPECT_TRUE(model.two_way_data.changed());
+    model.read_write_data = {str3};
+    EXPECT_TRUE(model.read_write_data.changed());
 
     map.clear();
     model.convert(ud);
 
-    EXPECT_NE(map.find("=two-way-data"), map.end());
-    EXPECT_EQ(map["=two-way-data"], str3);
+    EXPECT_NE(map.find("=read-write-data"), map.end());
+    EXPECT_EQ(map["=read-write-data"], str3);
 }
 
 } // namespace tikpp::tests

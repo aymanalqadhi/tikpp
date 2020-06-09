@@ -28,21 +28,21 @@ struct dissolver {
         }
 
         template <typename T>
-        void operator%(const tikpp::data::types::readonly<T> &w) {
+        void operator%(const tikpp::data::types::sticky<T> &w) {
             if constexpr (!is_creating) {
                 dissolve(w.value());
             }
         }
 
         template <typename T>
-        void operator%(const tikpp::data::types::one_way<T> &w) {
+        void operator%(const tikpp::data::types::read_only<T> &w) {
             if constexpr (is_creating) {
                 dissolve(w.value());
             }
         }
 
         template <typename T>
-        void operator%(tikpp::data::types::two_way<T> &w) {
+        void operator%(tikpp::data::types::read_write<T> &w) {
             if constexpr (!is_creating) {
                 if (!w.changed()) {
                     return;

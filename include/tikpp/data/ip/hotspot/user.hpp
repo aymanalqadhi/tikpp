@@ -16,10 +16,10 @@ namespace tikpp ::data::ip::hotspot {
 struct user : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user";
 
-    two_way<std::string> name;
-    two_way<std::string> password;
-    two_way<std::string> profile;
-    two_way<std::string> comment;
+    read_write<std::string> name;
+    read_write<std::string> password;
+    read_write<std::string> profile;
+    read_write<std::string> comment;
 
     template <typename Converter>
     inline void convert(Converter &c) {
@@ -36,21 +36,21 @@ struct user_detail : user {
     using bytes    = tikpp::data::types::bytes;
     using duration = tikpp::data::types::duration<std::chrono::seconds>;
 
-    one_way<bytes>         bytes_in;
-    one_way<bytes>         bytes_out;
-    one_way<std::uint32_t> packets_in;
-    one_way<std::uint32_t> packets_out;
-    one_way<duration>      uptime;
-    one_way<bool>          is_dynamic;
+    read_only<bytes>         bytes_in;
+    read_only<bytes>         bytes_out;
+    read_only<std::uint32_t> packets_in;
+    read_only<std::uint32_t> packets_out;
+    read_only<duration>      uptime;
+    read_only<bool>          is_dynamic;
 
-    two_way<bytes>    limit_bytes_in;
-    two_way<bytes>    limit_bytes_out;
-    two_way<bytes>    limit_bytes_total;
-    two_way<duration> limit_uptime;
+    read_write<bytes>    limit_bytes_in;
+    read_write<bytes>    limit_bytes_out;
+    read_write<bytes>    limit_bytes_total;
+    read_write<duration> limit_uptime;
 
-    two_way<std::string> address;
-    two_way<std::string> mac_address;
-    two_way<std::string> email;
+    read_write<std::string> address;
+    read_write<std::string> mac_address;
+    read_write<std::string> email;
 
     template <typename Converter>
     inline void convert(Converter &c) {

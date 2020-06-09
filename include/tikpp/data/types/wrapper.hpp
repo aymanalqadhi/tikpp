@@ -158,15 +158,14 @@ template <typename T>
 using stateful_wrapper = type_wrapper<stateful_value_wrapper, T>;
 
 template <typename T>
-struct readonly {
-    explicit readonly(T &&val) : value_ {std::move(val)} {
+struct read_only {
+    explicit read_only(T &&val) : value_ {std::move(val)} {
     }
 
-    explicit readonly(const T &val) : value_ {val} {
+    explicit read_only(const T &val) : value_ {val} {
     }
 
-    readonly() = default;
-
+    read_only() = default;
     inline operator const T &() const noexcept {
         return value_;
     }
@@ -180,19 +179,19 @@ struct readonly {
 };
 
 template <typename T>
-struct one_way : readonly<T> {
-    explicit one_way(T &&val) : readonly<T> {std::move(val)} {
-    }
-
-    explicit one_way(const T &val) : readonly<T> {val} {
-    }
-
-    one_way() = default;
+struct read_write : stateful_wrapper<T> {
+    using stateful_wrapper<T>::operator=;
 };
 
 template <typename T>
-struct two_way : stateful_wrapper<T> {
-    using stateful_wrapper<T>::operator=;
+struct sticky : read_only<T> {
+    explicit sticky(T &&val) : read_only<T> {std::move(val)} {
+    }
+
+    explicit sticky(const T &val) : read_only<T> {val} {
+    }
+
+    sticky() = default;
 };
 
 } // namespace tikpp::data::types

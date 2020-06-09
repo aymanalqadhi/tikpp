@@ -12,16 +12,16 @@ namespace tikpp::data {
 
 struct model {
     template <typename T>
-    using readonly = tikpp::data::types::readonly<T>;
+    using sticky = tikpp::data::types::sticky<T>;
 
     template <typename T>
-    using one_way = tikpp::data::types::one_way<T>;
+    using read_only = tikpp::data::types::read_only<T>;
 
     template <typename T>
-    using two_way = tikpp::data::types::two_way<T>;
+    using read_write = tikpp::data::types::read_write<T>;
 
-    readonly<tikpp::data::types::identity> id;
-    two_way<bool>                            is_disabled;
+    sticky<tikpp::data::types::identity> id;
+    read_write<bool>                     is_disabled;
 
     template <template <typename> typename Converter, typename Map>
     inline void convert(Converter<Map> &c) {

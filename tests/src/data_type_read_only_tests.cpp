@@ -7,7 +7,7 @@ using test_type = unsigned long;
 
 namespace tikpp::tests {
 
-using test_wrapper = tikpp::data::types::one_way<test_type>;
+using test_wrapper = tikpp::data::types::read_only<test_type>;
 
 TEST(OneWayBinderTypeTests, ArithmeticTest) {
     auto rnd1 = tikpp::tests::util::random<test_type>();

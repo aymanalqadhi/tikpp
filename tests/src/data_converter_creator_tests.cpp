@@ -1,5 +1,5 @@
-#include "tikpp/detail/type_traits/model.hpp"
 #include "tikpp/data/converters/creator.hpp"
+#include "tikpp/detail/type_traits/model.hpp"
 
 #include "tikpp/tests/fakes/model.hpp"
 #include "tikpp/tests/util/random.hpp"
@@ -61,9 +61,9 @@ TEST(ModelsCreatorTests, DefaultValuesTest2) {
     model.convert(creator);
 
     EXPECT_EQ(model.id.value().to_string(), "*0");
-    EXPECT_EQ(model.readonly_data.value(), "");
-    EXPECT_EQ(model.one_way_data.value(), "");
-    EXPECT_EQ(model.two_way_data.value(), "");
+    EXPECT_EQ(model.sticky_data.value(), "");
+    EXPECT_EQ(model.read_only_data.value(), "");
+    EXPECT_EQ(model.read_write_data.value(), "");
 }
 
 TEST(ModelsCreatorTests, CreationTest2) {
@@ -77,18 +77,18 @@ TEST(ModelsCreatorTests, CreationTest2) {
     auto str3 = tikpp::tests::util::random_string(
         0xFF, tikpp::tests::util::random_string_options::mixed);
 
-    map["id"]            = "*ABCD";
-    map["readonly-data"] = str1;
-    map["one-way-data"]  = str2;
-    map["two-way-data"]  = str3;
+    map["id"]              = "*ABCD";
+    map["sticky-data"]     = str1;
+    map["read-only-data"]  = str2;
+    map["read-write-data"] = str3;
 
     tikpp::data::converters::creator<map_type> creator {map};
     model.convert(creator);
 
     EXPECT_EQ(model.id.value().value(), 0xABCD);
-    EXPECT_EQ(model.readonly_data.value(), str1);
-    EXPECT_EQ(model.one_way_data.value(), str2);
-    EXPECT_EQ(model.two_way_data.value(), str3);
+    EXPECT_EQ(model.sticky_data.value(), str1);
+    EXPECT_EQ(model.read_only_data.value(), str2);
+    EXPECT_EQ(model.read_write_data.value(), str3);
 }
 
 } // namespace tikpp::tests

@@ -1,6 +1,7 @@
 #ifndef TIKPP_TESTS_FAKES_MODEL_HPP
 #define TIKPP_TESTS_FAKES_MODEL_HPP
 
+#include "tikpp/data/model.hpp"
 #include "tikpp/data/types/identity.hpp"
 #include "tikpp/data/types/wrapper.hpp"
 
@@ -30,21 +31,19 @@ struct model1 {
     }
 };
 
-struct model2 {
+struct model2 : tikpp::data::model {
     static constexpr auto api_path = "/tikpp/tests/fakes/model2";
 
-    tikpp::data::types::readonly<tikpp::data::types::identity> id;
-
-    tikpp::data::types::two_way<std::string>  two_way_data;
-    tikpp::data::types::one_way<std::string>  one_way_data;
-    tikpp::data::types::readonly<std::string> readonly_data;
+    sticky<std::string>     sticky_data;
+    read_write<std::string> read_write_data;
+    read_only<std::string>  read_only_data;
 
     template <typename Convertor>
     void convert(Convertor &c) {
         c["id"] % id;
-        c["readonly-data"] % readonly_data;
-        c["one-way-data"] % one_way_data;
-        c["two-way-data"] % two_way_data;
+        c["sticky-data"] % sticky_data;
+        c["read-only-data"] % read_only_data;
+        c["read-write-data"] % read_write_data;
     }
 };
 
