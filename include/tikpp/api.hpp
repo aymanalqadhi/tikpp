@@ -11,6 +11,9 @@
 
 namespace tikpp {
 
+template <typename ErrorHandle>
+using api = tikpp::basic_api<boost::asio::ip::tcp::socket, ErrorHandle>;
+
 template <typename AsyncStream = boost::asio::ip::tcp::socket,
           typename ErrorHandler>
 [[nodiscard]] inline decltype(auto) make_api(tikpp::io_context &io,
