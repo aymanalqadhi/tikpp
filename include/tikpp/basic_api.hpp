@@ -179,6 +179,7 @@ struct basic_api
           logged_in_ {false} {
     }
 
+  private:
     inline void send_next() {
         assert(!send_queue_.empty());
 
@@ -252,7 +253,6 @@ struct basic_api
         error_handler_(err);
     }
 
-  private:
     tikpp ::io_context &io_;
     AsyncStream         sock_;
     ErrorHandler        error_handler_;
