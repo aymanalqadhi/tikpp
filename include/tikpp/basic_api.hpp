@@ -27,7 +27,7 @@
 
 namespace tikpp {
 
-enum class api_state { closed, connecting, connected, reading };
+enum class api_state { closed, connecting, connected };
 
 template <typename AsyncStream,
           typename ErrorHandler,
@@ -61,7 +61,7 @@ struct basic_api
              handler {std::move(handler)}](const auto &err) mutable {
                 assert(self->state_.load() == api_state::connecting);
                 self->state_.store(err ? api_state::closed
-                                       : api_state::reading);
+                                       : api_state::connected);
                 self->read_next_response();
                 handler(err);
             });
@@ -162,7 +162,7 @@ struct basic_api
     }
 
     [[nodiscard]] inline auto is_open() const noexcept -> bool {
-        return state_.load() != api_state::closed && sock_.is_open();
+        return state_.load() == api_state::connected && sock_.is_open();
     }
 
     [[nodiscard]] inline auto is_logged_in() const noexcept -> bool {
@@ -177,14 +177,6 @@ struct basic_api
           state_ {api_state::closed},
           current_tag_ {0},
           logged_in_ {false} {
-    }
-
-    inline void start() {
-        assert(is_open());
-        assert(state_.load() != api_state::reading);
-
-        state_.store(api_state::reading);
-        read_next_response();
     }
 
     inline void send_next() {
@@ -225,7 +217,7 @@ struct basic_api
     }
 
     inline void read_next_response() {
-        if (!is_open() || state_.load() != api_state::reading) {
+        if (!is_open()) {
             return;
         }
 
