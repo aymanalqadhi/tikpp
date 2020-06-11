@@ -100,7 +100,7 @@ struct repository {
 
     template <typename CompletionToken>
     inline decltype(auto) async_remove(tikpp::data::types::identity id,
-                                       CompletionToken &&             token) {
+                                       CompletionToken &&           token) {
         return async_remove(id.to_string(),
                             std::forward<CompletionToken>(token));
     }
@@ -225,7 +225,8 @@ struct repository {
 }; // namespace tikpp
 
 template <typename Model, typename ApiPtr>
-inline auto make_repository(ApiPtr api) -> repository<Model, ApiPtr> {
+[[nodiscard]] inline auto make_repository(ApiPtr api)
+    -> repository<Model, ApiPtr> {
     return repository<Model, ApiPtr> {api};
 }
 

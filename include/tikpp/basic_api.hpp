@@ -279,7 +279,8 @@ struct basic_api_creator : tikpp::basic_api<AsyncStream, ErrorHandler> {
 } // namespace detail
 
 template <typename AsyncStream, typename ErrorHandler>
-inline auto make_basic_api(tikpp::io_context &io, ErrorHandler &&handler)
+[[nodiscard]] inline auto make_basic_api(tikpp::io_context &io,
+                                         ErrorHandler &&    handler)
     -> std::shared_ptr<tikpp::basic_api<AsyncStream, ErrorHandler>> {
     return std::make_shared<
         tikpp::detail::basic_api_creator<AsyncStream, ErrorHandler>>(
