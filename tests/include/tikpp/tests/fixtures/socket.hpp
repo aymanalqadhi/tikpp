@@ -6,27 +6,10 @@
 
 #include "gtest/gtest.h"
 
-#if defined(NO_MOCK_OBJECTS)
-#    include <boost/asio/ip/tcp.hpp>
-#endif
-
-#if !defined(TEST_IP_ADDRESS)
-#    if defined(NO_MOCK_OBJECTS)
-#        error "Test IP address was not defined"
-#    else
-#        define TEST_IP_ADDRESS "1.2.3.4"
-#    endif
-#endif
-
-#if !defined(TEST_API_PORT)
-#    if defined(NO_MOCK_OBJECTS)
-#        error "Test API port was not defined"
-#    else
-#        define TEST_API_PORT 1234
-#    endif
-#endif
-
 namespace tikpp::tests::fixtures {
+
+constexpr auto test_ip_address = "1.2.3.4";
+constexpr auto test_api_port   = 8728;
 
 struct SocketTest : ::testing::Test {
     SocketTest() : sock {io} {
@@ -34,20 +17,15 @@ struct SocketTest : ::testing::Test {
 
     void SetUp() override {
         sock.async_connect(
-            {boost::asio::ip::address::from_string(TEST_IP_ADDRESS),
-             TEST_API_PORT},
+            {boost::asio::ip::address::from_string(test_ip_address),
+             test_api_port},
             [](const auto &err) { EXPECT_FALSE(err); });
         io.run();
         EXPECT_TRUE(sock.is_open());
     }
 
     tikpp::io_context io;
-
-#if defined(NO_MOCK_OBJECTS)
-    boost::asio::ip::tcp::socket sock;
-#else
     tikpp::tests::fakes::socket sock;
-#endif
 };
 
 } // namespace tikpp::tests::fixtures
