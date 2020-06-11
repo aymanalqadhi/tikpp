@@ -20,7 +20,7 @@ Then create an API object by calling `tikpp::make_api` factory function passing 
 ///...
 
 tikpp::io_context io{};
-auto api = api = tikpp::api<my_app>::create(io, [](const auto& err) { ... });
+auto api = tikpp::make_api(io, [](const auto& err) { /* ... */ });
 
 // Note: Error handlers can be any callable object which overloads operator()(const boost::system::error_code&) function
 ```
