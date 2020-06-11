@@ -13,18 +13,16 @@ namespace tikpp {
 
 template <typename AsyncStream = boost::asio::ip::tcp::socket,
           typename ErrorHandler>
-inline decltype(auto) create_api(tikpp::io_context &io,
-                                 ErrorHandler &&    handler) {
-    return tikpp::basic_api<AsyncStream, std::decay_t<ErrorHandler>>::create(
-        io, std::move(handler));
+inline decltype(auto) make_api(tikpp::io_context &io, ErrorHandler &&handler) {
+    return tikpp::make_basic_api<AsyncStream, ErrorHandler>(
+        io, std::forward<ErrorHandler>(handler));
 }
 
 template <typename AsyncStream = boost::asio::ip::tcp::socket,
           typename ErrorHandler>
-inline decltype(auto) create_api(tikpp::io_context &io, ErrorHandler &handler) {
+inline decltype(auto) make_api(tikpp::io_context &io, ErrorHandler &handler) {
     using wrapper_type = std::reference_wrapper<std::decay_t<ErrorHandler>>;
-
-    return tikpp::basic_api<AsyncStream, wrapper_type>::create(
+    return tikpp::make_basic_api<AsyncStream, wrapper_type>(
         io, wrapper_type {handler});
 }
 
