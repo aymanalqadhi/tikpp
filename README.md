@@ -2,7 +2,7 @@
 
 ### Features
 - An easy to use interface
-- Making use of C++17 features (feature?)
+- Making use of C++17 features
 - Fully asynchronous (Callbacks/Futures/Coroutines supported via Boost.Asio completion tokens)
 - No RTTI is being used in the library (Templates!)
 - No expcetions are being used
@@ -20,7 +20,7 @@ Then create an API object by calling `tikpp::make_api` factory function passing 
 ///...
 
 tikpp::io_context io{};
-auto api = api = tikpp::api<my_app>::create(io, [](const auto& err) { ... });
+auto api = tikpp::make_api(io, [](const auto& err) { /* ... */ });
 
 // Note: Error handlers can be any callable object which overloads operator()(const boost::system::error_code&) function
 ```
