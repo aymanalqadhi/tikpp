@@ -34,12 +34,11 @@ template <typename AsyncStream,
           typename = std::enable_if_t<
               tikpp::detail::type_traits::is_async_stream_v<AsyncStream> &&
               tikpp::detail::type_traits::is_error_handler_v<ErrorHandler>>>
-class basic_api : public std::enable_shared_from_this<
-                      basic_api<AsyncStream, ErrorHandler>> {
+struct basic_api
+    : std::enable_shared_from_this<basic_api<AsyncStream, ErrorHandler>> {
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
 
-  public:
     template <typename CompletionToken>
     decltype(auto) async_open(const std::string &host,
                               std::uint16_t      port,
@@ -62,8 +61,8 @@ class basic_api : public std::enable_shared_from_this<
              handler {std::move(handler)}](const auto &err) mutable {
                 assert(self->state_.load() == api_state::connecting);
                 self->state_.store(err ? api_state::closed
-                                       : api_state::connected);
-                self->start();
+                                       : api_state::reading);
+                self->read_next_response();
                 handler(err);
             });
 
@@ -170,12 +169,6 @@ class basic_api : public std::enable_shared_from_this<
         return logged_in_;
     }
 
-    static inline auto create(tikpp::io_context &io, ErrorHandler &&handler)
-        -> std::shared_ptr<basic_api<AsyncStream, ErrorHandler>> {
-        return std::shared_ptr<basic_api<AsyncStream, ErrorHandler>>(
-            new basic_api<AsyncStream, ErrorHandler> {io, std::move(handler)});
-    }
-
   protected:
     explicit basic_api(tikpp::io_context &io, ErrorHandler &&handler)
         : io_ {io},
@@ -280,6 +273,27 @@ class basic_api : public std::enable_shared_from_this<
     std::map<std::uint32_t, read_handler>                         read_cbs_;
 };
 
-} // namespace tikpp
+namespace detail {
+
+template <typename AsyncStream, typename ErrorHandler>
+struct basic_api_creator : tikpp::basic_api<AsyncStream, ErrorHandler> {
+    template <typename... Arg>
+    basic_api_creator(Arg &&... args)
+        : tikpp::basic_api<AsyncStream, ErrorHandler> {
+              std::forward<Arg>(args)...} {
+    }
+};
+
+} // namespace detail
+
+template <typename AsyncStream, typename ErrorHandler>
+inline auto make_basic_api(tikpp::io_context &io, ErrorHandler &&handler)
+    -> std::shared_ptr<tikpp::basic_api<AsyncStream, ErrorHandler>> {
+    return std::make_shared<
+        tikpp::detail::basic_api_creator<AsyncStream, ErrorHandler>>(
+        io, std::forward<ErrorHandler>(handler));
+}
+
+}; // namespace tikpp
 
 #endif
