@@ -33,7 +33,7 @@ template <typename AsyncStream,
           typename ErrorHandler,
           typename = std::enable_if_t<
               tikpp::detail::type_traits::is_async_stream_v<AsyncStream> &&
-              tikpp::detail::type_traits::has_on_error_v<ErrorHandler>>>
+              tikpp::detail::type_traits::is_error_handler_v<ErrorHandler>>>
 class basic_api : public std::enable_shared_from_this<
                       basic_api<AsyncStream, ErrorHandler>> {
     using read_handler = std::function<bool(const boost::system::error_code &,
@@ -170,18 +170,17 @@ class basic_api : public std::enable_shared_from_this<
         return logged_in_;
     }
 
-    static inline auto create(tikpp::io_context &io,
-                              ErrorHandler &     error_handler)
+    static inline auto create(tikpp::io_context &io, ErrorHandler &&handler)
         -> std::shared_ptr<basic_api<AsyncStream, ErrorHandler>> {
         return std::shared_ptr<basic_api<AsyncStream, ErrorHandler>>(
-            new basic_api<AsyncStream, ErrorHandler> {io, error_handler});
+            new basic_api<AsyncStream, ErrorHandler> {io, std::move(handler)});
     }
 
   protected:
-    explicit basic_api(tikpp::io_context &io, ErrorHandler &error_handler)
+    explicit basic_api(tikpp::io_context &io, ErrorHandler &&handler)
         : io_ {io},
           sock_ {io},
-          error_handler_ {error_handler},
+          error_handler_ {std::move(handler)},
           state_ {api_state::closed},
           current_tag_ {0},
           logged_in_ {false} {
@@ -265,13 +264,14 @@ class basic_api : public std::enable_shared_from_this<
 
     inline void on_error(const boost::system::error_code &err) {
         close();
-        error_handler_.on_error(err);
+        error_handler_(err);
     }
 
   private:
-    tikpp ::io_context &   io_;
-    AsyncStream            sock_;
-    ErrorHandler &         error_handler_;
+    tikpp ::io_context &io_;
+    AsyncStream         sock_;
+    ErrorHandler        error_handler_;
+
     std::atomic<api_state> state_;
     std::atomic_uint32_t   current_tag_;
     bool                   logged_in_;
