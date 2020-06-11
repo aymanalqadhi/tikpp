@@ -62,8 +62,8 @@ struct basic_api
                 assert(self->state_.load() == api_state::connecting);
                 self->state_.store(err ? api_state::closed
                                        : api_state::connected);
-                self->read_next_response();
                 handler(err);
+                self->read_next_response();
             });
 
         return result.get();
