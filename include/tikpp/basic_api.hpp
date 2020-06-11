@@ -63,18 +63,11 @@ class basic_api : public std::enable_shared_from_this<
                 assert(self->state_.load() == api_state::connecting);
                 self->state_.store(err ? api_state::closed
                                        : api_state::connected);
+                self->start();
                 handler(err);
             });
 
         return result.get();
-    }
-
-    inline void start() {
-        assert(is_open());
-        assert(state_.load() != api_state::reading);
-
-        state_.store(api_state::reading);
-        read_next_response();
     }
 
     inline void close() {
@@ -192,6 +185,14 @@ class basic_api : public std::enable_shared_from_this<
           state_ {api_state::closed},
           current_tag_ {0},
           logged_in_ {false} {
+    }
+
+    inline void start() {
+        assert(is_open());
+        assert(state_.load() != api_state::reading);
+
+        state_.store(api_state::reading);
+        read_next_response();
     }
 
     inline void send_next() {
