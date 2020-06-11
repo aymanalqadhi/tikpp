@@ -5,6 +5,8 @@
 #include "tikpp/request.hpp"
 
 #include "gtest/gtest.h"
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/write.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -28,7 +30,7 @@ TEST_F(AsyncReadWordLengthTest, LengthTest) {
         tikpp::detail::encode_length(std::rand(), buf);
     }
 
-    sock.input_buffer().write(reinterpret_cast<char *>(buf.data()), buf.size());
+    boost::asio::write(sock.input_pipe(), boost::asio::buffer(buf));
     std::srand(start_seed);
 
     for (std::size_t i {0}; i < test_iterations; ++i) {
@@ -37,10 +39,9 @@ TEST_F(AsyncReadWordLengthTest, LengthTest) {
                 EXPECT_FALSE(err);
                 EXPECT_EQ(rand(), len);
             });
-
-        io.restart();
-        io.run();
     }
+
+    io.run();
 }
 
 } // namespace tikpp::tests

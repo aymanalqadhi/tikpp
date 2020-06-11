@@ -6,6 +6,8 @@
 
 #include "fmt/format.h"
 #include "gtest/gtest.h"
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/write.hpp>
 
 #include <cstddef>
 #include <cstdint>
@@ -21,7 +23,7 @@ namespace tikpp::tests {
 struct AsyncReadWordLengthTest : tikpp::tests::fixtures::SocketTest {};
 
 TEST_F(AsyncReadWordLengthTest, SentenceTest) {
-    static constexpr auto test_iterations    = 100;
+    static constexpr auto test_iterations    = 50;
     static constexpr auto words_per_sentence = 10;
 
     std::time_t start_seed {std::time(nullptr)};
@@ -43,8 +45,7 @@ TEST_F(AsyncReadWordLengthTest, SentenceTest) {
         }
 
         req->encode(buf);
-        sock.input_buffer().write(reinterpret_cast<char *>(buf.data()),
-                                  buf.size());
+        boost::asio::write(sock.input_pipe(), boost::asio::buffer(buf));
     }
 
     std::srand(start_seed);
@@ -72,10 +73,9 @@ TEST_F(AsyncReadWordLengthTest, SentenceTest) {
 
                 EXPECT_FALSE(err);
             });
-
-        io.restart();
-        io.run();
     }
+
+    io.run();
 }
 
 } // namespace tikpp::tests
