@@ -2,14 +2,32 @@
 #define TIKPP_API_HPP
 
 #include "tikpp/basic_api.hpp"
+#include "tikpp/io_context.hpp"
 
 #include <boost/asio/ip/tcp.hpp>
 
+#include <memory>
+#include <type_traits>
+
 namespace tikpp {
 
-template <typename ErrorHandler>
-using api = tikpp::basic_api<boost::asio::ip::tcp::socket, ErrorHandler>;
-
+template <typename AsyncStream = boost::asio::ip::tcp::socket,
+          typename ErrorHandler>
+inline decltype(auto) create_api(tikpp::io_context &io,
+                                 ErrorHandler &&    handler) {
+    return tikpp::basic_api<AsyncStream, std::decay_t<ErrorHandler>>::create(
+        io, std::move(handler));
 }
+
+template <typename AsyncStream = boost::asio::ip::tcp::socket,
+          typename ErrorHandler>
+inline decltype(auto) create_api(tikpp::io_context &io, ErrorHandler &handler) {
+    using wrapper_type = std::reference_wrapper<std::decay_t<ErrorHandler>>;
+
+    return tikpp::basic_api<AsyncStream, wrapper_type>::create(
+        io, wrapper_type {handler});
+}
+
+} // namespace tikpp
 
 #endif
