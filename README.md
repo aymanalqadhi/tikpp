@@ -24,8 +24,18 @@ auto api = tikpp::make_api(io, [](const auto& err) { /* ... */ });
 
 // Note: Error handlers can be any callable object which overloads operator()(const boost::system::error_code&) function
 ```
+Then, open a connection to the router
+```cpp
+api->async_open(address, port, name, password, [](const auto& err) {
+    if (err) {
+        // handler errors
+    }
 
-Then start the `tikpp::io_context` object by calling `io.run()` . **Remember** that the call to `io.run()` will block the calling thread, so you must call it after initiating at least one asynchronous operation, or in another thread.
+    // Connected & logged in
+});
+```
+
+Finally, start the `tikpp::io_context` object by calling `io.run()` . **Remember** that the call to `io.run()` will block the calling thread, so you must call it after initiating at least one asynchronous operation, or in another thread.
 
 ## Examples
 ### Sending a request
@@ -60,13 +70,25 @@ api->async_send(std::move(req), [](const auto& err, auto&& resp) {
     }
 
     // Check response type
-    if (resp.type == tikpp::response_type::...) {
+    if (resp.type() == tikpp::response_type::...) {
         // Do something
     }
 
     // Get response fields
     const auto& value1 = resp["resp-key-1"];
     const auto& value2 = resp["resp-key-2"];
+
+    // Get response fields of specific type
+    auto value3 = resp.get<std::uint32_t>("resp-key-3");
+    auto value4 = resp.get<double>("resp-key-4");
+
+    // library types
+    auto value5 = resp.get<tikpp::data::types::bytes>("resp-key-5");
+    auto value6 = resp.get<tikpp::data::types::duration>("resp-key-6");
+
+    // User defined types (Must be constructible with const std::string&)
+    auto value7 = resp.get<foo>("resp-key-7");
+    auto value8 = resp.get<bar>("resp-key-8");
 
     // ...
 
@@ -82,16 +104,16 @@ Futures can be used to handle the response (Note that futures are generally slow
 
 ```cpp
 #include "tikpp/tokens.hpp"
-auto retf = api->async_send(std::move(api), tikpp::use_future);
+
+//...
+
+auto retf = api->async_send(std::move(api), tikpp::use_futures);
+
 //
 // Do some work...
 //
 
-try {
-    auto value = retf.get();
-} catch (const boost::system::system_error& e) {
-    // handle error
-}
+auto resp = retf.get(); // May throw!!!
 ```
 
 ### Using the data repository
