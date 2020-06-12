@@ -34,7 +34,8 @@ struct socket final {
         assert(!connected_.load());
 
         if (fails_.load()) {
-            handler(boost::asio::error::fault);
+            handler(
+                boost::asio::error::make_error_code(boost::asio::error::fault));
             return;
         }
 
