@@ -8,10 +8,10 @@
 
 namespace tikpp::tests::fixtures {
 
-constexpr auto test_ip_address = "1.2.3.4";
-constexpr auto test_api_port   = 8728;
-
 struct SocketTest : ::testing::Test {
+    static constexpr auto test_ip_address = "1.2.3.4";
+    static constexpr auto test_api_port   = 8728;
+
     SocketTest() : sock {io} {
     }
 
@@ -24,7 +24,7 @@ struct SocketTest : ::testing::Test {
         EXPECT_TRUE(sock.is_open());
     }
 
-    tikpp::io_context io;
+    tikpp::io_context           io;
     tikpp::tests::fakes::socket sock;
 };
 
