@@ -69,6 +69,41 @@ struct basic_api
         return result.get();
     }
 
+    template <typename CompletionToken>
+    decltype(auto) async_open(const std::string &host,
+                              std::uint16_t      port,
+                              const std::string &name,
+                              const std::string &password,
+                              CompletionToken && token) {
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result);
+
+        async_open(host, port,
+                   [this, handler {std::move(handler)}, name,
+                    password](const auto &err) mutable {
+                       if (err) {
+                           return handler(err);
+                       }
+
+                       async_login(name, password,
+                                   [this, handler {std::move(handler)}](
+                                       const auto &err) mutable {
+                                       if (err) {
+                                           if (is_open()) {
+                                               close();
+                                           }
+
+                                           handler(err);
+                                       } else {
+                                           handler(
+                                               boost::system::error_code {});
+                                       }
+                                   });
+                   });
+
+        return result.get();
+    }
+
     inline void close() {
         assert(is_open());
         sock_.close();
