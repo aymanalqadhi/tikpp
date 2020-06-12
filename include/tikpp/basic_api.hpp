@@ -60,9 +60,15 @@ struct basic_api
             [self = this->shared_from_this(),
              handler {std::move(handler)}](const auto &err) mutable {
                 assert(self->state_.load() == api_state::connecting);
-                self->state_.store(err ? api_state::closed
-                                       : api_state::connected);
+
+                if (err) {
+                    self->state_.store(api_state::closed);
+                    return handler(err);
+                }
+
+                self->state_.store(api_state::connected);
                 handler(err);
+
                 self->read_next_response();
             });
 
@@ -156,6 +162,7 @@ struct basic_api
                                CompletionToken && token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
                                     token, handler, result);
+
         async_send(
             make_request<tikpp::commands::v2::login>(name, password),
             [this, name, password, handler {std::move(handler)}](
