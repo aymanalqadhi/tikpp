@@ -265,6 +265,11 @@ struct basic_api
     std::map<std::uint32_t, read_handler>                         read_cbs_;
 };
 
+template <typename AsyncStream>
+using basic_api_te =
+    basic_api<AsyncStream,
+              std::function<void(const boost::system::error_code &)>>;
+
 namespace detail {
 
 template <typename AsyncStream, typename ErrorHandler>
