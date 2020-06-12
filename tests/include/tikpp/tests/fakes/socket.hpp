@@ -51,6 +51,9 @@ struct socket final {
             throw std::logic_error {"Cannot close socket"};
         }
 
+        input_pipe_.close();
+        output_pipe_.close();
+
         connected_.store(false);
     }
 
