@@ -83,6 +83,14 @@ struct socket final {
         output_pipe_.async_write_some(buf, std::move(handler));
     }
 
+    [[nodiscard]] inline auto always_fails() const noexcept -> bool {
+        return fails_.load();
+    }
+
+    inline void always_fails(bool value) noexcept {
+        fails_.store(value);
+    }
+
     [[nodiscard]] inline auto is_open() const noexcept -> bool {
         return connected_;
     }
