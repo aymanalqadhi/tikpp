@@ -1,6 +1,7 @@
 #ifndef TIKPP_TESTS_FAKES_SOCKET_HPP
 #define TIKPP_TESTS_FAKES_SOCKET_HPP
 
+#include "tikpp/detail/async_result.hpp"
 #include "tikpp/io_context.hpp"
 
 #include <boost/asio/buffer.hpp>
@@ -28,21 +29,26 @@ struct socket final {
           fails_ {false} {
     }
 
-    template <typename CompletionHandler>
-    inline void async_connect(const boost::asio::ip::tcp::endpoint &ep,
-                              CompletionHandler &&                  handler) {
+    template <typename CompletionToken>
+    inline decltype(auto)
+    async_connect(const boost::asio::ip::tcp::endpoint &ep,
+                  CompletionToken &&                    token) {
+        GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
+                                    token, handler, result);
+
         assert(!connected_.load());
 
         if (fails_.load()) {
-            handler(
+            return handler(
                 boost::asio::error::make_error_code(boost::asio::error::fault));
-            return;
         }
 
         connected_.store(true);
         ep_ = ep;
 
         handler(boost::system::error_code {});
+
+        return result.get();
     }
 
     inline void close() {
@@ -58,9 +64,13 @@ struct socket final {
         connected_.store(false);
     }
 
-    template <typename CompletionHandler>
+    template <typename CompletionToken>
     inline void async_read_some(boost::asio::mutable_buffer buf,
-                                CompletionHandler &&        handler) {
+                                CompletionToken &&          token) {
+        GENERATE_COMPLETION_HANDLER(
+            void(const boost::system::error_code &, std::size_t), token,
+            handler, result);
+
         assert(connected_);
 
         if (fails_) {
@@ -69,11 +79,16 @@ struct socket final {
         }
 
         input_pipe_.async_read_some(buf, std::move(handler));
+        return result.get();
     }
 
-    template <typename Handler>
+    template <typename CompletionToken>
     inline void async_write_some(boost::asio::const_buffer buf,
-                                 Handler &&                handler) {
+                                 CompletionToken &&        token) {
+        GENERATE_COMPLETION_HANDLER(
+            void(const boost::system::error_code &, std::size_t), token,
+            handler, result);
+
         assert(connected_);
 
         if (fails_) {
@@ -82,6 +97,7 @@ struct socket final {
         }
 
         output_pipe_.async_write_some(buf, std::move(handler));
+        return result.get();
     }
 
     [[nodiscard]] inline auto always_fails() const noexcept -> bool {
