@@ -115,9 +115,8 @@ struct basic_api
     inline void close() {
         assert(is_open());
         sock_.close();
-
         state_.store(api_state::closed);
-        logged_in_ = false;
+        logged_in_.store(false);
     }
 
     [[nodiscard]] inline auto aquire_unique_tag() noexcept -> std::uint32_t {
@@ -186,7 +185,7 @@ struct basic_api
                                    } else if (resp.error()) {
                                        handler(resp.error());
                                    } else {
-                                       logged_in_ = true;
+                                       logged_in_.store(true);
                                        handler(boost::system::error_code {});
                                    }
 
@@ -210,7 +209,7 @@ struct basic_api
     }
 
     [[nodiscard]] inline auto is_logged_in() const noexcept -> bool {
-        return logged_in_;
+        return logged_in_.load();
     }
 
   protected:
@@ -303,7 +302,7 @@ struct basic_api
 
     std::atomic<api_state> state_;
     std::atomic_uint32_t   current_tag_;
-    bool                   logged_in_;
+    std::atomic_bool       logged_in_;
 
     std::deque<std::pair<std::shared_ptr<request>, read_handler>> send_queue_;
     std::map<std::uint32_t, read_handler>                         read_cbs_;
