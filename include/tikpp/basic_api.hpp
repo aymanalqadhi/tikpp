@@ -47,8 +47,10 @@ struct basic_api
                                     token, handler, result);
 
         if (state_.load() == api_state::connecting) {
-            handler(boost::asio::error::make_error_code(
-                boost::asio::error::in_progress));
+            io_.post([handler {std::move(handler)}]() mutable {
+                handler(boost::asio::error::make_error_code(
+                    boost::asio::error::in_progress));
+            });
             return result.get();
         }
 
