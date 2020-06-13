@@ -118,7 +118,7 @@ struct basic_api
         logged_in_ = false;
     }
 
-    [[nodiscard]] inline auto aquire_unique_tag() noexcept {
+    [[nodiscard]] inline auto aquire_unique_tag() noexcept -> std::uint32_t {
         return current_tag_.fetch_add(1);
     }
 
