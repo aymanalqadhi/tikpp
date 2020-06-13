@@ -23,6 +23,7 @@ create_test(testing_util_random)
 create_test(convert)
 create_test(convert_back)
 
+create_test(basic_api)
 create_test(request)
 create_test(response)
 
