@@ -47,6 +47,23 @@ struct repository {
     }
 
     template <typename CompletionToken>
+    inline decltype(auto) async_stream(CompletionToken &&token) {
+        auto req =
+            api_->template make_request<tikpp::commands::getall<Model>>();
+        return do_async_stream(std::move(req),
+                               std::forward<CompletionToken>(token));
+    }
+
+    template <typename CompletionToken>
+    inline decltype(auto) async_stream(query_type        query,
+                                       CompletionToken &&token) {
+        auto req = api_->template make_request<tikpp::commands::getall<Model>>(
+            std::move(query));
+        return do_async_stream(std::move(req),
+                               std::forward<CompletionToken>(token));
+    }
+
+    template <typename CompletionToken>
     decltype(auto) async_add(Model model, CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &,
                                          tikpp::data::types::identity &&),
@@ -87,7 +104,7 @@ struct repository {
                              if (err) {
                                  handler(err);
                              } else if (resp.error()) {
-                                 handler(tikpp::make_error_code(resp.error()));
+                                 handler(resp.error());
                              } else {
                                  handler(boost::system::error_code {});
                              }
@@ -130,23 +147,6 @@ struct repository {
         return result.get();
     }
 
-    template <typename CompletionToken>
-    inline decltype(auto) async_stream(CompletionToken &&token) {
-        auto req =
-            api_->template make_request<tikpp::commands::getall<Model>>();
-        return do_async_stream(std::move(req),
-                               std::forward<CompletionToken>(token));
-    }
-
-    template <typename CompletionToken>
-    inline decltype(auto) async_stream(query_type        query,
-                                       CompletionToken &&token) {
-        auto req = api_->template make_request<tikpp::commands::getall<Model>>(
-            std::move(query));
-        return do_async_stream(std::move(req),
-                               std::forward<CompletionToken>(token));
-    }
-
   private:
     template <typename CompletionToken>
     decltype(auto) do_async_load(std::shared_ptr<tikpp::request> req,
@@ -161,22 +161,27 @@ struct repository {
                                 const auto &err, auto &&resp) mutable {
                 if (err) {
                     handler(err, std::vector<Model> {});
-                    return false;
-                }
-
-                if (resp.empty()) {
+                } else if (resp.error()) {
+                    handler(resp.error(), std::vector<Model> {});
+                } else if (resp.type() == tikpp::response_type::normal &&
+                           resp.empty()) {
                     handler(boost::system::error_code {}, std::move(*ret));
-                    return false;
+                } else if (resp.type() != tikpp::response_type::data) {
+                    handler(tikpp::make_error_code(
+                                tikpp::error_code::invalid_response),
+                            std::vector<Model> {});
+                } else {
+                    tikpp::data::converters::creator<tikpp::response> creator {
+                        resp};
+
+                    Model item {};
+                    item.convert(creator);
+
+                    ret->emplace_back(std::move(item));
+                    return true;
                 }
 
-                tikpp::data::converters::creator<tikpp::response> creator {
-                    resp};
-
-                Model item {};
-                item.convert(creator);
-
-                ret->emplace_back(std::move(item));
-                return true;
+                return false;
             });
 
         return result.get();
