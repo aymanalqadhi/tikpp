@@ -32,6 +32,7 @@ create_test(operation_async_read_word)
 create_test(operation_async_read_response)
 create_test(operation_async_connect)
 
+create_test(data_repository)
 create_test(data_converter_proplist_collector)
 create_test(data_converter_creator)
 create_test(data_converter_dissolver)
