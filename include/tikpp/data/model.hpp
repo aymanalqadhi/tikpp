@@ -20,6 +20,7 @@ struct model {
     template <typename T>
     using read_write = tikpp::data::types::read_write<T>;
 
+    //! \brief The item API ID
     sticky<tikpp::data::types::identity> id;
 
     template <typename Converter>
