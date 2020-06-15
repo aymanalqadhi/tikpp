@@ -119,6 +119,10 @@ struct basic_api
         logged_in_.store(false);
     }
 
+    [[nodiscard]] inline auto current_tag() const noexcept  -> std::uint32_t {
+        return current_tag_.load();
+    }
+
     [[nodiscard]] inline auto aquire_unique_tag() noexcept -> std::uint32_t {
         return current_tag_.fetch_add(1);
     }
