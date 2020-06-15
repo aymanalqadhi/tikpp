@@ -10,30 +10,16 @@
 
 namespace tikpp::data::ip::hotspot {
 
-struct user_profile : tikpp::data::model {
+struct user_profile_detail : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user/profile";
+
+    using duration = tikpp::data::types::duration<std::chrono::seconds>;
 
     read_write<std::string>   address_list;
     read_write<std::string>   address_pool;
     read_write<std::string>   name;
     read_write<std::string>   rate_limit;
     read_write<std::uint32_t> shared_users;
-
-    template <typename Converter>
-    inline void convert(Converter &c) {
-        model::convert(c);
-
-        c["address-list"] % address_list;
-        c["address-pool"] % address_pool;
-        c["name"] % name;
-        c["rate-limit"] % rate_limit;
-        c["shared-users"] % shared_users;
-    }
-};
-
-struct user_profile_detail : user_profile {
-    using duration = tikpp::data::types::duration<std::chrono::seconds>;
-
     read_write<bool>        advertise;
     read_write<duration>    advertise_interval;
     read_write<duration>    advertise_timeout;
@@ -53,8 +39,13 @@ struct user_profile_detail : user_profile {
 
     template <typename Converter>
     inline void convert(Converter &c) {
-        user_profile::convert(c);
+        tikpp::data::model::convert(c);
 
+        c["address-list"] % address_list;
+        c["address-pool"] % address_pool;
+        c["name"] % name;
+        c["rate-limit"] % rate_limit;
+        c["shared-users"] % shared_users;
         c["advertise"] % advertise;
         c["advertise-interval"] % advertise_interval;
         c["advertise-timeout"] % advertise_timeout;
@@ -63,7 +54,6 @@ struct user_profile_detail : user_profile {
         c["incoming-filter"] % incoming_filter;
         c["incoming-packet-mark"] % incoming_packet_mark;
         c["keepalive-timeout"] % keepalive_timeout;
-
         c["on-login"] % on_login;
         c["on-logout"] % on_logout;
         c["open-status-page"] % open_status_page;

@@ -14,27 +14,14 @@ namespace tikpp::data::ip::hotspot {
 struct user : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user";
 
+    using bytes                    = tikpp::data::types::bytes;
+    using duration = tikpp::data::types::duration<std::chrono::seconds>;
+
     read_write<std::string> name;
     read_write<bool>        is_disabled;
     read_write<std::string> password;
     read_write<std::string> profile;
     read_write<std::string> comment;
-
-    template <typename Converter>
-    inline void convert(Converter &c) {
-        model::convert(c);
-
-        c["name"] % name;
-        c["disabled"] % is_disabled;
-        c["password"] % password;
-        c["profile"] % profile;
-        c["comment"] % comment;
-    }
-};
-
-struct user_detail : user {
-    using bytes    = tikpp::data::types::bytes;
-    using duration = tikpp::data::types::duration<std::chrono::seconds>;
 
     read_only<bytes>         bytes_in;
     read_only<bytes>         bytes_out;
@@ -54,7 +41,13 @@ struct user_detail : user {
 
     template <typename Converter>
     inline void convert(Converter &c) {
-        user::convert(c);
+        tikpp::data::model::convert(c);
+
+        c["name"] % name;
+        c["disabled"] % is_disabled;
+        c["password"] % password;
+        c["profile"] % profile;
+        c["comment"] % comment;
 
         c["bytes-in"] % bytes_in;
         c["bytes-out"] % bytes_out;
