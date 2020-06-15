@@ -29,6 +29,9 @@ namespace tikpp {
 
 enum class api_state { closed, connecting, connected };
 
+/*!
+ * A struct to manage RouterOS API connections
+ */
 template <typename AsyncStream,
           typename ErrorHandler,
           typename = std::enable_if_t<
@@ -36,9 +39,21 @@ template <typename AsyncStream,
               tikpp::detail::type_traits::is_error_handler_v<ErrorHandler>>>
 struct basic_api
     : std::enable_shared_from_this<basic_api<AsyncStream, ErrorHandler>> {
+
+    //! \brief The handler that handlers read responses
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
 
+    /*!
+     * \brief Asynchronously opens an API connection to the router, then logs
+     *        in to the router
+     *
+     * \param host  The router host address
+     * \param port  The API listening port
+     * \param token The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     decltype(auto) async_open(const std::string &host,
                               std::uint16_t      port,
@@ -77,6 +92,18 @@ struct basic_api
         return result.get();
     }
 
+    /*!
+     * \brief Asynchronously opens an API connection to the router, then logs
+     *        in to the router
+     *
+     * \param host     The router host address
+     * \param port     The API listening port
+     * \param name     The name used to login after successfully connecting
+     * \param password The password used to login after successfully connecting
+     * \param token    The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     decltype(auto) async_open(const std::string &host,
                               std::uint16_t      port,
@@ -112,6 +139,7 @@ struct basic_api
         return result.get();
     }
 
+    //! \brief Closes an already-opened connection to the router
     inline void close() {
         assert(is_open());
         sock_.close();
@@ -119,14 +147,13 @@ struct basic_api
         logged_in_.store(false);
     }
 
-    [[nodiscard]] inline auto current_tag() const noexcept  -> std::uint32_t {
-        return current_tag_.load();
-    }
-
-    [[nodiscard]] inline auto aquire_unique_tag() noexcept -> std::uint32_t {
-        return current_tag_.fetch_add(1);
-    }
-
+    /*!
+     * \brief Creates a request from a command request type
+     *
+     * \param args The arguments used to construct the command request
+     *
+     * \return The created command request
+     */
     template <
         typename Command,
         typename... Args,
@@ -137,12 +164,27 @@ struct basic_api
                                          std::forward<Args>(args)...);
     }
 
+    /*!
+     * \brief Creates a request from a command string
+     *
+     * \param command The command string to be used to construct the request
+     *
+     * \return The created request
+     */
     [[nodiscard]] inline auto make_request(std::string command)
         -> std::shared_ptr<tikpp::request> {
         return std::make_shared<tikpp::request>(std::move(command),
                                                 aquire_unique_tag());
     }
 
+    /*!
+     * \brief Asynchronously sends a request to the router
+     *
+     * \param req   The request to the best
+     * \param token The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     void async_send(std::shared_ptr<request> req, CompletionToken &&token) {
         assert(req != nullptr);
@@ -161,6 +203,15 @@ struct basic_api
         return result.get();
     }
 
+    /*!
+     * \brief Asynchronously logs in to the router
+     *
+     * \param name     The user name which to be used to login to the router
+     * \param password The password which to be used to login to the router
+     * \param token    The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     decltype(auto) async_login(const std::string &name,
                                const std::string &password,
@@ -204,14 +255,47 @@ struct basic_api
         return result.get();
     }
 
+    /*!
+     * \brief Gets the current request tag that the next request will have
+     *
+     * \return The next request tag
+     */
+    [[nodiscard]] inline auto current_tag() const noexcept -> std::uint32_t {
+        return current_tag_.load();
+    }
+
+    /*!
+     * \brief Gets a unique tag to be used for a request
+     *
+     * \return A unique request tag
+     */
+    [[nodiscard]] inline auto aquire_unique_tag() noexcept -> std::uint32_t {
+        return current_tag_.fetch_add(1);
+    }
+
+    /*!
+     * \brief Gets the API connection socket
+     *
+     * \return The connection socket
+     */
     [[nodiscard]] inline auto socket() noexcept -> AsyncStream & {
         return sock_;
     }
 
+    /*!
+     * \brief Gets whether the API connection is open or not
+     *
+     * \return The connection open status
+     */
     [[nodiscard]] inline auto is_open() const noexcept -> bool {
         return state_.load() == api_state::connected && sock_.is_open();
     }
 
+    /*!
+     * \brief Gets whether the API connection is authenticated or not
+     *
+     * \return The connection authentication status
+     */
     [[nodiscard]] inline auto is_logged_in() const noexcept -> bool {
         return logged_in_.load();
     }
@@ -312,6 +396,7 @@ struct basic_api
     std::map<std::uint32_t, read_handler>                         read_cbs_;
 };
 
+//! A type-erased alias for \see basic_api struct
 template <typename AsyncStream>
 using basic_api_te =
     basic_api<AsyncStream,
@@ -319,6 +404,10 @@ using basic_api_te =
 
 namespace detail {
 
+/*!
+ * \brief A wrapper class to enable the use of \see std::make_shared function
+ *        on \see basic_api struct
+ */
 template <typename AsyncStream, typename ErrorHandler>
 struct basic_api_creator : tikpp::basic_api<AsyncStream, ErrorHandler> {
     template <typename... Arg>
@@ -330,6 +419,14 @@ struct basic_api_creator : tikpp::basic_api<AsyncStream, ErrorHandler> {
 
 } // namespace detail
 
+/*!
+ * \brief Creates a new instance of \see basic_api struct
+ *
+ * \param io      The IO object to be used by the API connection
+ * \param handler A callable object to be called on fatal errors
+ *
+ * \return The create \see basic_api instance
+ */
 template <typename AsyncStream, typename ErrorHandler>
 [[nodiscard]] inline auto make_basic_api(tikpp::io_context &io,
                                          ErrorHandler &&    handler)
