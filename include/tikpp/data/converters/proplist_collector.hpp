@@ -14,9 +14,15 @@ struct proplist_collector {
         }
     };
 
-    inline auto operator[](std::string key) -> dummy_wrapper {
+    inline auto operator()(const std::string &key) -> dummy_wrapper {
         proplist.emplace_back(std::move(key));
         return dummy_wrapper {};
+    }
+
+    inline auto operator()(const std::string &key,
+                           [[maybe_unused]] const std::string &) const noexcept
+        -> dummy_wrapper {
+        return operator()(key);
     }
 
     Container proplist;
