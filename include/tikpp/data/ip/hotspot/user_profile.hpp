@@ -41,27 +41,27 @@ struct user_profile_detail : tikpp::data::model {
     inline void convert(Converter &c) {
         tikpp::data::model::convert(c);
 
-        c["address-list"] % address_list;
-        c["address-pool"] % address_pool;
-        c["name"] % name;
-        c["rate-limit"] % rate_limit;
-        c["shared-users"] % shared_users;
-        c["advertise"] % advertise;
-        c["advertise-interval"] % advertise_interval;
-        c["advertise-timeout"] % advertise_timeout;
-        c["advertise-url"] % advertise_url;
-        c["idle-timeout"] % idle_timeout;
-        c["incoming-filter"] % incoming_filter;
-        c["incoming-packet-mark"] % incoming_packet_mark;
-        c["keepalive-timeout"] % keepalive_timeout;
-        c["on-login"] % on_login;
-        c["on-logout"] % on_logout;
-        c["open-status-page"] % open_status_page;
-        c["outgoing-filter"] % outgoing_filter;
-        c["outgoing-packet-mark"] % outgoing_packet_mark;
-        c["session-timeout"] % session_timeout;
-        c["status-autorefresh"] % status_autorefresh;
-        c["transparent-proxy"] % transparent_proxy;
+        c("address-list") % address_list;
+        c("address-pool") % address_pool;
+        c("name") % name;
+        c("rate-limit") % rate_limit;
+        c("shared-users") % shared_users;
+        c("advertise") % advertise;
+        c("advertise-interval") % advertise_interval;
+        c("advertise-timeout") % advertise_timeout;
+        c("advertise-url") % advertise_url;
+        c("idle-timeout") % idle_timeout;
+        c("incoming-filter") % incoming_filter;
+        c("incoming-packet-mark") % incoming_packet_mark;
+        c("keepalive-timeout") % keepalive_timeout;
+        c("on-login") % on_login;
+        c("on-logout") % on_logout;
+        c("open-status-page") % open_status_page;
+        c("outgoing-filter") % outgoing_filter;
+        c("outgoing-packet-mark") % outgoing_packet_mark;
+        c("session-timeout") % session_timeout;
+        c("status-autorefresh") % status_autorefresh;
+        c("transparent-proxy") % transparent_proxy;
     }
 };
 

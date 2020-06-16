@@ -38,28 +38,28 @@ struct interface_model : tikpp::data::model {
     inline void convert(Converter &c) {
         tikpp::data::model::convert(c);
 
-        c["name"] % name;
-        c["l2mtu"] % l2mtu;
-        c["mtu"] % mtu;
+        c("name") % name;
+        c("l2mtu") % l2mtu;
+        c("mtu") % mtu;
 
-        c["dynamic"] % is_dynamic;
-        c["fast-path"] % fast_path;
-        c["id"] % if_id;
-        c["ifindex"] % if_index;
-        c["ifname"] % if_name;
-        c["mac-address"] % mac_address;
-        c["max-l2mtu"] % max_l2mtu;
-        c["running"] % is_running;
-        c["rx-byte"] % rx_byte;
-        c["rx-drop"] % rx_drop;
-        c["rx-errors"] % rx_errors;
-        c["rx-packet"] % rx_packet;
-        c["slave"] % is_slave;
-        c["status"] % status;
-        c["tx-byte"] % tx_byte;
-        c["tx-drop"] % tx_drop;
-        c["tx-errors"] % tx_errors;
-        c["tx-packet"] % tx_packet;
+        c("dynamic") % is_dynamic;
+        c("fast-path") % fast_path;
+        c("id") % if_id;
+        c("ifindex") % if_index;
+        c("ifname") % if_name;
+        c("mac-address") % mac_address;
+        c("max-l2mtu") % max_l2mtu;
+        c("running") % is_running;
+        c("rx-byte") % rx_byte;
+        c("rx-drop") % rx_drop;
+        c("rx-errors") % rx_errors;
+        c("rx-packet") % rx_packet;
+        c("slave") % is_slave;
+        c("status") % status;
+        c("tx-byte") % tx_byte;
+        c("tx-drop") % tx_drop;
+        c("tx-errors") % tx_errors;
+        c("tx-packet") % tx_packet;
     }
 };
 

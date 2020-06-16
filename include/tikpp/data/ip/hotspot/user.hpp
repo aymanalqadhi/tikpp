@@ -148,27 +148,27 @@ struct user : tikpp::data::model {
     inline void convert(Converter &c) {
         tikpp::data::model::convert(c);
 
-        c["name"] % name;
-        c["disabled"] % is_disabled;
-        c["password"] % password;
-        c["profile"] % profile;
-        c["comment"] % comment;
+        c("name") % name;
+        c("disabled") % is_disabled;
+        c("password") % password;
+        c("profile") % profile;
+        c("comment") % comment;
 
-        c["bytes-in"] % bytes_in;
-        c["bytes-out"] % bytes_out;
-        c["packets-in"] % packets_in;
-        c["packets-out"] % packets_out;
-        c["uptime"] % uptime;
+        c("bytes-in") % bytes_in;
+        c("bytes-out") % bytes_out;
+        c("packets-in") % packets_in;
+        c("packets-out") % packets_out;
+        c("uptime") % uptime;
 
-        c["address"] % address;
-        c["email"] % email;
-        c["limit-bytes-in"] % limit_bytes_in;
-        c["limit-bytes-out"] % limit_bytes_out;
-        c["limit-bytes-total"] % limit_bytes_total;
-        c["limit-uptime"] % limit_uptime;
-        c["mac-address"] % mac_address;
-        c["routes"] % routes;
-        c["server"] % server;
+        c("address") % address;
+        c("email") % email;
+        c("limit-bytes-in") % limit_bytes_in;
+        c("limit-bytes-out") % limit_bytes_out;
+        c("limit-bytes-total") % limit_bytes_total;
+        c("limit-uptime") % limit_uptime;
+        c("mac-address") % mac_address;
+        c("routes") % routes;
+        c("server") % server;
     }
 };
 

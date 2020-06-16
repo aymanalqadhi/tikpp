@@ -25,7 +25,7 @@ struct model {
 
     template <typename Converter>
     inline void convert(Converter &c) {
-        c[".id"] % id;
+        c(".id") % id;
     }
 };
 
