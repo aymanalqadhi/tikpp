@@ -1,8 +1,8 @@
 #ifndef TIKPP_DATA_CONVERTERS_DISSOLVER_HPP
 #define TIKPP_DATA_CONVERTERS_DISSOLVER_HPP
 
-#include "tikpp/detail/convert.hpp"
 #include "tikpp/data/types/wrapper.hpp"
+#include "tikpp/detail/convert.hpp"
 
 #include <string>
 #include <utility>
@@ -11,7 +11,7 @@ namespace tikpp::data::converters {
 
 template <typename HashMap, bool is_creating>
 struct dissolver {
-    struct item_wrapper {
+    struct [[nodiscard]] item_wrapper {
         template <typename T>
         inline void dissolve(const T &value) {
             data["=" + key] = tikpp::detail::convert_back(value);
@@ -53,12 +53,18 @@ struct dissolver {
             w.changed(false);
         }
 
-        std::string key;
-        HashMap &   data;
+        const std::string &key;
+        HashMap &          data;
     };
 
-    inline auto operator[](std::string key) noexcept -> item_wrapper {
-        return item_wrapper {std::move(key), data};
+    inline auto operator()(const std::string &key) -> item_wrapper {
+        return item_wrapper {key, data};
+    }
+
+    inline auto operator()(const std::string &key,
+                           const std::string &default_value) const noexcept
+        -> item_wrapper {
+        return operator()(key);
     }
 
     HashMap &data;
