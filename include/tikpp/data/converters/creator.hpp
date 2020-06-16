@@ -9,7 +9,7 @@ namespace tikpp::data::converters {
 
 template <typename HashMap>
 struct creator {
-    struct item_wrapper {
+    struct [[nodiscard]] item_wrapper {
         template <typename T>
         inline void operator%(T &rhs) {
             rhs = tikpp::detail::convert<T>(value);
@@ -17,21 +17,29 @@ struct creator {
 
         template <template <typename> typename Wrapper, typename T>
         void operator%(Wrapper<T> &rhs) {
-            rhs = Wrapper<T> {std::move(tikpp::detail::convert<T>(value))};
+            rhs = Wrapper<T> {tikpp::detail::convert<T>(value)};
         }
 
         const std::string &value;
     };
 
-    inline auto operator[](const std::string &key) const noexcept
+    inline auto operator()(const std::string &key,
+                           const std::string &default_value) const noexcept
         -> item_wrapper {
-        static std::string empty_str {};
-
-        return item_wrapper {contains(key) ? data[key] : empty_str};
+        return item_wrapper {data.find(key) != data.end() ? data[key]
+                                                          : default_value};
     }
 
-    inline auto contains(const std::string &key) const noexcept -> bool {
-        return data.find(key) != data.end();
+    inline auto operator()(const std::string &key) -> item_wrapper {
+        static std::string empty_string {};
+        return             operator()(key, empty_string);
+    }
+
+    template <typename Model>
+    inline auto create() noexcept -> Model {
+        Model model {};
+        model.convert(*this);
+        return model;
     }
 
     HashMap &data;
