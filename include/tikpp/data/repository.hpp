@@ -171,13 +171,8 @@ struct repository {
                                 tikpp::error_code::invalid_response),
                             std::vector<Model> {});
                 } else {
-                    tikpp::data::converters::creator<tikpp::response> creator {
-                        resp};
-
-                    Model item {};
-                    item.convert(creator);
-
-                    ret->emplace_back(std::move(item));
+                    tikpp::data::converters::creator<tikpp::response> c {resp};
+                    ret->emplace_back(c.create<Model>());
                     return true;
                 }
 
