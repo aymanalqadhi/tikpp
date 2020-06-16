@@ -48,9 +48,9 @@ struct basic_api
      * \brief Asynchronously opens an API connection to the router, then logs
      *        in to the router
      *
-     * \param host  The router host address
-     * \param port  The API listening port
-     * \param token The asynchronous operation completion token
+     * \param [in]     host     The router host address
+     * \param [in]     port     The API listening port
+     * \param [in,out] token    The asynchronous operation completion token
      *
      * \return The passed completion token result
      */
@@ -96,11 +96,13 @@ struct basic_api
      * \brief Asynchronously opens an API connection to the router, then logs
      *        in to the router
      *
-     * \param host     The router host address
-     * \param port     The API listening port
-     * \param name     The name used to login after successfully connecting
-     * \param password The password used to login after successfully connecting
-     * \param token    The asynchronous operation completion token
+     * \param [in]     host     The router host address
+     * \param [in]     port     The API listening port
+     * \param [in]     name     The name used to login after successfully
+     *                          connecting
+     * \param [in]     password The password used to login after successfully
+     *                          connecting
+     * \param [in,out] token    The asynchronous operation completion token
      *
      * \return The passed completion token result
      */
@@ -150,7 +152,7 @@ struct basic_api
     /*!
      * \brief Creates a request from a command request type
      *
-     * \param args The arguments used to construct the command request
+     * \param [in] args The arguments used to construct the command request
      *
      * \return The created command request
      */
@@ -167,7 +169,8 @@ struct basic_api
     /*!
      * \brief Creates a request from a command string
      *
-     * \param command The command string to be used to construct the request
+     * \param [in] command The command string to be used to construct the
+     *                     request
      *
      * \return The created request
      */
@@ -180,8 +183,8 @@ struct basic_api
     /*!
      * \brief Asynchronously sends a request to the router
      *
-     * \param req   The request to the best
-     * \param token The asynchronous operation completion token
+     * \param [in]      req   The request to the best
+     * \param [in, out] token The asynchronous operation completion token
      *
      * \return The passed completion token result
      */
@@ -206,9 +209,12 @@ struct basic_api
     /*!
      * \brief Asynchronously logs in to the router
      *
-     * \param name     The user name which to be used to login to the router
-     * \param password The password which to be used to login to the router
-     * \param token    The asynchronous operation completion token
+     * \param [in]      name     The user name which to be used to login to the
+     *                           router
+     * \param [in]      password The password which to be used to login
+     *                           to the router
+     * \param [in, out] token    The asynchronous operation
+     *                           completion token
      *
      * \return The passed completion token result
      */
@@ -422,8 +428,8 @@ struct basic_api_creator : tikpp::basic_api<AsyncStream, ErrorHandler> {
 /*!
  * \brief Creates a new instance of \see basic_api struct
  *
- * \param io      The IO object to be used by the API connection
- * \param handler A callable object to be called on fatal errors
+ * \param [in] io      The IO object to be used by the API connection
+ * \param [in] handler A callable object to be called on fatal errors
  *
  * \return The create \see basic_api instance
  */

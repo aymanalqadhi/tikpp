@@ -27,8 +27,8 @@ using api_te = tikpp::basic_api_te<boost::asio::ip::tcp::socket>;
 /*!
  * \brief Creates a new instance of \see api
  *
- * \param io      The IO object to be used by the API connection
- * \param handler A callable object to be called on fatal errors
+ * \param [in] io      The IO object to be used by the API connection
+ * \param [in] handler A callable object to be called on fatal errors
  *
  * \return The create \see basic_api instance
  */
@@ -52,8 +52,8 @@ template <typename AsyncStream = boost::asio::ip::tcp::socket,
 /*!
  * \brief Creates a new instance of \see basic_api_te
  *
- * \param io      The IO object to be used by the API connection
- * \param handler A callable object to be called on fatal errors
+ * \param [in] io      The IO object to be used by the API connection
+ * \param [in] handler A callable object to be called on fatal errors
  *
  * \return The create \see basic_api instance
  */
