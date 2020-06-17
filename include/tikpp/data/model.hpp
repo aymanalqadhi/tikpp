@@ -36,6 +36,20 @@ struct model {
     }
 };
 
+struct disableable_model : model {
+    /*!
+     * \brief Whether the model is currently disabled or not.
+     */
+    read_write<bool> is_disabled;
+
+    template <typename Converter>
+    inline void convert(Converter &c) {
+        model::convert(c);
+
+        c("disabled", is_disabled);
+    }
+};
+
 } // namespace tikpp::data
 
 #endif
