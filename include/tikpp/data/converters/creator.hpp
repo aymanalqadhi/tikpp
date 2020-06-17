@@ -9,30 +9,44 @@ namespace tikpp::data::converters {
 
 template <typename HashMap>
 struct creator {
-    struct [[nodiscard]] item_wrapper {
-        template <typename T>
-        inline void operator%(T &rhs) {
-            rhs = tikpp::detail::convert<T>(value);
-        }
-
-        template <template <typename> typename Wrapper, typename T>
-        void operator%(Wrapper<T> &rhs) {
-            rhs = Wrapper<T> {tikpp::detail::convert<T>(value)};
-        }
-
-        const std::string &value;
-    };
-
-    inline auto operator()(const std::string &key,
-                           const std::string &default_value) const noexcept
-        -> item_wrapper {
-        return item_wrapper {data.find(key) != data.end() ? data[key]
-                                                          : default_value};
+    template <typename T,
+              typename = std::enable_if_t<!std::is_same_v<T, std::string>>>
+    inline void assign(T &lhs, const T &rhs) const noexcept {
+        lhs = rhs;
     }
 
-    inline auto operator()(const std::string &key) -> item_wrapper {
-        static std::string empty_string {};
-        return             operator()(key, empty_string);
+    template <template <typename> typename Wrapper,
+              typename T,
+              typename = std::enable_if_t<!std::is_same_v<T, std::string>>>
+    inline void assign(Wrapper<T> &lhs, const T &rhs) const noexcept {
+        lhs = Wrapper<T> {rhs};
+    }
+
+    template <typename T>
+    inline void assign(T &lhs, const std::string &rhs) const noexcept {
+        lhs = tikpp::detail::convert<T>(rhs);
+    }
+
+    template <template <typename> typename Wrapper, typename T>
+    inline void assign(Wrapper<T> &lhs, const std::string &rhs) const noexcept {
+        lhs = Wrapper<T> {tikpp::detail::convert<T>(rhs)};
+    }
+
+    template <typename T>
+    inline void operator()(const std::string &key, T &value) {
+        if (data.find(key) != data.end()) {
+            assign(value, data[key]);
+        }
+    }
+
+    template <typename T, typename U>
+    inline void
+    operator()(const std::string &key, T &value, const U &default_value) {
+        if (data.find(key) != data.end()) {
+            assign(value, data[key]);
+        } else {
+            assign(value, default_value);
+        }
     }
 
     template <typename Model>

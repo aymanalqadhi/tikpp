@@ -11,60 +11,62 @@ namespace tikpp::data::converters {
 
 template <typename HashMap, bool is_creating>
 struct dissolver {
-    struct [[nodiscard]] item_wrapper {
-        template <typename T>
-        inline void dissolve(const T &value) {
-            data["=" + key] = tikpp::detail::convert_back(value);
-        }
-
-        template <typename T>
-        void operator%(const T &value) {
-            dissolve(value);
-        }
-
-        template <template <typename> typename Wrapper, typename T>
-        void operator%(const Wrapper<T> &w) {
-            dissolve(w.value());
-        }
-
-        template <typename T>
-        void operator%(const tikpp::data::types::sticky<T> &w) {
-            if constexpr (!is_creating) {
-                dissolve(w.value());
-            }
-        }
-
-        template <typename T>
-        void operator%(const tikpp::data::types::read_only<T> &w) {
-            if constexpr (is_creating) {
-                dissolve(w.value());
-            }
-        }
-
-        template <typename T>
-        void operator%(tikpp::data::types::read_write<T> &w) {
-            if constexpr (!is_creating) {
-                if (!w.changed()) {
-                    return;
-                }
-            }
-
-            dissolve(w.value());
-            w.changed(false);
-        }
-
-        const std::string &key;
-        HashMap &          data;
-    };
-
-    inline auto operator()(const std::string &key) -> item_wrapper {
-        return item_wrapper {key, data};
+    template <typename T>
+    inline void dissolve(const std::string &key, const T &value) {
+        data["=" + key] = tikpp::detail::convert_back(value);
     }
 
-    inline auto operator()(const std::string &key,
-                           [[maybe_unused]] const std::string &) const noexcept
-        -> item_wrapper {
-        return operator()(key);
+    template <typename T>
+    inline void operator()(const std::string &key, const T &value) {
+        dissolve(key, value);
+    }
+
+    template <typename T>
+    inline void operator()(const std::string &key,
+                           const T &          value,
+                           [[maybe_unused]] const T &) {
+        operator()<T>(key, value);
+    }
+
+    template <template <typename> typename Wrapper, typename T>
+    inline void operator()(const std::string &key, const Wrapper<T> &w) {
+        dissolve(key, w.value());
+    }
+
+    template <typename T>
+    inline void operator()(const std::string &                  key,
+                           const tikpp::data::types::sticky<T> &w) {
+        if constexpr (!is_creating) {
+            dissolve(key, w.value());
+        }
+    }
+
+    template <typename T>
+    inline void operator()(const std::string &                     key,
+                           const tikpp::data::types::read_only<T> &w) {
+        if constexpr (is_creating) {
+            dissolve(key, w.value());
+        }
+    }
+
+    template <typename T>
+    void operator()(const std::string &                key,
+                    tikpp::data::types::read_write<T> &w) {
+        if constexpr (!is_creating) {
+            if (!w.changed()) {
+                return;
+            }
+        }
+
+        dissolve(key, w.value());
+        w.changed(false);
+    }
+
+    template <template <typename> typename Wrapper, typename T>
+    inline void operator()(const std::string &key,
+                           const Wrapper<T> & w,
+                           [[maybe_unused]] const T &) {
+        operator()<Wrapper, T>(key, w.value());
     }
 
     HashMap &data;
