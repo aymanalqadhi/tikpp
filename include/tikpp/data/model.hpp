@@ -11,6 +11,11 @@
 namespace tikpp::data {
 
 struct model {
+    /*!
+     * \brief A constant that contains an empty string literal
+     */
+    static constexpr auto empty_string = "";
+
     template <typename T>
     using sticky = tikpp::data::types::sticky<T>;
 
@@ -20,12 +25,14 @@ struct model {
     template <typename T>
     using read_write = tikpp::data::types::read_write<T>;
 
-    //! \brief The item API ID
+    /*!
+     * \brief The item API ID
+     */
     sticky<tikpp::data::types::identity> id;
 
     template <typename Converter>
     inline void convert(Converter &c) {
-        c(".id") % id;
+        c(".id", id);
     }
 };
 
