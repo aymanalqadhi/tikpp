@@ -13,7 +13,7 @@
  */
 namespace tikpp::models::ip::hotspot {
 
-struct user_profile_detail : tikpp::data::model {
+struct user_profile : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user/profile";
 
     using duration = tikpp::data::types::duration<std::chrono::seconds>;
@@ -250,7 +250,7 @@ struct user_profile_detail : tikpp::data::model {
         c("outgoing-filter", outgoing_filter, empty_string);
         c("outgoing-packet-mark", outgoing_packet_mark, empty_string);
         c("rate-limit", rate_limit, empty_string);
-        c("shared-users", shared_users, 1);
+        c("shared-users", shared_users, 1U);
         c("session-timeout", session_timeout, 0_s);
         c("status-autorefresh", status_autorefresh);
         c("transparent-proxy", transparent_proxy, true);
