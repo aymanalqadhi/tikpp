@@ -82,15 +82,11 @@ template <typename T>
 inline auto convert(const std::string &str) -> std::decay_t<T> {
     using type = std::decay_t<T>;
 
-    if constexpr (std::is_same_v<type, std::string>) {
-        return str;
-    } else if constexpr (std::is_constructible_v<type, decltype(str)>) {
+    if constexpr (std::is_constructible_v<type, decltype(str)>) {
         return T {str};
     }
 
-    if constexpr (std::is_same_v<type, bool>) {
-        return str == "true" || str == "yes";
-    } else if constexpr (std::is_integral_v<type> && std::is_unsigned_v<type>) {
+    if constexpr (std::is_integral_v<type> && std::is_unsigned_v<type>) {
         return parse_uint<type>(str);
     }
 
@@ -101,6 +97,16 @@ inline auto convert(const std::string &str) -> std::decay_t<T> {
     }
 
     return ret;
+}
+
+template <>
+inline auto convert<std::string>(const std::string &str) -> std::string {
+    return str;
+}
+
+template <>
+inline auto convert<bool>(const std::string &str) -> bool {
+    return str == "true" || str == "yes";
 }
 
 template <typename T>
