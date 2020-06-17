@@ -28,14 +28,14 @@ struct hotspot_model : tikpp::data::model {
     inline void convert(Converter &c) {
         tikpp::data::model::convert(c);
 
-        c("name") % name;
-        c("address-pool") % address_pool;
-        c("idle-timeout") % idle_timeout;
-        c("keepalive-timeout") % keepalive_timeout;
-        c("login-timeout") % login_timeout;
-        c("interface") % interface;
-        c("addresses-per-mac") % addresses_per_mac;
-        c("profile") % profile;
+        c("name", name);
+        c("address-pool", address_pool);
+        c("idle-timeout", idle_timeout);
+        c("keepalive-timeout", keepalive_timeout);
+        c("login-timeout", login_timeout);
+        c("interface", interface);
+        c("addresses-per-mac", addresses_per_mac);
+        c("profile", profile);
     }
 };
 
