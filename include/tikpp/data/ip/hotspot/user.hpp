@@ -11,6 +11,9 @@
 
 namespace tikpp::data::ip::hotspot {
 
+/*!
+ * \brief A data model to represent `/ip/hotspot/user' list
+ */
 struct user : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user";
 
@@ -146,29 +149,31 @@ struct user : tikpp::data::model {
 
     template <typename Converter>
     inline void convert(Converter &c) {
+        using namespace tikpp::data::types::literals;
+
         tikpp::data::model::convert(c);
 
-        c("name") % name;
-        c("disabled") % is_disabled;
-        c("password") % password;
-        c("profile") % profile;
-        c("comment") % comment;
+        c("name", name, empty_string);
+        c("disabled", is_disabled);
+        c("password", password, empty_string);
+        c("profile", profile, "default");
+        c("comment", comment, empty_string);
 
-        c("bytes-in") % bytes_in;
-        c("bytes-out") % bytes_out;
-        c("packets-in") % packets_in;
-        c("packets-out") % packets_out;
-        c("uptime") % uptime;
+        c("bytes-in", bytes_in);
+        c("bytes-out", bytes_out);
+        c("packets-in", packets_in);
+        c("packets-out", packets_out);
+        c("uptime", uptime);
 
-        c("address") % address;
-        c("email") % email;
-        c("limit-bytes-in") % limit_bytes_in;
-        c("limit-bytes-out") % limit_bytes_out;
-        c("limit-bytes-total") % limit_bytes_total;
-        c("limit-uptime") % limit_uptime;
-        c("mac-address") % mac_address;
-        c("routes") % routes;
-        c("server") % server;
+        c("address", address, "0.0.0.0");
+        c("email", email, "");
+        c("limit-bytes-in", limit_bytes_in, 0_b);
+        c("limit-bytes-out", limit_bytes_out, 0_b);
+        c("limit-bytes-total", limit_bytes_total, 0_b);
+        c("limit-uptime", limit_uptime, 0_s);
+        c("mac-address", mac_address, "00:00:00:00:00:00");
+        c("routes", routes, empty_string);
+        c("server", server, "all");
     }
 };
 
