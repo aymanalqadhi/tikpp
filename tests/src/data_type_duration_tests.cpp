@@ -9,6 +9,7 @@
 #include <chrono>
 
 using namespace std::chrono_literals;
+using namespace tikpp::data::types::literals;
 
 using tikpp::tests::util::random_string;
 using tikpp::tests::util::random_string_options;
@@ -23,6 +24,14 @@ constexpr auto test_string_size = 0xFF;
 }
 
 namespace tikpp::tests {
+
+TEST(DurationTypeTests, LiteralsTest) {
+    EXPECT_EQ((1_s).value(), 1s);
+    EXPECT_EQ((1_m).value(), 1min);
+    EXPECT_EQ((1_h).value(), 1h);
+    EXPECT_EQ((1_d).value(), 24h);
+    EXPECT_EQ((1_w).value(), 24h * 7);
+}
 
 TEST(DurationTypeTests, OperatorsTest) {
     tikpp::data::types::duration<test_duration_type> dur {1};
