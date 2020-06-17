@@ -10,16 +10,14 @@ namespace tikpp::data::types {
 
 template <typename T>
 struct stateless_value_wrapper {
-    stateless_value_wrapper(T &&val) : value_ {std::move(val)} {
+    stateless_value_wrapper(T &&val)
+        : value_ {std::move(val)}, has_value_ {true} {
     }
 
-    stateless_value_wrapper(const T &val) : value_ {val} {
+    stateless_value_wrapper(const T &val) : value_ {val}, has_value_ {true} {
     }
 
-    stateless_value_wrapper() = default;
-
-    inline operator T &() noexcept {
-        return value_;
+    stateless_value_wrapper() : has_value_ {false} {
     }
 
     inline operator const T &() const noexcept {
@@ -33,17 +31,34 @@ struct stateless_value_wrapper {
     template <typename U = T,
               typename   = std::enable_if_t<std::is_copy_assignable_v<T>>>
     inline void value(const T &v) {
+        if (!has_value_) {
+            has_value_ = true;
+        }
+
         value_ = v;
     }
 
     template <typename U = T,
               typename   = std::enable_if_t<std::is_move_assignable_v<T>>>
     inline void value(T &&v) {
+        if (!has_value_) {
+            has_value_ = true;
+        }
+
         value_ = std::move(v);
     }
 
+    [[nodiscard]] inline auto has_value() const noexcept -> bool {
+        return has_value_;
+    }
+
+    inline void reset_value() noexcept {
+        has_value_ = false;
+    }
+
   private:
-    T value_;
+    T    value_;
+    bool has_value_;
 };
 
 template <typename T>
@@ -56,7 +71,8 @@ struct stateful_value_wrapper : stateless_value_wrapper<T> {
         : stateless_value_wrapper<T> {val}, changed_ {false} {
     }
 
-    stateful_value_wrapper() = default;
+    stateful_value_wrapper() : stateless_value_wrapper<T> {} {
+    }
 
     template <typename U = T,
               typename   = std::enable_if_t<std::is_copy_assignable_v<T>>>
@@ -94,7 +110,8 @@ struct type_wrapper : Wrapper<T> {
     type_wrapper(const T &val) : Wrapper<T> {val} {
     }
 
-    type_wrapper() = default;
+    type_wrapper() : Wrapper<T> {} {
+    }
 
     template <typename U = T,
               typename   = std::enable_if_t<std::is_copy_assignable_v<T>>>
@@ -158,20 +175,14 @@ template <typename T>
 using stateful_wrapper = type_wrapper<stateful_value_wrapper, T>;
 
 template <typename T>
-struct read_only {
-    explicit read_only(T &&val) : value_ {std::move(val)} {
+struct read_only : stateless_value_wrapper<T> {
+    explicit read_only(T &&val) : stateless_value_wrapper<T> {std::move(val)} {
     }
 
-    explicit read_only(const T &val) : value_ {val} {
+    explicit read_only(const T &val) : stateless_value_wrapper<T> {val} {
     }
 
-    read_only() = default;
-    inline operator const T &() const noexcept {
-        return value_;
-    }
-
-    inline auto value() const noexcept -> const T & {
-        return value_;
+    read_only() : stateless_value_wrapper<T> {} {
     }
 
   private:
