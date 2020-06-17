@@ -133,6 +133,35 @@ std::istream &operator>>(std::istream &in, duration<Duration> &d) {
     return in;
 }
 
+namespace literals {
+
+inline auto operator""_s(unsigned long long int s)
+    -> duration<std::chrono::seconds> {
+    return duration<std::chrono::seconds> {std::chrono::seconds {s}};
+}
+
+inline auto operator""_m(unsigned long long int m)
+    -> duration<std::chrono::seconds> {
+    return duration<std::chrono::seconds> {std::chrono::minutes {m}};
+}
+
+inline auto operator""_h(unsigned long long int h)
+    -> duration<std::chrono::seconds> {
+    return duration<std::chrono::seconds> {std::chrono::hours {h}};
+}
+
+inline auto operator""_d(unsigned long long int d)
+    -> duration<std::chrono::seconds> {
+    return duration<std::chrono::seconds> {std::chrono::hours {d} * 24};
+}
+
+inline auto operator""_w(unsigned long long int w)
+    -> duration<std::chrono::seconds> {
+    return duration<std::chrono::seconds> {std::chrono::hours {w} * 24 * 7};
+}
+
+} // namespace literals
+
 } // namespace tikpp::data::types
 
 namespace fmt {
