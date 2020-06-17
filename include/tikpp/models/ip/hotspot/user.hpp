@@ -1,5 +1,5 @@
-#ifndef TIKPP_DATA_IP_HOTSPOT_USER_HPP
-#define TIKPP_DATA_IP_HOTSPOT_USER_HPP
+#ifndef TIKPP_MODELS_IP_HOTSPOT_USER_HPP
+#define TIKPP_MODELS_IP_HOTSPOT_USER_HPP
 
 #include "tikpp/data/model.hpp"
 #include "tikpp/data/types/bytes.hpp"
@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <string>
 
-namespace tikpp::data::ip::hotspot {
+namespace tikpp::models::ip::hotspot {
 
 /*!
  * \brief A data model to represent `/ip/hotspot/user' list

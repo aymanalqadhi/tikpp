@@ -1,12 +1,12 @@
-#ifndef TIKPP_DATA_INTERFACE_HPP
-#define TIKPP_DATA_INTERFACE_HPP
+#ifndef TIKPP_MODELS_INTERFACE_HPP
+#define TIKPP_MODELS_INTERFACE_HPP
 
 #include "tikpp/data/model.hpp"
 
 #include <cstdint>
 #include <string>
 
-namespace tikpp::data {
+namespace tikpp::models {
 
 struct interface_model : tikpp::data::model {
     static constexpr auto api_path = "/interface";

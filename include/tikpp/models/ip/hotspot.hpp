@@ -1,5 +1,5 @@
-#ifndef TIKPP_DATA_IP_HOTSPOT_HPP
-#define TIKPP_DATA_IP_HOTSPOT_HPP
+#ifndef TIKPP_MODELS_IP_HOTSPOT_HPP
+#define TIKPP_MODELS_IP_HOTSPOT_HPP
 
 #include "tikpp/data/model.hpp"
 #include "tikpp/data/types/duration.hpp"
@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <string>
 
-namespace tikpp::data::ip {
+namespace tikpp::models::ip {
 
 struct hotspot_model : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot";

@@ -1,5 +1,5 @@
-#ifndef TIKPP_DATA_IP_HOTSPOT_USER_PROFILE_HPP
-#define TIKPP_DATA_IP_HOTSPOT_USER_PROFILE_HPP
+#ifndef TIKPP_MODELS_IP_HOTSPOT_USER_PROFILE_HPP
+#define TIKPP_MODELS_IP_HOTSPOT_USER_PROFILE_HPP
 
 #include "tikpp/data/model.hpp"
 #include "tikpp/data/types/bytes.hpp"
@@ -8,7 +8,7 @@
 #include <chrono>
 #include <string>
 
-namespace tikpp::data::ip::hotspot {
+namespace tikpp::models::ip::hotspot {
 
 struct user_profile_detail : tikpp::data::model {
     static constexpr auto api_path = "/ip/hotspot/user/profile";
