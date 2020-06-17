@@ -62,7 +62,7 @@ struct dissolver {
     }
 
     inline auto operator()(const std::string &key,
-                           const std::string &default_value) const noexcept
+                           [[maybe_unused]] const std::string &) const noexcept
         -> item_wrapper {
         return operator()(key);
     }
