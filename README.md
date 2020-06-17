@@ -244,9 +244,12 @@ struct my_model : tikpp::data::model {
         // Call base convert function
         model::convert(c);
 
-        c["read-only-data"] % read_only_data;
-        c["bytes-data"]     % bytes_data;
-        c["other-data"]     % other_data;
+        // Converting syntax:
+        // c(RouterOS field, Model field [, Default value]);
+
+        c("read-only-data", read_only_data, "Default text");
+        c("bytes-data", bytes_data, 123_mb);
+        c("other-data", other_data);
     }
 };
 ```
