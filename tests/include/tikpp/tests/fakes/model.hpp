@@ -22,12 +22,12 @@ struct model1 {
 
     template <typename Convertor>
     void convert(Convertor &c) {
-        c("prop1") % prop1;
-        c("prop2") % prop2;
-        c("prop3") % prop3;
-        c("prop4") % prop4;
-        c("prop5") % prop5;
-        c("prop6") % prop6;
+        c("prop1", prop1);
+        c("prop2", prop2);
+        c("prop3", prop3);
+        c("prop4", prop4);
+        c("prop5", prop5);
+        c("prop6", prop6);
     }
 };
 
@@ -40,10 +40,10 @@ struct model2 : tikpp::data::model {
 
     template <typename Convertor>
     void convert(Convertor &c) {
-        c("id") % id;
-        c("sticky-data") % sticky_data;
-        c("read-only-data") % read_only_data;
-        c("read-write-data") % read_write_data;
+        c("id", id);
+        c("sticky-data", sticky_data);
+        c("read-only-data", read_only_data);
+        c("read-write-data", read_write_data);
     }
 };
 
