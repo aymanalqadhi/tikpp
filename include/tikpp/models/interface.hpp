@@ -8,40 +8,130 @@
 
 namespace tikpp::models {
 
+/*!
+ * \brief A data model to represent `/interface' list
+ */
 struct interface_model : tikpp::data::model {
     static constexpr auto api_path = "/interface";
 
-    read_write<std::string>   name;
+    /*!
+     * \brief Layer 2 Maximum transmission unit.
+     *
+     * Layer 2 Maximum transmission unit. Note that this property can not be
+     * configured on all interfaces.
+     */
     read_write<std::uint32_t> l2mtu;
+
+    /*!
+     * \brief Layer3 Maximum transmission unit
+     */
     read_write<std::uint32_t> mtu;
 
-    read_only<bool>          is_dynamic;
-    read_only<bool>          fast_path;
+    /*!
+     * \brief Name of an interface
+     */
+    read_write<std::string> name;
+
+    /*!
+     * \brief Whether interface is dynamically created
+     */
+    read_only<bool> is_dynamic;
+
+    /*!
+     * \brief Fast path
+     */
+    read_only<bool> fast_path;
+
+    /*!
+     * \brief Interface id
+     */
     read_only<std::uint32_t> if_id;
+
+    /*!
+     * \brief Interface index
+     */
     read_only<std::uint32_t> if_index;
-    read_only<std::string>   if_name;
-    read_only<std::string>   mac_address;
+
+    /*!
+     * \brief Interface name in Linux kernel
+     */
+    read_only<std::string> if_name;
+
+    /*!
+     * \brief Interface Mac-Address
+     */
+    read_only<std::string> mac_address;
+
+    /*!
+     * \brief Max supported L2MTU
+     */
     read_only<std::uint32_t> max_l2mtu;
-    read_only<bool>          is_running;
+
+    /*!
+     * \brief Whether interface is running.
+     *
+     * 	Whether interface is running. Note that some interfaces may not have a
+     * 'running check' and they will always be reported as "running" (e.g. EoIP)
+     */
+    read_only<bool> is_running;
+
+    /*!
+     * \brief Number of received bytes.
+     */
     read_only<std::uint32_t> rx_byte;
+
+    /*!
+     * \brief Number of received packets being dropped
+     */
     read_only<std::uint32_t> rx_drop;
+
+    /*!
+     * \brief Packets received with some kind of an error.
+     */
     read_only<std::uint32_t> rx_errors;
+
+    /*!
+     * \brief Number of packets received.
+     */
     read_only<std::uint32_t> rx_packet;
-    read_only<bool>          is_slave;
-    read_only<std::string>   status;
+
+    /*!
+     * \brief Whether interface is configured as a slave of another interface.
+     */
+    read_only<bool> is_slave;
+
+    /*!
+     * \brief The interface status
+     */
+    read_only<std::string> status;
+
+    /*!
+     * \brief Number of transmitted bytes.
+     */
     read_only<std::uint32_t> tx_byte;
+
+    /*!
+     * \brief Number of transmitted packets being dropped.
+     */
     read_only<std::uint32_t> tx_drop;
+
+    /*!
+     * \brief Packets transmitted with some kind of an error.
+     */
     read_only<std::uint32_t> tx_errors;
+
+    /*!
+     * \brief Number of transmitted packets.
+     */
     read_only<std::uint32_t> tx_packet;
 
     template <typename Converter>
     inline void convert(Converter &c) {
         tikpp::data::model::convert(c);
 
-        c("name", name);
-        c("l2mtu", l2mtu);
-        c("mtu", mtu);
-
+        c("l2mtu", l2mtu, empty_string);
+        c("mtu", mtu, empty_string);
+        c("name", name, empty_string);
         c("dynamic", is_dynamic);
         c("fast-path", fast_path);
         c("id", if_id);
@@ -63,6 +153,6 @@ struct interface_model : tikpp::data::model {
     }
 };
 
-} // namespace tikpp::data
+} // namespace tikpp::models
 
 #endif
