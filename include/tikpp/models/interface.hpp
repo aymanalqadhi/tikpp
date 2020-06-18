@@ -126,7 +126,7 @@ struct interface_model : tikpp::data::model {
     read_only<std::uint32_t> tx_packet;
 
     template <typename Converter>
-    inline void convert(Converter &c) {
+    void convert(Converter &c) {
         tikpp::data::model::convert(c);
 
         c("l2mtu", l2mtu, empty_string);

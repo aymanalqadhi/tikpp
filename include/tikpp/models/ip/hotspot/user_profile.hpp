@@ -228,7 +228,7 @@ struct user_profile : tikpp::data::model {
     read_write<bool> transparent_proxy;
 
     template <typename Converter>
-    inline void convert(Converter &c) {
+    void convert(Converter &c) {
         using namespace tikpp::data::types::literals;
 
         tikpp::data::model::convert(c);

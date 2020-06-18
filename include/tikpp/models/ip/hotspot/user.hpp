@@ -140,7 +140,7 @@ struct user : tikpp::data::disableable_model {
     read_only<duration> uptime;
 
     template <typename Converter>
-    inline void convert(Converter &c) {
+    void convert(Converter &c) {
         using namespace tikpp::data::types::literals;
 
         tikpp::data::disableable_model::convert(c);
