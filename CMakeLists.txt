@@ -29,7 +29,7 @@ include_directories(include/)
 
 # Targets
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} fmt::fmt cryptopp ssl crypto)
+target_link_libraries(${PROJECT_NAME} fmt::fmt ssl crypto)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Testing
