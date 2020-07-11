@@ -22,13 +22,31 @@
 
 namespace tikpp::data {
 
+/*!
+ * \brief A struct to manage the router data sets
+ */
 template <typename Model, typename ApiPtr>
 struct repository {
+    /*!
+     * \brief The query type of the repository
+     */
     using query_type = decltype(std::declval<tikpp::data::query>().words);
 
+    /*!
+     * \brief Default constructor
+     *
+     * \param [in,out] api  A pointer to the API connection
+     */
     explicit repository(ApiPtr api) : api_ {std::move(api)} {
     }
 
+    /*!
+     * \brief Asynchronously loads all items from the router
+     *
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     inline decltype(auto) async_load(CompletionToken &&token) {
         auto req =
@@ -37,6 +55,14 @@ struct repository {
                              std::forward<CompletionToken>(token));
     }
 
+    /*!
+     * \brief Asynchronously loads filtered items from the router
+     *
+     * \param [in]     query  The query to be used to filter the result
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     inline decltype(auto) async_load(query_type        query,
                                      CompletionToken &&token) {
@@ -46,6 +72,13 @@ struct repository {
                              std::forward<CompletionToken>(token));
     }
 
+    /*!
+     * \brief Asynchronously loads all items from the router as a stream
+     *
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     inline decltype(auto) async_stream(CompletionToken &&token) {
         auto req =
@@ -54,6 +87,14 @@ struct repository {
                                std::forward<CompletionToken>(token));
     }
 
+    /*!
+     * \brief Asynchronously loads filtered items from the router as a stream
+     *
+     * \param [in]     query  The query to be used to filter the result
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     inline decltype(auto) async_stream(query_type        query,
                                        CompletionToken &&token) {
@@ -63,6 +104,14 @@ struct repository {
                                std::forward<CompletionToken>(token));
     }
 
+    /*!
+     * \brief Asynchronously adds an item to the router
+     *
+     * \param [in]     model  The item to be added
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     decltype(auto) async_add(Model model, CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &,
@@ -90,6 +139,14 @@ struct repository {
         return result.get();
     }
 
+    /*!
+     * \brief Asynchronously removes an item from the router
+     *
+     * \param [in]     id     The id of the item to be removed
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     decltype(auto) async_remove(std::string id, CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
@@ -115,6 +172,14 @@ struct repository {
         return result.get();
     }
 
+    /*!
+     * \brief Asynchronously removes an item from the router
+     *
+     * \param [in]     id     The id of the item to be removed
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     inline decltype(auto) async_remove(tikpp::data::types::identity id,
                                        CompletionToken &&           token) {
@@ -122,6 +187,14 @@ struct repository {
                             std::forward<CompletionToken>(token));
     }
 
+    /*!
+     * \brief Asynchronously updates an item in the router
+     *
+     * \param [in]     id     The id of the item to be removed
+     * \param [in,out] token  The asynchronous operation completion token
+     *
+     * \return The passed completion token result
+     */
     template <typename CompletionToken>
     decltype(auto) async_update(Model model, CompletionToken &&token) {
         GENERATE_COMPLETION_HANDLER(void(const boost::system::error_code &),
@@ -222,8 +295,15 @@ struct repository {
     }
 
     ApiPtr api_;
-}; // namespace tikpp
+};
 
+/*!
+ * \brief Creates a new instance of \see repository
+ *
+ * \param [in] api  A pointer to the api connection
+ *
+ * \return The create \see repository instance
+ */
 template <typename Model, typename ApiPtr>
 [[nodiscard]] inline auto make_repository(ApiPtr api)
     -> repository<Model, ApiPtr> {
