@@ -6,6 +6,8 @@
 - Fully asynchronous (Callbacks/Futures/Coroutines supported via Boost.Asio completion tokens)
 - No RTTI is being used in the library (Templates!)
 - No expcetions are being used
+- Support for API v1/v2 protocols
+- Support for API-SSL
 
 ### Getting started
 ##### Creating an API connection:
@@ -22,7 +24,10 @@ Then create an API object by calling `tikpp::make_api` factory function passing 
 tikpp::io_context io{};
 auto api = tikpp::make_api(io, [](const auto& err) { /* ... */ });
 
-// Note: Error handlers can be any callable object which overloads operator()(const boost::system::error_code&) function
+// For an SSL/TLS API
+auto api = tikpp::make_ssl_api(io, [](const auto& err) { /* ... */ });
+
+// Note: Error handlers can be any callable object which overloads operator()(const boost::system::error_code&) member function
 ```
 Then, open a connection to the router
 ```cpp
@@ -35,7 +40,7 @@ api->async_open(address, port, name, password, [](const auto& err) {
 });
 ```
 
-Finally, start the `tikpp::io_context` object by calling `io.run()` . **Remember** that the call to `io.run()` will block the calling thread, so you must call it after initiating at least one asynchronous operation, or in another thread.
+Finally, start the `tikpp::io_context` object by calling `io.run()` . **Remember** that the call to `io.run()` will block the calling thread, so you must call it after initiating at least one asynchronous operation, or in a separate thread.
 
 ## Examples
 ### Sending a request
@@ -57,6 +62,7 @@ req->add_attribute("bar", "value");
 
 ```cpp
 req->add_param("param-key", "Hello, {}{}", "World", '!');
+req->add_param("param-key", "{} + {} = {}", 1, 1, 2);
 ```
 
 Finally, send the request
@@ -78,11 +84,11 @@ api->async_send(std::move(req), [](const auto& err, auto&& resp) {
     const auto& value1 = resp["resp-key-1"];
     const auto& value2 = resp["resp-key-2"];
 
-    // Get response fields of specific type
+    // Get response fields of specific types
     auto value3 = resp.get<std::uint32_t>("resp-key-3");
     auto value4 = resp.get<double>("resp-key-4");
 
-    // library types
+    // With library types
     auto value5 = resp.get<tikpp::data::types::bytes>("resp-key-5");
     auto value6 = resp.get<tikpp::data::types::duration>("resp-key-6");
 
@@ -92,7 +98,7 @@ api->async_send(std::move(req), [](const auto& err, auto&& resp) {
 
     // ...
 
-    // Return false to remove this handler from handlers map
+    // Return false to remove this handler from the completion handlers map
     // If true is returned, this handler will remain in the completion
     // handlers map (Used for commands that return multiple responses,
     // such as: getall, listen, etc...)
@@ -117,7 +123,7 @@ auto resp = retf.get(); // May throw!!!
 ```
 
 ### Using the data repository
-You can use a higher level repository-pattern object to manage data of the router.
+You can use a higher level repository-pattern object to manage data on the router.
 
 Create a repository with a data model type as a template parameter
 
@@ -146,10 +152,10 @@ repo.async_load([](const auto& err, auto&& users) {
 });
 
 // Using futures
-auto users = repo.async_load(tikpp::use_futures);
+auto users = repo.async_load(tikpp::use_futures).get();
 
 // Use users
-for (const auto& user : user) {
+for (const auto& user : users) {
     // ...
 }
 ```
@@ -184,14 +190,14 @@ repo.async_load("foo"_t == "some_text" && "bar"_t <= 0xABCD,
 
 Supported query operators are:  !, &&, ||, ^,==,!=,<,<=,>,>=
 
-Objects can be loaded one at time using `async_stream`
+Objects can be loaded one at a time using `async_stream` function
 
 ```cpp
 repo.async_stream([](const auto& err, auto&& user) { /* ... */ });
 
 // Queries can also be used here
 repo.async_stream("foo"_t == "some_text", [](const auto& err, auto&& user) {
-    // ...
+    // err will be equal to tikpp::error_code::list_end on the last item
 });
 ```
 
@@ -245,7 +251,7 @@ struct my_model : tikpp::data::model {
         model::convert(c);
 
         // Converting syntax:
-        // c(RouterOS field, Model field [, Default value]);
+        // c(RouterOS field name, Model field [, Default value]);
 
         c("read-only-data", read_only_data, "Default text");
         c("bytes-data", bytes_data, 123_mb);
