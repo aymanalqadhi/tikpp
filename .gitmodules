@@ -4,3 +4,6 @@
 [submodule "lib/fmt"]
 	path = lib/fmt
 	url = https://github.com/fmtlib/fmt
+[submodule "lib/openssl-cmake"]
+	path = lib/openssl-cmake
+	url = https://github.com/viaduck/openssl-cmake
