@@ -13,13 +13,15 @@
 
 namespace tikpp {
 
-/*! \brief An alias for \see basic_api which uses boost::asio::ip::tcp::socket
+/*!
+ * \brief An alias for \see basic_api which uses boost::asio::ip::tcp::socket
  *         as the connection socket
  */
 template <typename ErrorHandler>
 using api = tikpp::basic_api<boost::asio::ip::tcp::socket, ErrorHandler>;
 
-/*! \brief A type-erase alias for \see basic_api which uses
+/*!
+ * \brief A type-erase alias for \see basic_api which uses
  *         boost::asio::ip::tcp::socket as the connection socket
  */
 using api_te = tikpp::basic_api_te<boost::asio::ip::tcp::socket>;
@@ -40,6 +42,15 @@ template <typename AsyncStream = boost::asio::ip::tcp::socket,
         io, std::forward<ErrorHandler>(handler));
 }
 
+/*!
+ * \brief Creates a new instance of \see api
+ *
+ * \param [in] io      The IO object to be used by the API connection
+ * \param [in] handler A reference to a callable object to be called on fatal
+ *                     errors
+ *
+ * \return The create \see basic_api instance
+ */
 template <typename AsyncStream = boost::asio::ip::tcp::socket,
           typename ErrorHandler>
 [[nodiscard]] inline decltype(auto) make_api(tikpp::io_context &io,
