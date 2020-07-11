@@ -2,11 +2,12 @@
 
 #define CRYPTOPP_ENABLE_NAMESPACE_WEAK 1
 
-#include <cryptopp/md5.h>
+#include <openssl/md5.h>
 
 #include <array>
 #include <cstddef>
 #include <cstdint>
+#include <stdexcept>
 #include <string>
 
 namespace {
@@ -74,11 +75,16 @@ auto hash_password(const std::string &plain, const std::string &cha)
 
     decode_hex_string(cha, cha_bytes);
 
-    CryptoPP::Weak::MD5 hash {};
-    hash.Update((const CryptoPP::byte *)&empty_byte, 1);
-    hash.Update((const CryptoPP::byte *)plain.data(), plain.size());
-    hash.Update((const CryptoPP::byte *)cha_bytes.data(), cha_bytes.size());
-    hash.Final((CryptoPP::byte *)digest_bytes.data());
+    MD5_CTX ctx;
+
+    if (!MD5_Init(&ctx)) {
+        throw std::runtime_error {"Could not create an OpenSSL MD5 context"};
+    }
+
+    MD5_Update(&ctx, &empty_byte, 1);
+    MD5_Update(&ctx, plain.data(), plain.size());
+    MD5_Update(&ctx, cha_bytes.data(), cha_bytes.size());
+    MD5_Final(digest_bytes.data(), &ctx);
 
     encode_hex_string(digest_bytes, tmp);
 
