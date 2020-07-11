@@ -30,7 +30,7 @@ namespace tikpp {
 enum class api_state { closed, connecting, connected };
 
 /*!
- * A struct to manage RouterOS API connections
+ * \brief A struct to manage RouterOS API connections
  */
 template <typename AsyncStream,
           typename ErrorHandler,
@@ -40,7 +40,9 @@ template <typename AsyncStream,
 struct basic_api
     : std::enable_shared_from_this<basic_api<AsyncStream, ErrorHandler>> {
 
-    //! \brief The handler that handlers read responses
+    /*!
+     * \brief The handler that handlers read responses
+     */
     using read_handler = std::function<bool(const boost::system::error_code &,
                                             tikpp::response &&)>;
 
