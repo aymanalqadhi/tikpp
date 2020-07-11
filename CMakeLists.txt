@@ -18,6 +18,7 @@ set(LIBRARY_OUTPUT_PATH lib)
 # Thiry-party libraries
 add_subdirectory(lib/fmt)
 add_subdirectory(lib/googletest)
+add_subdirectory(lib/openssl-cmake)
 
 # Project files
 set(SOURCE_FILES src/error.cpp
@@ -28,7 +29,7 @@ include_directories(include/)
 
 # Targets
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
-target_link_libraries(${PROJECT_NAME} fmt::fmt cryptopp)
+target_link_libraries(${PROJECT_NAME} fmt::fmt cryptopp ssl crypto)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 # Testing
