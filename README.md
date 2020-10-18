@@ -5,7 +5,7 @@
 - Making use of C++17 features
 - Fully asynchronous (Callbacks/Futures/Coroutines supported via Boost.Asio completion tokens)
 - No RTTI is being used in the library (Templates!)
-- No expcetions are being used
+- No exceptions are being used
 - Support for API v1/v2 protocols
 - Support for API-SSL
 
