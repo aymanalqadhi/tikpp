@@ -29,6 +29,7 @@ include_directories(include/)
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} fmt::fmt ssl crypto)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+set(SYSTEM_OPENSSL ON)
 
 # Dependencies
 find_package(Boost COMPONENTS system thread REQUIRED)
