@@ -84,7 +84,12 @@ T random(T min = std::numeric_limits<T>::min(),
     std::mt19937 rng {std::random_device {}()};
 
     if constexpr (std::is_integral_v<T>) {
-        return std::uniform_int_distribution<T> {min, max}(rng);
+      if constexpr (sizeof(T) == 1) {
+        auto ret = std::uniform_int_distribution<std::int32_t>{min, max}(rng);
+        return static_cast<T>(ret % (1 << 8));
+      } else {
+        return std::uniform_int_distribution<T>{min, max}(rng);
+      }
     } else {
         return std::uniform_real_distribution<T> {min, max}(rng);
     }
