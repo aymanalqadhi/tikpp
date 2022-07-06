@@ -9,13 +9,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
 endif()
-
-set(LIBRARY_OUTPUT_PATH lib)
-set(SYSTEM_OPENSSL ON)
 
 # Thiry-party libraries
 add_subdirectory(lib/fmt)
@@ -33,6 +29,7 @@ include_directories(include/)
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} fmt::fmt ssl crypto)
 target_include_directories(${PROJECT_NAME} PUBLIC include)
+set(SYSTEM_OPENSSL ON)
 
 # Dependencies
 find_package(Boost COMPONENTS system thread REQUIRED)
