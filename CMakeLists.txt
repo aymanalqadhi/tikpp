@@ -9,13 +9,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-
 if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wno-long-long -pedantic")
 endif()
-
-set(LIBRARY_OUTPUT_PATH lib)
-set(SYSTEM_OPENSSL ON)
 
 # Thiry-party libraries
 add_subdirectory(lib/fmt)
@@ -40,6 +36,7 @@ target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
 include_directories(${Boost_INCLUDE_DIR})
 
 # OpenSSL
+set(SYSTEM_OPENSSL ON)
 if (WIN32)
     link_directories(${OpenSSL_ROOT}/lib)
 endif (WIN32)
