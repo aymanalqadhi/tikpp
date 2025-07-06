@@ -1,10 +1,8 @@
 #include "tikpp/api.hpp"
-#include "tikpp/request.hpp"
 
 #include <boost/asio/io_context.hpp>
 #include <boost/system/error_code.hpp>
 
-#include <future>
 #include <iostream>
 #include <memory>
 #include <regex>
@@ -13,7 +11,7 @@
 #include <vector>
 
 struct api_error_handler {
-    void on_error(const boost::system::error_code &err) {
+    void operator()(const boost::system::error_code &err) {
         std::cout << "[!] An error occured: " << err.message() << std::endl;
     }
 };
@@ -89,9 +87,9 @@ auto main(int argc, char *argv[]) -> int {
     boost::asio::io_context io {};
     api_error_handler       error_handler {};
 
-    auto api = tikpp::api<api_error_handler>::create(io, error_handler);
+    auto api = tikpp::make_api(io, std::move(error_handler));
 
-    api->async_open(host, port, [&](const auto &err) mutable {
+    api->async_open(host, port, [&, api = std::move(api)](const auto &err) mutable {
         if (err) {
             std::cerr << "[!] Could not connect: " << err.message()
                       << std::endl;
@@ -99,7 +97,6 @@ auto main(int argc, char *argv[]) -> int {
         }
 
         std::cout << "[+] Connected successfully" << std::endl;
-        api->start();
 
         api->async_login(
             username, password, [&io, api {std::move(api)}](const auto &err) {
