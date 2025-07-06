@@ -105,8 +105,6 @@ inline auto operator""_pb(unsigned long long int b) -> bytes {
 
 } // namespace tikpp::data::types
 
-namespace fmt {
-
 template <>
 struct fmt::formatter<tikpp::data::types::bytes> {
     constexpr auto parse(format_parse_context &ctx) {
@@ -118,7 +116,5 @@ struct fmt::formatter<tikpp::data::types::bytes> {
         return format_to(ctx.out(), b.to_string());
     }
 };
-
-} // namespace fmt
 
 #endif

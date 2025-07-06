@@ -8,7 +8,6 @@
 #include "tikpp/detail/type_traits/stream.hpp"
 
 #include "tikpp/commands/login.hpp"
-#include "tikpp/error_code.hpp"
 #include "tikpp/io_context.hpp"
 #include "tikpp/request.hpp"
 #include "tikpp/response.hpp"
@@ -17,6 +16,7 @@
 #include <boost/asio/write.hpp>
 #include <boost/system/error_code.hpp>
 
+#include <type_traits>
 #include <atomic>
 #include <cassert>
 #include <deque>
@@ -34,7 +34,7 @@ enum class api_state { closed, connecting, connected };
  */
 template <typename AsyncStream,
           typename ErrorHandler,
-          typename = std::enable_if_t<
+          typename = std::enable_if<
               tikpp::detail::type_traits::is_async_stream_v<AsyncStream> &&
               tikpp::detail::type_traits::is_error_handler_v<ErrorHandler>>>
 struct basic_api

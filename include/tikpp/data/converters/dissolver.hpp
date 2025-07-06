@@ -5,7 +5,6 @@
 #include "tikpp/detail/convert.hpp"
 
 #include <string>
-#include <utility>
 
 namespace tikpp::data::converters {
 
@@ -26,11 +25,6 @@ struct dissolver {
                            const T &          value,
                            [[maybe_unused]] const T &) {
         operator()<T>(key, value);
-    }
-
-    template <template <typename> typename Wrapper, typename T>
-    inline void operator()(const std::string &key, const Wrapper<T> &w) {
-        dissolve(key, w.value());
     }
 
     template <typename T>

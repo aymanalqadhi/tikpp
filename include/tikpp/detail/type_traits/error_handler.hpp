@@ -1,8 +1,6 @@
 #ifndef TIKPP_DETAIL_TYPE_TRAITS_ERROR_HANDLER_HPP
 #define TIKPP_DETAIL_TYPE_TRAITS_ERROR_HANDLER_HPP
 
-#include "tikpp/detail/type_traits/macros.hpp"
-
 #include <boost/system/error_code.hpp>
 
 #include <type_traits>
